@@ -22,3 +22,6 @@ review and merge any PRs.
 - Discord: armen5173
 - Email: armendero330@gmail.com
 - LinkedIn: [Armen Deroian](https://www.linkedin.com/in/armen-deroian)
+
+## Credits
+- [Spdlog](https://github.com/gabime/spdlog/tree/v1.x) - Fast C++ logging library.
