@@ -9,7 +9,12 @@ set(LOCAL_PROJECT_DESCRIPTION "Server software for Minecraft")
 
 # Source files
 set(SOURCES
-        main.cpp
+        Stratos.cpp
+        Server.cpp
+)
+
+set(HEADERS
+        Server.h
 )
 
 # Project
@@ -21,9 +26,10 @@ project(${LOCAL_PROJECT_NAME}
 add_executable(${LOCAL_PROJECT_NAME})
 
 list(TRANSFORM SOURCES PREPEND "src/")
+list(TRANSFORM HEADERS PREPEND "src/")
 
 target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include)
-target_sources(${LOCAL_PROJECT_NAME} PRIVATE ${SOURCES})
+target_sources(${LOCAL_PROJECT_NAME} PRIVATE ${SOURCES} ${HEADERS})
 
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")

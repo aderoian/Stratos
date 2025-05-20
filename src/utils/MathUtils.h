@@ -17,14 +17,19 @@
  *
  */
 
-#include "spdlog/spdlog.h"
+#ifndef MATH_H
+#define MATH_H
 
-#include <iostream>
+#include <cmath>
 
-using std::cout;
-using std::endl;
+namespace stratos::utils {
 
-int main() {
-    spdlog::info("Hello World!");
-    return 0;
+template <typename T>
+T round(const T value, const int precision) {
+    const T factor = std::pow(10, precision);
+    return std::round(value * factor) / factor;
 }
+
+} // namespace stratos::utils
+
+#endif //MATH_H
