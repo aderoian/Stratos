@@ -1,5 +1,8 @@
 <component name="CopyrightManager">
   <settings default="Stratos">
+    <module2copyright>
+      <element module="Source" copyright="Stratos" />
+    </module2copyright>
     <LanguageOptions name="C/C++" />
     <LanguageOptions name="CSS">
       <option name="fileTypeOverride" value="1" />
