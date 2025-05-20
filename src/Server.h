@@ -20,10 +20,11 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include <atomic>
-#include <array>
-
+#include "network/Socket.h"
 #include "spdlog/spdlog.h"
+
+#include <array>
+#include <atomic>
 
 namespace stratos {
 class Server final {
@@ -64,6 +65,10 @@ private:
     float currentUse;
     std::array<float, 20> averageTPS;
     std::array<float, 20> averageUse;
+
+    std::string                address;
+    int                        port;
+    std::unique_ptr<TCPSocket> socket;
 };
 
 extern std::unique_ptr<Server> server;

@@ -19,6 +19,7 @@
 
 #include "Server.h"
 
+#include "network/Socket.h"
 #include "utils/MathUtils.h"
 #include "utils/TimeUtils.h"
 
@@ -31,6 +32,8 @@ namespace stratos {
         averageUse.fill(1.0f);
 
         // TODO: Load server settings from config file
+        address = "0.0.0.0";
+        port    = 25566;
     }
 
     std::shared_ptr<spdlog::logger> Server::getLogger() const {
@@ -77,12 +80,26 @@ namespace stratos {
 
         startTime = utils::currentTimeMillis();
 
+        try {
+            socket = std::make_unique<TCPSocket>(logger, address, port);
+            socket->bind();
+        } catch (std::exception& e) {
+            logger->error("Error starting server: {}", e.what());
+            // TODO: Crash? Force Shutdown?
+            return;
+        }
+
         tickProcessor();
     }
 
     void Server::shutdown() {
         logger->info("Shutting down server...");
         running = false;
+
+        if (socket) {
+            socket->stop();
+            socket.reset();
+        }
     }
 
     void Server::tickProcessor() {
