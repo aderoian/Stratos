@@ -5,7 +5,7 @@ UseTab: Never
 
 BreakBeforeBraces: Attach
 AllowShortFunctionsOnASingleLine: Inline
-ColumnLimit: 120
+ColumnLimit: 180
 
 AlwaysBreakTemplateDeclarations: No
 AlignConsecutiveAssignments: true
