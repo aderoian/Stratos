@@ -27,7 +27,9 @@
 #else
 
 #endif
+#include <atomic>
 #include <memory>
+#include <thread>
 
 namespace spdlog {
 class logger;
@@ -36,32 +38,40 @@ class logger;
 namespace stratos {
 
 class Socket {
-public:
-    Socket (const std::shared_ptr<spdlog::logger> & logger, const std::string & address, const int & port)
-        : logger(logger), address(address), port(port) {}
-    virtual ~Socket() = default;
+  public:
+    Socket(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port) : logger(logger), address(address), port(port) {}
+    virtual ~Socket()   = default;
     virtual void bind() = 0;
-    virtual void stop() = 0;
-protected:
+    virtual void listen() { listen(SOMAXCONN); }
+    virtual void listen(int backlog) = 0;
+    virtual void run()               = 0;
+    virtual void stop()              = 0;
+
+  protected:
     std::shared_ptr<spdlog::logger> logger;
-    unsigned long long socket_fd;
-    const std::string address;
-    int port;
-    bool isBound = false;
+    unsigned long long              socket_fd;
+    const std::string               address;
+    int                             port;
+    bool                            isBound   = false;
+    std::atomic<bool>               isRunning = false;
 };
 
 class TCPSocket final : public Socket {
-public:
-    TCPSocket(const std::shared_ptr<spdlog::logger> & logger, const std::string & address, const int & port);
+  public:
+    TCPSocket(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port);
     ~TCPSocket() override;
     void bind() override;
+    void listen(int backlog) override;
+    void run() override;
     void stop() override;
-private:
+
+  private:
 #ifdef _WIN32
-    WSADATA wsaData;
+    WSADATA     wsaData;
+    std::thread runner;
 #endif
 };
 
 } // namespace stratos
 
-#endif //SOCKET_H
+#endif // SOCKET_H

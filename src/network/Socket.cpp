@@ -19,9 +19,9 @@
 
 #include "Socket.h"
 
-stratos::TCPSocket::TCPSocket(const std::shared_ptr<spdlog::logger>& logger, const std::string& address,
-                              const int& port)
-    : Socket(logger, address, port) {
+#include "spdlog/logger.h"
+
+stratos::TCPSocket::TCPSocket(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port) : Socket(logger, address, port) {
 #ifdef _WIN32
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         throw std::runtime_error("Failed to initialize Winsock");
@@ -31,6 +31,13 @@ stratos::TCPSocket::TCPSocket(const std::shared_ptr<spdlog::logger>& logger, con
     if (socket_fd == INVALID_SOCKET) {
         WSACleanup();
         throw std::runtime_error("Failed to create socket");
+    }
+
+    u_long mode = 1;
+    if (ioctlsocket(socket_fd, FIONBIO, &mode) != 0) {
+        closesocket(socket_fd);
+        WSACleanup();
+        throw std::runtime_error("Failed to set non-blocking mode.");
     }
 #else
     // unix
@@ -55,8 +62,7 @@ void stratos::TCPSocket::bind() {
         const int err = WSAGetLastError();
         closesocket(socket_fd);
         WSACleanup();
-        throw std::runtime_error("Failed to bind socket to address '" + address + "' (Code: " + std::to_string(err) +
-                                 ").");
+        throw std::runtime_error("Failed to bind socket to address '" + address + "' (Code: " + std::to_string(err) + ").");
     }
 #else
     // unix
@@ -64,17 +70,81 @@ void stratos::TCPSocket::bind() {
 
     isBound = true;
 }
+void stratos::TCPSocket::listen(const int backlog) {
+    if (!isBound) bind();
+#ifdef _WIN32
+    if (::listen(socket_fd, backlog) == SOCKET_ERROR) {
+        const int err = WSAGetLastError();
+        closesocket(socket_fd);
+        WSACleanup();
+        throw std::runtime_error("Failed to listen on socket (Code: " + std::to_string(err) + ").");
+    }
+#endif
 
-void stratos::TCPSocket::stop() {
-    if (isBound) {
+    runner = std::thread(&TCPSocket::run, this);
+    if (!runner.joinable()) {
 #ifdef _WIN32
         closesocket(socket_fd);
         WSACleanup();
-#else
-        // unix
 #endif
-        isBound = false;
+        throw std::runtime_error("Failed to create thread for socket.");
     }
+
+    runner.detach();
+}
+
+void stratos::TCPSocket::run() {
+    if (isRunning || !isBound) return;
+
+    bool expected = false;
+    isRunning.compare_exchange_strong(expected, true);
+#ifdef _WIN32
+    fd_set  readSet;
+    timeval timeout{};
+    timeout.tv_sec  = 0;
+    timeout.tv_usec = 10000;
+
+    int err;
+    while (isRunning) {
+        FD_ZERO(&readSet);
+        FD_SET(socket_fd, &readSet);
+
+        const int result = select(0, &readSet, nullptr, nullptr, &timeout);
+        if (result == SOCKET_ERROR) {
+            err = WSAGetLastError();
+            logger->error("select() failed (code: {}).", err);
+            break;
+        }
+
+        if (result > 0 && FD_ISSET(socket_fd, &readSet)) {
+            sockaddr_in  clientAddr{};
+            int          addrLen      = sizeof(clientAddr);
+            const SOCKET clientSocket = accept(socket_fd, reinterpret_cast<sockaddr*>(&clientAddr), &addrLen);
+
+            if (clientSocket == INVALID_SOCKET) {
+                if (err = WSAGetLastError(); err != WSAEWOULDBLOCK) logger->error("accept() failed (code: {}).", err);
+                continue;
+            }
+
+            logger->info("Accepted connection from {}:{}", inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+            // TODO: spawn client handler thread or queue work
+            closesocket(clientSocket); // Placeholder
+        }
+    }
+
+    closesocket(socket_fd);
+    WSACleanup();
+    isBound = false;
+#else
+    // Unix implementation
+#endif
+}
+
+void stratos::TCPSocket::stop() {
+    bool expected = true;
+    isRunning.compare_exchange_strong(expected, false);
+
+    runner.join();
 }
 
 stratos::TCPSocket::~TCPSocket() {

@@ -25,118 +25,118 @@
 
 namespace stratos {
 
-    std::unique_ptr<Server> server = nullptr;
+std::unique_ptr<Server> server = nullptr;
 
-    Server::Server(const std::shared_ptr<spdlog::logger>& logger) : logger(logger) {
-        averageTPS.fill(20.0f);
-        averageUse.fill(1.0f);
+Server::Server(const std::shared_ptr<spdlog::logger>& logger) : logger(logger) {
+    averageTPS.fill(20.0f);
+    averageUse.fill(1.0f);
 
-        // TODO: Load server settings from config file
-        address = "0.0.0.0";
-        port    = 25566;
+    // TODO: Load server settings from config file
+    address = "0.0.0.0";
+    port    = 25566;
+}
+
+std::shared_ptr<spdlog::logger> Server::getLogger() const {
+    return logger;
+}
+
+bool Server::isRunning() const {
+    return running.load();
+}
+
+unsigned int Server::getTick() const {
+    return tickCounter;
+}
+
+float Server::getCurrentTPS() const {
+    return currentTPS;
+}
+
+float Server::getCurrentLoad() const {
+    return currentUse;
+}
+
+float Server::getAverageTPS() const {
+    float total = 0.0f;
+    for (const float tps : averageTPS) {
+        total += tps;
     }
 
-    std::shared_ptr<spdlog::logger> Server::getLogger() const {
-        return logger;
+    return utils::round(total / averageTPS.size(), 2);
+}
+
+float Server::getAverageLoad() const {
+    float total = 0.0f;
+    for (const float use : averageUse) {
+        total += use;
     }
 
-    bool Server::isRunning() const {
-        return running.load();
+    return utils::round((total / averageUse.size()) * 100.0f, 2);
+}
+
+void Server::start() {
+    logger->info("Starting server...");
+    running = true;
+
+    startTime = utils::currentTimeMillis();
+
+    try {
+        socket = std::make_unique<TCPSocket>(logger, address, port);
+        socket->listen(5);
+    } catch (std::exception& e) {
+        logger->error("Error starting server: {}", e.what());
+        // TODO: Crash? Force Shutdown?
+        return;
     }
 
-    unsigned int Server::getTick() const {
-        return tickCounter;
+    tickProcessor();
+}
+
+void Server::shutdown() {
+    logger->info("Shutting down server...");
+    running = false;
+
+    if (socket) {
+        socket->stop();
+        socket.reset();
     }
+}
 
-    float Server::getCurrentTPS() const {
-        return currentTPS;
-    }
+void Server::tickProcessor() {
+    nextTick = utils::currentTimeMillis();
 
-    float Server::getCurrentLoad() const {
-        return currentUse;
-    }
+    while (running) {
+        tick();
 
-    float Server::getAverageTPS() const {
-        float total = 0.0f;
-        for (const float tps : averageTPS) {
-            total += tps;
-        }
-
-        return utils::round(total / averageTPS.size(), 2);
-    }
-
-    float Server::getAverageLoad() const {
-        float total = 0.0f;
-        for (const float use : averageUse) {
-            total += use;
-        }
-
-        return utils::round((total / averageUse.size()) * 100.0f, 2);
-    }
-
-    void Server::start() {
-        logger->info("Starting server...");
-        running = true;
-
-        startTime = utils::currentTimeMillis();
-
-        try {
-            socket = std::make_unique<TCPSocket>(logger, address, port);
-            socket->bind();
-        } catch (std::exception& e) {
-            logger->error("Error starting server: {}", e.what());
-            // TODO: Crash? Force Shutdown?
-            return;
-        }
-
-        tickProcessor();
-    }
-
-    void Server::shutdown() {
-        logger->info("Shutting down server...");
-        running = false;
-
-        if (socket) {
-            socket->stop();
-            socket.reset();
-        }
-    }
-
-    void Server::tickProcessor() {
-        nextTick = utils::currentTimeMillis();
-
-        while (running) {
-            tick();
-
-            if (int sleepTime = std::max(0L, (nextTick - utils::currentTimeMillis())); sleepTime > 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
-            }
-        }
-    }
-
-    void Server::tick() {
-        const long tickTime = utils::currentTimeMillis();
-        if ((tickTime - nextTick) < -25) {
-            return;
-        }
-
-        ++tickCounter;
-
-        // Tick server
-
-        const long now = utils::currentTimeMillis();
-        const long totalTickTime = now - tickTime;
-        currentTPS = std::min(TARGET_TICKS_PER_SECOND, 1000.0f / std::max(1L, totalTickTime));
-        currentUse = std::min(1.0f, totalTickTime / TARGET_MILLIS_PER_TICK);
-
-        const int index = tickCounter % static_cast<int>(TARGET_TICKS_PER_SECOND);
-        averageTPS[index] = currentTPS;
-        averageUse[index] = currentUse;
-
-        if ((nextTick - tickTime) < -1000) {
-            nextTick = now;
-        } else {
-            nextTick += TARGET_MILLIS_PER_TICK;
+        if (int sleepTime = std::max(0L, (nextTick - utils::currentTimeMillis())); sleepTime > 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
         }
     }
-} // stratos
+}
+
+void Server::tick() {
+    const long tickTime = utils::currentTimeMillis();
+    if ((tickTime - nextTick) < -25) {
+        return;
+    }
+
+    ++tickCounter;
+
+    // Tick server
+
+    const long now           = utils::currentTimeMillis();
+    const long totalTickTime = now - tickTime;
+    currentTPS               = std::min(TARGET_TICKS_PER_SECOND, 1000.0f / std::max(1L, totalTickTime));
+    currentUse               = std::min(1.0f, totalTickTime / TARGET_MILLIS_PER_TICK);
+
+    const int index   = tickCounter % static_cast<int>(TARGET_TICKS_PER_SECOND);
+    averageTPS[index] = currentTPS;
+    averageUse[index] = currentUse;
+
+    if ((nextTick - tickTime) < -1000) {
+        nextTick = now;
+    } else {
+        nextTick += TARGET_MILLIS_PER_TICK;
+    }
+}
+} // namespace stratos
