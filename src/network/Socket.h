@@ -36,42 +36,67 @@ class logger;
 }
 
 namespace stratos {
-
-class Socket {
-  public:
-    Socket(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port) : logger(logger), address(address), port(port) {}
-    virtual ~Socket()   = default;
+class SocketServer {
+public:
+    SocketServer(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port) : logger(logger), address(address), port(port) {}
+    virtual ~SocketServer()   = default;
     virtual void bind() = 0;
     virtual void listen() { listen(SOMAXCONN); }
     virtual void listen(int backlog) = 0;
-    virtual void run()               = 0;
     virtual void stop()              = 0;
 
-  protected:
+protected:
     std::shared_ptr<spdlog::logger> logger;
     unsigned long long              socket_fd;
     const std::string               address;
     int                             port;
     bool                            isBound   = false;
-    std::atomic<bool>               isRunning = false;
 };
 
-class TCPSocket final : public Socket {
-  public:
-    TCPSocket(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port);
-    ~TCPSocket() override;
+class TCPServer final : public SocketServer {
+public:
+    TCPServer(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port);
+    ~TCPServer() override;
     void bind() override;
     void listen(int backlog) override;
-    void run() override;
+    void run();
     void stop() override;
 
-  private:
+private:
 #ifdef _WIN32
     WSADATA     wsaData;
     std::thread runner;
+    std::atomic<bool>               isRunning = false;
 #endif
 };
 
+class SocketConnection {
+public:
+    SocketConnection(const std::shared_ptr<spdlog::logger>& logger, std::string address, const int& port) : logger(logger), address(std::move(address)), port(port) {}
+    virtual ~SocketConnection() = default;
+
+    virtual int receive(int amount, byte& buffer) = 0;
+    virtual int send(const byte& buffer, int length, int flags = 0) = 0;
+    virtual void close() = 0;
+
+    [[nodiscard]] const std::string& getAddress() const { return address; }
+    [[nodiscard]] int getPort() const { return port; }
+protected:
+    std::shared_ptr<spdlog::logger> logger;
+    unsigned long long              socket_fd;
+    const std::string               address;
+    int                             port;
+};
+
+class TCPConnection final : public SocketConnection {
+public:
+    TCPConnection(const std::shared_ptr<spdlog::logger>& logger, std::string address, const int& port) : SocketConnection(logger, std::move(address), port) {}
+    ~TCPConnection() override;
+
+    int receive(int length, byte& buffer) override;
+    int send(const byte& buffer, int length, int flags = 0) override;
+    void close() override;
+};
 } // namespace stratos
 
 #endif // SOCKET_H
