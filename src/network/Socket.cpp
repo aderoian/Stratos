@@ -156,7 +156,7 @@ stratos::TCPServer::~TCPServer() {
 int stratos::TCPConnection::receive(int amount, byte& buffer) {
 #ifdef _WIN32
     char      readBuf[amount];
-    const int bytes = recv(socket_fd, readBuf, amount, 0);
+    const int bytes = recv(socketFd, readBuf, amount, 0);
     if (bytes == SOCKET_ERROR) {
         if (const int err = WSAGetLastError(); err == WSAEWOULDBLOCK) {
             Sleep(0); // Yield to other threads to avoid busy waiting on blocked socket
@@ -177,7 +177,7 @@ int stratos::TCPConnection::send(const byte& buffer, const int length, const int
     int        sent    = 0;
     const auto sendBuf = reinterpret_cast<const char*>(&buffer);
     while(sent < length) {
-        const int bytes = ::send(socket_fd, sendBuf + sent, length - sent, flags);
+        const int bytes = ::send(socketFd, sendBuf + sent, length - sent, flags);
         if (bytes == SOCKET_ERROR) {
             if (const int err = WSAGetLastError(); err == WSAEWOULDBLOCK) {
                 Sleep(0); // Yield to other threads to avoid busy waiting on blocked socket
@@ -197,9 +197,9 @@ int stratos::TCPConnection::send(const byte& buffer, const int length, const int
 
 void stratos::TCPConnection::close() {
 #ifdef _WIN32
-    if (socket_fd != INVALID_SOCKET) {
-        closesocket(socket_fd);
-        socket_fd = INVALID_SOCKET;
+    if (socketFd != INVALID_SOCKET) {
+        closesocket(socketFd);
+        socketFd = INVALID_SOCKET;
     }
 #else
     // unix

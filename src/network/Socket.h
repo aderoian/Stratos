@@ -72,7 +72,7 @@ private:
 
 class SocketConnection {
 public:
-    SocketConnection(const std::shared_ptr<spdlog::logger>& logger, std::string address, const int& port) : logger(logger), address(std::move(address)), port(port) {}
+    SocketConnection(const SOCKET socketFd, std::string address, const int& port) : socketFd(socketFd), address(std::move(address)), port(port) {}
     virtual ~SocketConnection() = default;
 
     virtual int receive(int amount, byte& buffer) = 0;
@@ -82,15 +82,14 @@ public:
     [[nodiscard]] const std::string& getAddress() const { return address; }
     [[nodiscard]] int getPort() const { return port; }
 protected:
-    std::shared_ptr<spdlog::logger> logger;
-    unsigned long long              socket_fd;
+    unsigned long long              socketFd;
     const std::string               address;
     int                             port;
 };
 
 class TCPConnection final : public SocketConnection {
 public:
-    TCPConnection(const std::shared_ptr<spdlog::logger>& logger, std::string address, const int& port) : SocketConnection(logger, std::move(address), port) {}
+    TCPConnection(const SOCKET socketFd, std::string address, const int& port) : SocketConnection(socketFd, std::move(address), port) {}
     ~TCPConnection() override;
 
     int receive(int length, byte& buffer) override;
