@@ -22,78 +22,98 @@
 
 #ifdef _WIN32
 #include <winsock2.h>
-#include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 #else
 
 #endif
-#include <atomic>
-#include <memory>
-#include <thread>
-
-namespace spdlog {
-class logger;
-}
+#include <string>
+#include <utility>
 
 namespace stratos {
-class SocketServer {
-public:
-    SocketServer(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port) : logger(logger), address(address), port(port) {}
-    virtual ~SocketServer()   = default;
-    virtual void bind() = 0;
-    virtual void listen() { listen(SOMAXCONN); }
-    virtual void listen(int backlog) = 0;
-    virtual void stop()              = 0;
+#ifdef _WIN32
+using SocketFd                   = SOCKET;
+constexpr auto INVALID_SOCKET_FD = INVALID_SOCKET;
+#else
+using SocketFd                       = int;
+constexpr SocketFd INVALID_SOCKET_FD = -1;
+#endif
 
-protected:
-    std::shared_ptr<spdlog::logger> logger;
-    unsigned long long              socket_fd;
-    const std::string               address;
-    int                             port;
-    bool                            isBound   = false;
+struct ClientInfo {
+    SocketFd    socket;
+    std::string ip;
+    int         port;
+};
+
+class Socket {
+  public:
+    Socket(std::string address, const int& port) : address(std::move(address)), port(port) {}
+    Socket(const Socket&) = delete;
+    Socket(Socket&&)      = default;
+    virtual ~Socket()     = default;
+
+    [[nodiscard]] const std::string& getAddress() const { return address; }
+    [[nodiscard]] int                getPort() const { return port; }
+    [[nodiscard]] int                getLastError() const { return lastError; }
+    [[nodiscard]] bool               isValid() const { return socketFd != INVALID_SOCKET; }
+
+    Socket& operator=(const Socket&) = delete;
+    Socket& operator=(Socket&&)      = default;
+
+  protected:
+    SocketFd    socketFd = INVALID_SOCKET;
+    std::string address;
+    int         port;
+
+    int lastError = 0;
+};
+
+class SocketServer : public Socket {
+  public:
+    SocketServer(const std::string& address, const int& port) : Socket(address, port) {}
+    ~SocketServer() override = default;
+
+    virtual void       bind() = 0;
+    virtual void       listen() { listen(SOMAXCONN); }
+    virtual void       listen(int backlog) = 0;
+    virtual ClientInfo accept()            = 0;
+    virtual void       close()             = 0;
+
+  protected:
+    bool isBound = false;
 };
 
 class TCPServer final : public SocketServer {
-public:
-    TCPServer(const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port);
+  public:
+    TCPServer(const std::string& address, const int& port);
     ~TCPServer() override;
-    void bind() override;
-    void listen(int backlog) override;
-    void run();
-    void stop() override;
+    void       bind() override;
+    void       listen(int backlog) override;
+    ClientInfo accept() override;
+    void       close() override;
 
-private:
+  private:
 #ifdef _WIN32
-    WSADATA     wsaData;
-    std::thread runner;
-    std::atomic<bool>               isRunning = false;
+    WSADATA wsaData;
 #endif
 };
 
-class SocketConnection {
-public:
-    SocketConnection(const SOCKET socketFd, std::string address, const int& port) : socketFd(socketFd), address(std::move(address)), port(port) {}
-    virtual ~SocketConnection() = default;
+class SocketConnection : public Socket {
+  public:
+    SocketConnection(const SocketFd socketFd, const std::string& address, const int& port) : Socket(address, port) { this->socketFd = socketFd; }
+    ~SocketConnection() override = default;
 
-    virtual int receive(int amount, byte& buffer) = 0;
-    virtual int send(const byte& buffer, int length, int flags = 0) = 0;
-    virtual void close() = 0;
-
-    [[nodiscard]] const std::string& getAddress() const { return address; }
-    [[nodiscard]] int getPort() const { return port; }
-protected:
-    unsigned long long              socketFd;
-    const std::string               address;
-    int                             port;
+    virtual int  receive(int length, byte& buffer)               = 0;
+    virtual int  send(const byte& buffer, int length, int flags) = 0;
+    virtual void close()                                         = 0;
 };
 
 class TCPConnection final : public SocketConnection {
-public:
-    TCPConnection(const SOCKET socketFd, std::string address, const int& port) : SocketConnection(socketFd, std::move(address), port) {}
+  public:
+    TCPConnection(const SocketFd socketFd, const std::string& address, const int& port) : SocketConnection(socketFd, address, port) {}
     ~TCPConnection() override;
 
-    int receive(int length, byte& buffer) override;
-    int send(const byte& buffer, int length, int flags = 0) override;
+    int  receive(int length, byte& buffer) override;
+    int  send(const byte& buffer, int length, int flags) override;
     void close() override;
 };
 } // namespace stratos
