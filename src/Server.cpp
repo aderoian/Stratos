@@ -19,7 +19,7 @@
 
 #include "Server.h"
 
-#include "network/Socket.h"
+#include "network/Network.h"
 #include "utils/MathUtils.h"
 #include "utils/TimeUtils.h"
 
@@ -34,7 +34,17 @@ Server::Server(const std::shared_ptr<spdlog::logger>& logger) : logger(logger) {
     // TODO: Load server settings from config file
     address = "0.0.0.0";
     port    = 25566;
+
+    try {
+        logger->info("Starting network...");
+        network = std::make_unique<NetworkManager>(this, logger, address, port);
+    } catch (const std::exception& e) {
+        logger->error("Failed to create NetworkManager: {}", e.what());
+        throw;
+    }
 }
+
+Server::~Server() {}
 
 std::shared_ptr<spdlog::logger> Server::getLogger() const {
     return logger;
@@ -81,8 +91,7 @@ void Server::start() {
     startTime = utils::currentTimeMillis();
 
     try {
-        socket = std::make_unique<TCPSocket>(logger, address, port);
-        socket->listen(5);
+        network->start();
     } catch (std::exception& e) {
         logger->error("Error starting server: {}", e.what());
         // TODO: Crash? Force Shutdown?
@@ -96,9 +105,10 @@ void Server::shutdown() {
     logger->info("Shutting down server...");
     running = false;
 
-    if (socket) {
-        socket->stop();
-        socket.reset();
+    try {
+        network->stop();
+    } catch (std::exception& e) {
+        logger->error("Error shutting down server: {}", e.what());
     }
 }
 

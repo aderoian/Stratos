@@ -42,6 +42,10 @@ struct ClientInfo {
     SocketFd    socket;
     std::string ip;
     int         port;
+
+    bool operator==(const ClientInfo& other) const {
+        return socket == other.socket && ip == other.ip && port == other.port;
+    }
 };
 
 class Socket {
@@ -117,5 +121,9 @@ class TCPConnection final : public SocketConnection {
     void close() override;
 };
 } // namespace stratos
+
+template <> struct std::hash<stratos::ClientInfo> {
+    size_t operator()(const stratos::ClientInfo& client) const noexcept { return hash<stratos::SocketFd>()(client.socket) ^ hash<string>()(client.ip) ^ hash<int>()(client.port); }
+};
 
 #endif // SOCKET_H

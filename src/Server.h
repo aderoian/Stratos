@@ -27,6 +27,8 @@
 #include <atomic>
 
 namespace stratos {
+class NetworkManager;
+
 class Server final {
 
 public:
@@ -35,7 +37,7 @@ public:
     static constexpr float TARGET_MILLIS_PER_TICK = TARGET_SECONDS_PER_TICK * 1000.0f;
 
     explicit Server(const std::shared_ptr<spdlog::logger>& logger);
-    ~Server() = default;
+    ~Server();
 
     [[nodiscard]] std::shared_ptr<spdlog::logger> getLogger() const;
     [[nodiscard]] bool isRunning() const;
@@ -55,6 +57,8 @@ private:
     static std::unique_ptr<Server> _instance;
     std::shared_ptr<spdlog::logger> logger;
 
+    std::unique_ptr<NetworkManager> network;
+
     std::atomic<bool> running = false;
     long startTime;
 
@@ -68,7 +72,6 @@ private:
 
     std::string                address;
     int                        port;
-    std::unique_ptr<TCPSocket> socket;
 };
 
 extern std::unique_ptr<Server> server;
