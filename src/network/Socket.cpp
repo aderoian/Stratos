@@ -20,6 +20,7 @@
 #include "Socket.h"
 #ifdef _WIN32
 #include <ws2tcpip.h>
+#include <iphlpapi.h>
 #endif
 
 #include <cstring>
@@ -118,7 +119,7 @@ stratos::ClientInfo stratos::TCPServer::accept() {
         return {clientSocket, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port)};
     }
 
-    return {INVALID_SOCKET, "", -1};
+    return {INVALID_SOCKET_FD, "", -1};
 #else
     // unix
 #endif
@@ -150,42 +151,39 @@ stratos::TCPServer::~TCPServer() {
  * @return Number of bytes received, zero if the connection was closed, or -1 if there was no data to read.
  * @throws runtime_error if a SOCKET_ERROR occurs.
  */
-int stratos::TCPConnection::receive(const int length, byte& buffer) {
+int stratos::TCPConnection::receive(const int length, ByteVec& buffer) {
 #ifdef _WIN32
-    if (!buffer || length <= 0) return SOCKET_ERROR;
+    if (!buffer.data() || length <= 0) return SOCKET_ERROR;
 
-    std::vector<char> readBuf(length);
-    const int         bytes = recv(socketFd, readBuf.data(), length, 0);
+    const int bytes = recv(socketFd, reinterpret_cast<char*>(buffer.data()), length, 0);
     if (bytes == SOCKET_ERROR) {
         if (const int err = WSAGetLastError(); err == WSAEWOULDBLOCK || err == WSAEINTR) return -1;
         throw std::runtime_error("recv() failed (code: " + std::to_string(WSAGetLastError()) + ").");
     }
 
-    if (bytes > 0) std::memcpy(&buffer, readBuf.data(), bytes);
+    buffer.resize(bytes);
     return bytes;
 #else
     // unix
 #endif
 }
 
-int stratos::TCPConnection::send(const byte& buffer, const int length, const int flags) {
+/**
+ * Sends data to the socket.
+ * @param buffer Buffer containing the data to send.
+ * @param length Amount of data to send in bytes.
+ * @param flags Flags for the send operation (default is 0).
+ * @return Number of bytes sent, or SOCKET_ERROR if an error occurred.
+ */
+int stratos::TCPConnection::send(const ByteVec& buffer, const int length, const int flags) {
 #ifdef _WIN32
-    int        sent    = 0;
-    const auto sendBuf = reinterpret_cast<const char*>(&buffer);
-    while (sent < length) {
-        const int bytes = ::send(socketFd, sendBuf + sent, length - sent, flags);
-        if (bytes == SOCKET_ERROR) {
-            if (const int err = WSAGetLastError(); err == WSAEWOULDBLOCK) {
-                Sleep(0); // Yield to other threads to avoid busy waiting on blocked socket
-                continue;
-            }
-            return SOCKET_ERROR;
-        }
-
-        sent += bytes;
+    const int bytes = ::send(socketFd, reinterpret_cast<const char*>(buffer.data()), length, flags);
+    if (bytes == SOCKET_ERROR) {
+        if (const int err = WSAGetLastError(); err == WSAEWOULDBLOCK)
+            return 0;
+        return SOCKET_ERROR;
     }
-
-    return sent;
+    return bytes;
 #else
     // unix
 #endif
@@ -201,7 +199,37 @@ void stratos::TCPConnection::close() {
     // unix
 #endif
 }
+int stratos::getMTUForSocket(const SocketFd socketFd) {
+#ifdef _WIN32
+    std::cout << "Getting MTU for socket: " << socketFd << "\n";
+    sockaddr_in addr{};
+    int addrLen = sizeof(addr);
+    if (getsockname(socketFd, reinterpret_cast<sockaddr*>(&addr), &addrLen) == SOCKET_ERROR) return -1;
 
-stratos::TCPConnection::~TCPConnection() {
-    close();
+    char ipStr[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &addr.sin_addr, ipStr, sizeof(ipStr));
+    const std::string socketIp = ipStr;
+    if (socketIp == "127.0.0.1") return 1500; // Localhost MTU
+
+    ULONG outBufLen = 15000;
+    std::vector<BYTE> buffer(outBufLen);
+    auto* adapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data());
+    if (const DWORD result = GetAdaptersAddresses(AF_INET, GAA_FLAG_SKIP_ANYCAST, nullptr, adapterAddresses, &outBufLen); result != NO_ERROR) return -1;
+
+    for (const auto* adapter = adapterAddresses; adapter != nullptr; adapter = adapter->Next) {
+        for (const IP_ADAPTER_UNICAST_ADDRESS* ua = adapter->FirstUnicastAddress; ua != nullptr; ua = ua->Next) {
+            char adapterIp[INET_ADDRSTRLEN] = {};
+            if (ua->Address.lpSockaddr->sa_family == AF_INET) {
+                const auto sa_in = reinterpret_cast<sockaddr_in*>(ua->Address.lpSockaddr);
+                inet_ntop(AF_INET, &sa_in->sin_addr, adapterIp, sizeof(adapterIp));
+                if (socketIp == adapterIp) return static_cast<int>(adapter->Mtu);
+            }
+        }
+    }
+
+    return -1;
+#else
+    // unix
+    return -1;
+#endif
 }

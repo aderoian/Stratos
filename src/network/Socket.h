@@ -26,8 +26,10 @@
 #else
 
 #endif
+#include <iostream>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace stratos {
 #ifdef _WIN32
@@ -37,6 +39,9 @@ constexpr auto INVALID_SOCKET_FD = INVALID_SOCKET;
 using SocketFd                       = int;
 constexpr SocketFd INVALID_SOCKET_FD = -1;
 #endif
+
+using byte = unsigned char;
+using ByteVec = std::vector<byte>;
 
 struct ClientInfo {
     SocketFd    socket;
@@ -55,9 +60,9 @@ class Socket {
     Socket(Socket&&)      = default;
     virtual ~Socket()     = default;
 
+    [[nodiscard]] SocketFd getFd() const { return socketFd; }
     [[nodiscard]] const std::string& getAddress() const { return address; }
     [[nodiscard]] int                getPort() const { return port; }
-    [[nodiscard]] int                getLastError() const { return lastError; }
     [[nodiscard]] bool               isValid() const { return socketFd != INVALID_SOCKET; }
 
     Socket& operator=(const Socket&) = delete;
@@ -67,8 +72,6 @@ class Socket {
     SocketFd    socketFd = INVALID_SOCKET;
     std::string address;
     int         port;
-
-    int lastError = 0;
 };
 
 class SocketServer : public Socket {
@@ -101,24 +104,31 @@ class TCPServer final : public SocketServer {
 #endif
 };
 
+int getMTUForSocket(SocketFd socketFd);
+
 class SocketConnection : public Socket {
   public:
     SocketConnection(const SocketFd socketFd, const std::string& address, const int& port) : Socket(address, port) { this->socketFd = socketFd; }
     ~SocketConnection() override = default;
 
-    virtual int  receive(int length, byte& buffer)               = 0;
-    virtual int  send(const byte& buffer, int length, int flags) = 0;
+    virtual int  receive(int length, ByteVec& buffer)               = 0;
+    virtual int  send(const ByteVec& buffer, int length, int flags) = 0;
     virtual void close()                                         = 0;
 };
 
-class TCPConnection final : public SocketConnection {
+class TCPConnection : public SocketConnection {
   public:
-    TCPConnection(const SocketFd socketFd, const std::string& address, const int& port) : SocketConnection(socketFd, address, port) {}
-    ~TCPConnection() override;
+    TCPConnection(const SocketFd socketFd, const std::string& address, const int& port) : SocketConnection(socketFd, address, port) { mtu = getMTUForSocket(socketFd); }
+    ~TCPConnection() override = default;
 
-    int  receive(int length, byte& buffer) override;
-    int  send(const byte& buffer, int length, int flags) override;
+    int  receive(int length, ByteVec& buffer) override;
+    int  send(const ByteVec& buffer, int length, int flags) override;
     void close() override;
+
+    [[nodiscard]] int getMtu() const { return mtu; }
+
+protected:
+    int mtu;
 };
 } // namespace stratos
 
