@@ -157,8 +157,9 @@ int stratos::TCPConnection::receive(const int length, ByteVec& buffer) {
 
     const int bytes = recv(socketFd, reinterpret_cast<char*>(buffer.data()), length, 0);
     if (bytes == SOCKET_ERROR) {
-        if (const int err = WSAGetLastError(); err == WSAEWOULDBLOCK || err == WSAEINTR) return -1;
-        throw std::runtime_error("recv() failed (code: " + std::to_string(WSAGetLastError()) + ").");
+        const int err = WSAGetLastError();
+        if (err == WSAEWOULDBLOCK || err == WSAEINTR) return -1;
+        if (err == WSAECONNRESET) return 0; // Connection reset by peer
     }
 
     buffer.resize(bytes);
