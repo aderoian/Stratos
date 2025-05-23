@@ -24,7 +24,7 @@
 #include <winsock2.h>
 #pragma comment(lib, "ws2_32.lib")
 #else
-
+#include <sys/socket.h>
 #endif
 #include <iostream>
 #include <string>
@@ -38,6 +38,7 @@ constexpr auto INVALID_SOCKET_FD = INVALID_SOCKET;
 #else
 using SocketFd                       = int;
 constexpr SocketFd INVALID_SOCKET_FD = -1;
+constexpr int SOCKET_ERROR = -1;
 #endif
 
 using byte = unsigned char;
@@ -63,13 +64,13 @@ class Socket {
     [[nodiscard]] SocketFd getFd() const { return socketFd; }
     [[nodiscard]] const std::string& getAddress() const { return address; }
     [[nodiscard]] int                getPort() const { return port; }
-    [[nodiscard]] bool               isValid() const { return socketFd != INVALID_SOCKET; }
+    [[nodiscard]] bool               isValid() const { return socketFd != INVALID_SOCKET_FD; }
 
     Socket& operator=(const Socket&) = delete;
     Socket& operator=(Socket&&)      = default;
 
   protected:
-    SocketFd    socketFd = INVALID_SOCKET;
+    SocketFd    socketFd = INVALID_SOCKET_FD;
     std::string address;
     int         port;
 };
@@ -101,9 +102,12 @@ class TCPServer final : public SocketServer {
   private:
 #ifdef _WIN32
     WSADATA wsaData;
+#else
+    int epollFd;
 #endif
 };
 
+int setNonBlocking(SocketFd socketFd);
 int getMTUForSocket(SocketFd socketFd);
 
 class SocketConnection : public Socket {

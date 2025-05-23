@@ -23,7 +23,6 @@
 #include "Socket.h"
 
 #include <memory>
-#include <optional>
 #include <shared_mutex>
 #include <string>
 #include <thread>
