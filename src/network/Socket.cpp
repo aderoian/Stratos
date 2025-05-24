@@ -19,17 +19,17 @@
 
 #include "Socket.h"
 #ifdef _WIN32
-#include <ws2tcpip.h>
 #include <iphlpapi.h>
+#include <ws2tcpip.h>
 #else
-#include <fcntl.h>
-#include <unistd.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <ifaddrs.h>
+#include <net/if.h>
+#include <netinet/in.h>
 #include <sys/epoll.h>
 #include <sys/ioctl.h>
-#include <net/if.h>
-#include <ifaddrs.h>
+#include <unistd.h>
 #endif
 
 #include <cstring>
@@ -77,10 +77,9 @@ stratos::TCPServer::TCPServer(const std::string& address, const int& port) : Soc
     }
 
     epoll_event event{};
-    event.events = EPOLLIN;
+    event.events  = EPOLLIN;
     event.data.fd = socketFd;
-    if (epoll_ctl(epollFd, EPOLL_CTL_ADD, socketFd, &event) == -1)
-        throw std::runtime_error("epoll_ctl failed: " + std::string(strerror(errno)));
+    if (epoll_ctl(epollFd, EPOLL_CTL_ADD, socketFd, &event) == -1) throw std::runtime_error("epoll_ctl failed: " + std::string(strerror(errno)));
 #else
     // unix, posix, macos
 #endif
@@ -167,17 +166,15 @@ stratos::ClientInfo stratos::TCPServer::accept() {
     return {INVALID_SOCKET_FD, "", -1};
 #elifdef __linux__
     epoll_event events[1];
-    int result = epoll_wait(epollFd, events, 1, 10000); // 10 sec timeout
+    int         result = epoll_wait(epollFd, events, 1, 10000); // 10 sec timeout
 
-    if (result == -1)
-        throw std::runtime_error("epoll_wait() failed (code: " + std::to_string(errno) + ": " + strerror(errno) + ").");
+    if (result == -1) throw std::runtime_error("epoll_wait() failed (code: " + std::to_string(errno) + ": " + strerror(errno) + ").");
 
     if (result > 0 && events[0].data.fd == socketFd && (events[0].events & EPOLLIN)) {
         sockaddr_in clientAddr{};
-        socklen_t addrLen = sizeof(clientAddr);
+        socklen_t   addrLen = sizeof(clientAddr);
         if (int clientSocket = ::accept(socketFd, reinterpret_cast<sockaddr*>(&clientAddr), &addrLen); clientSocket == -1) {
-            if (errno != EWOULDBLOCK && errno != EAGAIN)
-                throw std::runtime_error("accept() failed (code: " + std::to_string(errno) + ": " + strerror(errno) + ").");
+            if (errno != EWOULDBLOCK && errno != EAGAIN) throw std::runtime_error("accept() failed (code: " + std::to_string(errno) + ": " + strerror(errno) + ").");
         } else {
             if (setNonBlocking(clientSocket) == -1) {
                 ::close(clientSocket);
@@ -241,8 +238,8 @@ int stratos::TCPConnection::receive(const int length, ByteVec& buffer) {
         const int err = errno;
         if (err == EAGAIN || err == EWOULDBLOCK || err == EINTR) return -1;
         if (err == ECONNRESET) return 0; // Connection reset by peer
-    }
 #endif
+    }
     buffer.resize(bytes);
     return bytes;
 }
@@ -281,8 +278,7 @@ void stratos::TCPConnection::close() {
 int stratos::setNonBlocking(SocketFd socketFd) {
 #ifdef _WIN32
     u_long mode = 1;
-    if (ioctlsocket(socketFd, FIONBIO, &mode) == SOCKET_ERROR)
-        return SOCKET_ERROR;
+    return ioctlsocket(socketFd, FIONBIO, &mode) == SOCKET_ERROR ? SOCKET_ERROR : 0;
 #else
     const int flags = fcntl(socketFd, F_GETFL, 0);
     return (flags != -1 && fcntl(socketFd, F_SETFL, flags | O_NONBLOCK) != -1) ? 0 : -1;
@@ -292,7 +288,7 @@ int stratos::getMTUForSocket(const SocketFd socketFd) {
 #ifdef _WIN32
     std::cout << "Getting MTU for socket: " << socketFd << "\n";
     sockaddr_in addr{};
-    int addrLen = sizeof(addr);
+    int         addrLen = sizeof(addr);
     if (getsockname(socketFd, reinterpret_cast<sockaddr*>(&addr), &addrLen) == SOCKET_ERROR) return -1;
 
     char ipStr[INET_ADDRSTRLEN];
@@ -300,9 +296,9 @@ int stratos::getMTUForSocket(const SocketFd socketFd) {
     const std::string socketIp = ipStr;
     if (socketIp == "127.0.0.1") return 1280; // Localhost MTU
 
-    ULONG outBufLen = 15000;
+    ULONG             outBufLen = 15000;
     std::vector<BYTE> buffer(outBufLen);
-    auto* adapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data());
+    auto*             adapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data());
     if (const DWORD result = GetAdaptersAddresses(AF_INET, GAA_FLAG_SKIP_ANYCAST, nullptr, adapterAddresses, &outBufLen); result != NO_ERROR) return -1;
 
     for (const auto* adapter = adapterAddresses; adapter != nullptr; adapter = adapter->Next) {
@@ -319,24 +315,23 @@ int stratos::getMTUForSocket(const SocketFd socketFd) {
     return -1;
 #else
     sockaddr_in addr{};
-    socklen_t addrLen = sizeof(addr);
-    if (getsockname(socketFd, reinterpret_cast<sockaddr*>(&addr), &addrLen) == -1)return -1;
+    socklen_t   addrLen = sizeof(addr);
+    if (getsockname(socketFd, reinterpret_cast<sockaddr*>(&addr), &addrLen) == -1) return -1;
 
     char ipStr[INET_ADDRSTRLEN];
-    if (!inet_ntop(AF_INET, &addr.sin_addr, ipStr, sizeof(ipStr)))return -1;
+    if (!inet_ntop(AF_INET, &addr.sin_addr, ipStr, sizeof(ipStr))) return -1;
     std::string socketIp = ipStr;
     if (socketIp == "127.0.0.1") return 1280; // Default for loopback
 
     ifaddrs* ifaddr;
-    if (getifaddrs(&ifaddr) == -1)
-        return -1;
+    if (getifaddrs(&ifaddr) == -1) return -1;
 
     int mtu = -1;
     for (const ifaddrs* ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
         if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_INET) continue;
 
         const auto* sa = reinterpret_cast<sockaddr_in*>(ifa->ifa_addr);
-        char ifaceIp[INET_ADDRSTRLEN];
+        char        ifaceIp[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &sa->sin_addr, ifaceIp, sizeof(ifaceIp));
 
         if (socketIp == ifaceIp) {
@@ -345,8 +340,7 @@ int stratos::getMTUForSocket(const SocketFd socketFd) {
 
             ifreq ifr{};
             strncpy(ifr.ifr_name, ifa->ifa_name, IFNAMSIZ);
-            if (ioctl(fd, SIOCGIFMTU, &ifr) != -1)
-                mtu = ifr.ifr_mtu;
+            if (ioctl(fd, SIOCGIFMTU, &ifr) != -1) mtu = ifr.ifr_mtu;
 
             close(fd);
             break;

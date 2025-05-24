@@ -38,10 +38,10 @@ constexpr auto INVALID_SOCKET_FD = INVALID_SOCKET;
 #else
 using SocketFd                       = int;
 constexpr SocketFd INVALID_SOCKET_FD = -1;
-constexpr int SOCKET_ERROR = -1;
+constexpr int      SOCKET_ERROR      = -1;
 #endif
 
-using byte = unsigned char;
+using byte    = unsigned char;
 using ByteVec = std::vector<byte>;
 
 struct ClientInfo {
@@ -49,9 +49,7 @@ struct ClientInfo {
     std::string ip;
     int         port;
 
-    bool operator==(const ClientInfo& other) const {
-        return socket == other.socket && ip == other.ip && port == other.port;
-    }
+    bool operator==(const ClientInfo& other) const { return socket == other.socket && ip == other.ip && port == other.port; }
 };
 
 class Socket {
@@ -61,7 +59,7 @@ class Socket {
     Socket(Socket&&)      = default;
     virtual ~Socket()     = default;
 
-    [[nodiscard]] SocketFd getFd() const { return socketFd; }
+    [[nodiscard]] SocketFd           getFd() const { return socketFd; }
     [[nodiscard]] const std::string& getAddress() const { return address; }
     [[nodiscard]] int                getPort() const { return port; }
     [[nodiscard]] bool               isValid() const { return socketFd != INVALID_SOCKET_FD; }
@@ -117,7 +115,7 @@ class SocketConnection : public Socket {
 
     virtual int  receive(int length, ByteVec& buffer)               = 0;
     virtual int  send(const ByteVec& buffer, int length, int flags) = 0;
-    virtual void close()                                         = 0;
+    virtual void close()                                            = 0;
 };
 
 class TCPConnection : public SocketConnection {
@@ -131,7 +129,7 @@ class TCPConnection : public SocketConnection {
 
     [[nodiscard]] int getMtu() const { return mtu; }
 
-protected:
+  protected:
     int mtu;
 };
 } // namespace stratos

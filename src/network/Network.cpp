@@ -22,15 +22,15 @@
 #include "spdlog/logger.h"
 
 #include <ranges>
+#ifdef __linux__
 #include <sys/epoll.h>
+#endif
 
 stratos::NetworkSession::~NetworkSession() {
     networkManager->getLogger()->info("Destroying network session for client {}:{}", sessionId.ip, sessionId.port);
 }
-void stratos::NetworkSession::tick() {
-
-}
-int stratos::NetworkConnection::receive(ByteVec& data) {
+void stratos::NetworkSession::tick() {}
+int  stratos::NetworkConnection::receive(ByteVec& data) {
     if (ByteVec buffer; receiveQueue.try_dequeue(buffer)) {
         data = std::move(buffer);
         return static_cast<int>(data.size());
@@ -60,25 +60,28 @@ int stratos::NetworkConnection::handleReceive() {
     //
     // return -1;
 
-     ByteVec buffer;
-     ByteVec segment; segment.reserve(4096);
-     int totalReceived = 0;
+    ByteVec buffer;
+    ByteVec segment;
+    segment.reserve(4096);
+    int totalReceived = 0;
 
-     while (true) {
-         int received = 0;
-         totalReceived += received = receive(4096, segment);
-         if (received == 0) { return 0; }
-         if (received < 0) {
-             if (totalReceived < 0) {
-                 return -1;
-             }
-             receiveQueue.enqueue(std::move(buffer));
-             return totalReceived;
-         }
+    while (true) {
+        int received              = 0;
+        totalReceived += received = receive(4096, segment);
+        if (received == 0) {
+            return 0;
+        }
+        if (received < 0) {
+            if (totalReceived < 0) {
+                return -1;
+            }
+            receiveQueue.enqueue(std::move(buffer));
+            return totalReceived;
+        }
 
-         buffer.insert(buffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.begin() + received));
-         segment.clear();
-     }
+        buffer.insert(buffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.begin() + received));
+        segment.clear();
+    }
 }
 int stratos::NetworkConnection::flushSendQueue() {
     ByteVec buffer;
@@ -136,7 +139,7 @@ std::shared_ptr<stratos::NetworkSession> stratos::NetworkManager::getSession(con
     return nullptr;
 }
 std::vector<std::shared_ptr<stratos::NetworkSession>> stratos::NetworkManager::getSessions() {
-    std::shared_lock lock(sessionMutex);
+    std::shared_lock                             lock(sessionMutex);
     std::vector<std::shared_ptr<NetworkSession>> sessionList;
     sessionList.reserve(sessions.size());
     for (const auto& session : sessions | std::views::values) {
@@ -154,8 +157,8 @@ std::shared_ptr<stratos::NetworkSession> stratos::NetworkManager::createSession(
     }
     // Create a new session
     logger->info("Creating new network session for client {}:{}", client.ip, client.port);
-    auto             session = std::make_shared<NetworkSession>(this, client);
-    sessions[client]         = session;
+    auto session     = std::make_shared<NetworkSession>(this, client);
+    sessions[client] = session;
     return session;
 }
 bool stratos::NetworkManager::removeSession(const SessionId& sessionId) {
@@ -219,8 +222,7 @@ void stratos::BossThread::stop() {
 void stratos::WorkerThread::start() {
 #ifdef __linux__
     epollFd = epoll_create1(0);
-    if (epollFd == -1)
-        throw std::runtime_error("epoll_create1 failed: " + std::string(strerror(errno)));
+    if (epollFd == -1) throw std::runtime_error("epoll_create1 failed: " + std::string(strerror(errno)));
 #endif
 
     if (!running.exchange(true)) {
@@ -240,7 +242,7 @@ void stratos::WorkerThread::start() {
                 }
 
                 timeval timeout{};
-                timeout.tv_sec = 0;
+                timeout.tv_sec  = 0;
                 timeout.tv_usec = 2000;
                 select(maxFd + 1, &readSet, &writeSet, nullptr, &timeout);
 
@@ -258,9 +260,9 @@ void stratos::WorkerThread::start() {
                         conn->flushSendQueue(); // try sending pending buffers
                     }
                 }
-#elifdef  __linux__
+#elifdef __linux__
                 constexpr int MAX_EVENTS = 64;
-                epoll_event events[MAX_EVENTS];
+                epoll_event   events[MAX_EVENTS];
 
                 const int ready = epoll_wait(epollFd, events, MAX_EVENTS, 100); // wait up to 100 ms
                 if (ready == -1) {
@@ -269,14 +271,12 @@ void stratos::WorkerThread::start() {
                 }
 
                 for (int i = 0; i < ready; ++i) {
-                    int fd = events[i].data.fd;
-                    auto it = std::ranges::find_if(connections, [fd](const auto& c) {
-                        return c->getFd() == fd;
-                    });
+                    int  fd = events[i].data.fd;
+                    auto it = std::ranges::find_if(connections, [fd](const auto& c) { return c->getFd() == fd; });
 
                     if (it == connections.end()) continue;
-                    auto& conn = *it;
-                    bool closed = false;
+                    auto& conn   = *it;
+                    bool  closed = false;
                     if (events[i].events & EPOLLIN) {
                         if (conn->handleReceive() == 0) {
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
@@ -294,8 +294,7 @@ void stratos::WorkerThread::start() {
                         // If queue is empty, remove EPOLLOUT to prevent epoll wakeups
                         epoll_event ev{};
                         ev.events = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
-                        if (conn->getSendQueue().size_approx() > 0)
-                            ev.events |= EPOLLOUT;
+                        if (conn->getSendQueue().size_approx() > 0) ev.events |= EPOLLOUT;
                         ev.data.fd = fd;
                         epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &ev);
                     }
@@ -339,12 +338,11 @@ void stratos::WorkerThread::processIncomingConnections() {
     while (true) {
         if (std::shared_ptr<NetworkConnection> connection; inConnectionQueue.try_dequeue(connection)) {
 #ifdef __linux__
-            epoll_event ev {};
-            ev.events = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
+            epoll_event ev{};
+            ev.events  = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
             ev.data.fd = connection->getFd();
             if (epoll_ctl(epollFd, EPOLL_CTL_ADD, connection->getFd(), &ev) == -1) {
-                if (errno != EEXIST)
-                    throw std::runtime_error("epoll_ctl(ADD) failed: " + std::string(strerror(errno)));
+                if (errno != EEXIST) throw std::runtime_error("epoll_ctl(ADD) failed: " + std::string(strerror(errno)));
 
                 epoll_ctl(epollFd, EPOLL_CTL_MOD, connection->getFd(), &ev);
             }
