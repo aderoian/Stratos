@@ -7,6 +7,13 @@ set(LOCAL_PROJECT_NAME "Stratos")
 set(LOCAL_PROJECT_VERSION "1.0.0")
 set(LOCAL_PROJECT_DESCRIPTION "Server software for Minecraft")
 
+# Debugging
+# For C
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
+# For C++
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
+
+
 # Source files
 set(SOURCES
         Stratos.cpp
