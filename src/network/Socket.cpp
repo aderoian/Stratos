@@ -286,7 +286,6 @@ int stratos::setNonBlocking(SocketFd socketFd) {
 }
 int stratos::getMTUForSocket(const SocketFd socketFd) {
 #ifdef _WIN32
-    std::cout << "Getting MTU for socket: " << socketFd << "\n";
     sockaddr_in addr{};
     int         addrLen = sizeof(addr);
     if (getsockname(socketFd, reinterpret_cast<sockaddr*>(&addr), &addrLen) == SOCKET_ERROR) return -1;

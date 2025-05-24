@@ -252,8 +252,6 @@ void stratos::WorkerThread::start() {
                             // TODO: handle connection close
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
                             removeConnection(conn);
-                        } else {
-                            std::cout << "Received data from connection " << conn->getFd() << std::endl;
                         }
                     }
                     if (FD_ISSET(conn->getFd(), &writeSet)) {
@@ -283,8 +281,6 @@ void stratos::WorkerThread::start() {
                             removeConnection(conn);
                             ::close(fd);
                             closed = true;
-                        } else {
-                            std::cout << "Received data from connection " << conn->getFd() << std::endl;
                         }
                     }
 
