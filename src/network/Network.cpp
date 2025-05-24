@@ -22,6 +22,7 @@
 #include "spdlog/logger.h"
 
 #include <ranges>
+#include <sys/epoll.h>
 
 stratos::NetworkSession::~NetworkSession() {
     networkManager->getLogger()->info("Destroying network session for client {}:{}", sessionId.ip, sessionId.port);
@@ -49,15 +50,35 @@ int stratos::NetworkConnection::send(const ByteVec& data) {
     return static_cast<int>(data.size());
 }
 int stratos::NetworkConnection::handleReceive() {
-    ByteVec buffer;
-    buffer.reserve(mtu);
-    if (const int bytes = receive(mtu, buffer); bytes > 0) {
-        receiveQueue.enqueue(std::move(buffer));
-    } else if (bytes == 0) {
-        return 0;
-    }
+    // ByteVec buffer;
+    // buffer.reserve(mtu);
+    // if (const int bytes = receive(mtu, buffer); bytes > 0) {
+    //     receiveQueue.enqueue(std::move(buffer));
+    // } else if (bytes == 0) {
+    //     return 0;
+    // }
+    //
+    // return -1;
 
-    return -1;
+     ByteVec buffer;
+     ByteVec segment; segment.reserve(4096);
+     int totalReceived = 0;
+
+     while (true) {
+         int received = 0;
+         totalReceived += received = receive(4096, segment);
+         if (received == 0) { return 0; }
+         if (received < 0) {
+             if (totalReceived < 0) {
+                 return -1;
+             }
+             receiveQueue.enqueue(std::move(buffer));
+             return totalReceived;
+         }
+
+         buffer.insert(buffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.begin() + received));
+         segment.clear();
+     }
 }
 int stratos::NetworkConnection::flushSendQueue() {
     ByteVec buffer;
@@ -159,18 +180,22 @@ void stratos::BossThread::start() {
                     network->getLogger()->info("New connection from {}:{}", ip, port);
 
                     // Create a new session for the client
-                    const auto connection = std::make_shared<NetworkConnection>(socket, ip, port);
-                    if (workers.size() < workerThreads) {
-                        auto worker = std::make_unique<WorkerThread>(network, workers.size());
-                        worker->addConnection(connection);
-                        worker->start();
-                        workers.push_back(std::move(worker));
-                    } else {
-                        workers[connectionCount % workerThreads]->addConnection(connection);
+                    try {
+                        const auto connection = std::make_shared<NetworkConnection>(socket, ip, port);
+                        if (workers.size() < workerThreads) {
+                            auto worker = std::make_unique<WorkerThread>(network, workers.size());
+                            worker->start();
+                            worker->addConnection(connection);
+                            workers.push_back(std::move(worker));
+                        } else {
+                            workers[connectionCount % workerThreads]->addConnection(connection);
+                        }
+                        connectionCount++;
+                        network->logger->info("Client '{}:{} - {}' connected (MTU: {})", ip, port, socket, connection->getMtu());
+                    } catch (std::exception& e) {
+                        network->logger->error("Failed to connect client '{}:{}': {}", ip, port, e.what());
+                        ::close(socket);
                     }
-                    connectionCount++;
-
-                    network->logger->info("Client '{}:{}' connected (MTU: {})", ip, port, connection->getMtu());
                 }
             } catch (const std::exception& e) {
                 network->getLogger()->error("Socket Error: {}", e.what());
@@ -192,9 +217,17 @@ void stratos::BossThread::stop() {
     }
 }
 void stratos::WorkerThread::start() {
+#ifdef __linux__
+    epollFd = epoll_create1(0);
+    if (epollFd == -1)
+        throw std::runtime_error("epoll_create1 failed: " + std::string(strerror(errno)));
+#endif
+
     if (!running.exchange(true)) {
         thread = std::thread([this] {
             while (running) {
+                processIncomingConnections();
+#ifdef _WIN32
                 fd_set readSet, writeSet;
                 FD_ZERO(&readSet);
                 FD_ZERO(&writeSet);
@@ -225,6 +258,49 @@ void stratos::WorkerThread::start() {
                         conn->flushSendQueue(); // try sending pending buffers
                     }
                 }
+#elifdef  __linux__
+                constexpr int MAX_EVENTS = 64;
+                epoll_event events[MAX_EVENTS];
+
+                const int ready = epoll_wait(epollFd, events, MAX_EVENTS, 100); // wait up to 100 ms
+                if (ready == -1) {
+                    if (errno == EINTR) continue;
+                    throw std::runtime_error("epoll_wait failed: " + std::string(strerror(errno)));
+                }
+
+                for (int i = 0; i < ready; ++i) {
+                    int fd = events[i].data.fd;
+                    auto it = std::ranges::find_if(connections, [fd](const auto& c) {
+                        return c->getFd() == fd;
+                    });
+
+                    if (it == connections.end()) continue;
+                    auto& conn = *it;
+                    bool closed = false;
+                    if (events[i].events & EPOLLIN) {
+                        if (conn->handleReceive() == 0) {
+                            network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
+                            removeConnection(conn);
+                            ::close(fd);
+                            closed = true;
+                        } else {
+                            std::cout << "Received data from connection " << conn->getFd() << std::endl;
+                        }
+                    }
+
+                    if (!closed && events[i].events & EPOLLOUT) {
+                        conn->flushSendQueue();
+
+                        // If queue is empty, remove EPOLLOUT to prevent epoll wakeups
+                        epoll_event ev{};
+                        ev.events = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
+                        if (conn->getSendQueue().size_approx() > 0)
+                            ev.events |= EPOLLOUT;
+                        ev.data.fd = fd;
+                        epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &ev);
+                    }
+                }
+#endif
             }
         });
     }
@@ -243,13 +319,41 @@ void stratos::WorkerThread::stop() {
     }
 }
 void stratos::WorkerThread::addConnection(std::shared_ptr<NetworkConnection> connection) {
-    std::lock_guard lock(connectionMutex);
-    connections.push_back(std::move(connection));
-    connectionCount++;
+    inConnectionQueue.enqueue(std::move(connection));
 }
 
 void stratos::WorkerThread::removeConnection(const std::shared_ptr<NetworkConnection>& connection) {
+    if (!connection) return;
+
+#ifdef __linux__
+    epoll_ctl(epollFd, EPOLL_CTL_DEL, connection->getFd(), nullptr);
+#endif
+
     std::lock_guard lock(connectionMutex);
     std::erase(connections, connection);
     connectionCount--;
+}
+void stratos::WorkerThread::processIncomingConnections() {
+
+    std::lock_guard lock(connectionMutex);
+    while (true) {
+        if (std::shared_ptr<NetworkConnection> connection; inConnectionQueue.try_dequeue(connection)) {
+#ifdef __linux__
+            epoll_event ev {};
+            ev.events = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
+            ev.data.fd = connection->getFd();
+            if (epoll_ctl(epollFd, EPOLL_CTL_ADD, connection->getFd(), &ev) == -1) {
+                if (errno != EEXIST)
+                    throw std::runtime_error("epoll_ctl(ADD) failed: " + std::string(strerror(errno)));
+
+                epoll_ctl(epollFd, EPOLL_CTL_MOD, connection->getFd(), &ev);
+            }
+#endif
+
+            connections.push_back(connection);
+            connectionCount++;
+        } else {
+            break;
+        }
+    }
 }

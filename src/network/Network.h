@@ -171,6 +171,13 @@ private:
 
     std::mutex connectionMutex;
     std::vector<std::shared_ptr<NetworkConnection>> connections;
+    moodycamel::ConcurrentQueue<std::shared_ptr<NetworkConnection>> inConnectionQueue;
+
+    void processIncomingConnections();
+
+#ifdef __linux__
+    int epollFd = -1;
+#endif
 };
 } // namespace stratos
 

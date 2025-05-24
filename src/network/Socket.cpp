@@ -54,7 +54,7 @@ stratos::TCPServer::TCPServer(const std::string& address, const int& port) : Soc
         WSACleanup();
         throw std::runtime_error("Failed to set non-blocking mode.");
     }
-#else
+#elifdef __linux__
     socketFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (socketFd == INVALID_SOCKET_FD) {
         throw std::runtime_error("Failed to create socket");
@@ -81,6 +81,8 @@ stratos::TCPServer::TCPServer(const std::string& address, const int& port) : Soc
     event.data.fd = socketFd;
     if (epoll_ctl(epollFd, EPOLL_CTL_ADD, socketFd, &event) == -1)
         throw std::runtime_error("epoll_ctl failed: " + std::string(strerror(errno)));
+#else
+    // unix, posix, macos
 #endif
 }
 
@@ -163,7 +165,7 @@ stratos::ClientInfo stratos::TCPServer::accept() {
     }
 
     return {INVALID_SOCKET_FD, "", -1};
-#else
+#elifdef __linux__
     epoll_event events[1];
     int result = epoll_wait(epollFd, events, 1, 10000); // 10 sec timeout
 
@@ -187,6 +189,8 @@ stratos::ClientInfo stratos::TCPServer::accept() {
     }
 
     return {INVALID_SOCKET_FD, "", -1};
+#else
+    // unix, posix, macos
 #endif
 }
 
@@ -199,7 +203,7 @@ void stratos::TCPServer::close() {
     if (WSACleanup() != 0) {
         throw std::runtime_error("Failed to clean up Winsock");
     }
-#else
+#elifdef __linux__
     if (socketFd != INVALID_SOCKET_FD) {
         ::close(socketFd);
         socketFd = INVALID_SOCKET_FD;
@@ -208,6 +212,8 @@ void stratos::TCPServer::close() {
         ::close(epollFd);
         epollFd = -1;
     }
+#else
+    // unix, posix, macos
 #endif
 }
 
