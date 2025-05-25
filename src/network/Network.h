@@ -33,6 +33,7 @@ namespace spdlog {
 class logger;
 }
 namespace stratos {
+class NetworkConnection;
 class WorkerThread;
 class BossThread;
 class Server;
@@ -57,17 +58,16 @@ class NetworkManager final {
     std::shared_ptr<NetworkSession>              getSession(const SessionId& sessionId);
     std::vector<std::shared_ptr<NetworkSession>> getSessions();
 
-    NetworkManager& operator=(NetworkManager&) = delete;
-
-  protected:
-    std::shared_ptr<NetworkSession> createSession(const ClientInfo& client);
+    void createSession(std::shared_ptr<NetworkConnection> connection);
     bool                            removeSession(const SessionId& sessionId);
+
+    NetworkManager& operator=(NetworkManager&) = delete;
 
   private:
     Server*                         server;
     std::shared_ptr<spdlog::logger> logger;
 
-    std::shared_mutex                                              sessionMutex;
+    moodycamel::ConcurrentQueue<std::shared_ptr<NetworkConnection>> sessionsQueue;
     std::unordered_map<SessionId, std::shared_ptr<NetworkSession>> sessions;
 
     TCPServer socketServer;
@@ -76,24 +76,9 @@ class NetworkManager final {
 
     std::unique_ptr<BossThread> bossThread;
 
+    void processIncomingConnections();
+
     friend class BossThread;
-};
-
-class NetworkSession {
-  public:
-    explicit NetworkSession(NetworkManager* networkManager, const ClientInfo& client)
-        : networkManager(networkManager), sessionId{client.socket, client.ip, client.port}, socket(client.socket, client.ip, client.port) {}
-    ~NetworkSession();
-
-    [[nodiscard]] std::string getIp() const { return sessionId.ip; }
-    [[nodiscard]] int         getPort() const { return sessionId.port; }
-
-    void tick();
-
-  private:
-    NetworkManager* networkManager;
-    SessionId       sessionId;
-    TCPConnection   socket;
 };
 
 class NetworkConnection final : public TCPConnection {
@@ -101,10 +86,7 @@ class NetworkConnection final : public TCPConnection {
     using TCPConnection::receive;
     using TCPConnection::send;
 
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port) : TCPConnection(socketFd, address, port) {
-        sendQueue    = moodycamel::ConcurrentQueue<ByteVec>();
-        receiveQueue = moodycamel::ConcurrentQueue<ByteVec>();
-    }
+    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port) : TCPConnection(socketFd, address, port) {}
     ~NetworkConnection() override = default;
 
     [[nodiscard]] const moodycamel::ConcurrentQueue<ByteVec>& getSendQueue() const { return sendQueue; }
@@ -114,13 +96,39 @@ class NetworkConnection final : public TCPConnection {
     int send(const ByteVec& data);
 
   private:
-    moodycamel::ConcurrentQueue<ByteVec> sendQueue;
-    moodycamel::ConcurrentQueue<ByteVec> receiveQueue;
+    moodycamel::ConcurrentQueue<ByteVec> sendQueue = moodycamel::ConcurrentQueue<ByteVec>();
+    moodycamel::ConcurrentQueue<ByteVec> receiveQueue = moodycamel::ConcurrentQueue<ByteVec>();
 
     int handleReceive();
     int flushSendQueue();
 
     friend class WorkerThread;
+};
+
+class NetworkSession {
+  public:
+    explicit NetworkSession(NetworkManager* networkManager, SessionId id, std::shared_ptr<NetworkConnection> connection)
+        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)) {}
+    ~NetworkSession() = default;
+
+    [[nodiscard]] std::string getIp() const { return sessionId.ip; }
+    [[nodiscard]] int         getPort() const { return sessionId.port; }
+    [[nodiscard]] bool        isConnected() const { return connected; }
+    [[nodiscard]] bool        isStale() const { return !connected && connection->isClosed(); }
+
+    void tick();
+
+  private:
+    NetworkManager* networkManager;
+    SessionId       sessionId;
+    std::shared_ptr<NetworkConnection>   connection;
+
+    bool connected = true;
+
+    void handleReceived(ByteVec& data);
+    void dispose() const;
+
+    friend class NetworkManager;
 };
 
 class NetworkThread {

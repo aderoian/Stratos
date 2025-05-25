@@ -133,6 +133,7 @@ void Server::tick() {
     ++tickCounter;
 
     // Tick server
+    network->tick();
 
     const long now           = utils::currentTimeMillis();
     const long totalTickTime = now - tickTime;

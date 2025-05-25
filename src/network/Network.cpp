@@ -26,10 +26,34 @@
 #include <sys/epoll.h>
 #endif
 
-stratos::NetworkSession::~NetworkSession() {
-    networkManager->getLogger()->info("Destroying network session for client {}:{}", sessionId.ip, sessionId.port);
+void stratos::NetworkSession::tick() {
+    if (!connected) return;
+
+    if (connection->isClosed()) connected = false; // TODO: Handle connection close
+
+    // Empty received queue
+    // TODO: Should we always empty or consume a fix amount per tick?
+    ByteVec buffer;
+    ByteVec segment;
+    while (connection->receive(segment) > 0) {
+        buffer.insert(buffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.end()));
+        segment.clear();
+    }
+
+    if (!buffer.empty())
+        handleReceived(buffer);
 }
-void stratos::NetworkSession::tick() {}
+void stratos::NetworkSession::handleReceived(ByteVec& data) {
+    // TODO: Begin handling Java packets!!!
+    std::cout << "Received data from client " << sessionId.ip << ":" << sessionId.port << std::endl;
+}
+void stratos::NetworkSession::dispose() const {
+    networkManager->getLogger()->info("Disposing network session for client {}:{}", sessionId.ip, sessionId.port);
+    ByteVec buffer;
+    while (connection->receive(buffer) > 0) {
+        buffer.clear();
+    } // Empty the received queue
+}
 int  stratos::NetworkConnection::receive(ByteVec& data) {
     if (ByteVec buffer; receiveQueue.try_dequeue(buffer)) {
         data = std::move(buffer);
@@ -50,16 +74,6 @@ int stratos::NetworkConnection::send(const ByteVec& data) {
     return static_cast<int>(data.size());
 }
 int stratos::NetworkConnection::handleReceive() {
-    // ByteVec buffer;
-    // buffer.reserve(mtu);
-    // if (const int bytes = receive(mtu, buffer); bytes > 0) {
-    //     receiveQueue.enqueue(std::move(buffer));
-    // } else if (bytes == 0) {
-    //     return 0;
-    // }
-    //
-    // return -1;
-
     ByteVec buffer;
     ByteVec segment;
     segment.reserve(4096);
@@ -129,17 +143,28 @@ void stratos::NetworkManager::stop() {
     }
 }
 void stratos::NetworkManager::tick() {
-    for (const auto& session : sessions | std::views::values) {
+    processIncomingConnections();
+
+    // Tick all sessions
+    std::vector<SessionId> staleSessions;
+    for (const auto& [sessionId, session] : sessions) {
         session->tick();
+        if (session->isStale()) {
+            staleSessions.push_back(sessionId);
+            session->dispose();
+        }
+    }
+
+    // Remove stale sessions
+    for (const auto& sessionId : staleSessions) {
+        sessions.erase(sessionId);
     }
 }
 std::shared_ptr<stratos::NetworkSession> stratos::NetworkManager::getSession(const SessionId& sessionId) {
-    std::shared_lock lock(sessionMutex);
     if (const auto it = sessions.find(sessionId); it != sessions.end()) return it->second;
     return nullptr;
 }
 std::vector<std::shared_ptr<stratos::NetworkSession>> stratos::NetworkManager::getSessions() {
-    std::shared_lock                             lock(sessionMutex);
     std::vector<std::shared_ptr<NetworkSession>> sessionList;
     sessionList.reserve(sessions.size());
     for (const auto& session : sessions | std::views::values) {
@@ -148,26 +173,32 @@ std::vector<std::shared_ptr<stratos::NetworkSession>> stratos::NetworkManager::g
     return sessionList;
 }
 
-std::shared_ptr<stratos::NetworkSession> stratos::NetworkManager::createSession(const ClientInfo& client) {
-    std::unique_lock lock(sessionMutex);
-    if (const auto it = sessions.find(client); it != sessions.end()) {
-        // TODO: This could be due to a client loosing a connection and reconnecting, reuse session?
-        logger->warn("Session already exists for client {}:{}", client.ip, client.port);
-        return it->second; // Session already exists
-    }
-    // Create a new session
-    logger->info("Creating new network session for client {}:{}", client.ip, client.port);
-    auto session     = std::make_shared<NetworkSession>(this, client);
-    sessions[client] = session;
-    return session;
+void stratos::NetworkManager::createSession(std::shared_ptr<NetworkConnection> connection) {
+    sessionsQueue.enqueue(std::move(connection));
 }
 bool stratos::NetworkManager::removeSession(const SessionId& sessionId) {
-    std::unique_lock lock(sessionMutex);
     if (const auto it = sessions.find(sessionId); it != sessions.end()) {
         sessions.erase(it);
         return true;
     }
     return false;
+}
+void stratos::NetworkManager::processIncomingConnections() {
+    std::shared_ptr<NetworkConnection> connection;
+    while (sessionsQueue.try_dequeue(connection)) {
+        if (connection) {
+            ClientInfo client{connection->getFd(), connection->getAddress(), connection->getPort()};
+            if (const auto it = sessions.find(client); it != sessions.end()) {
+                // TODO: This could be due to a client loosing a connection and reconnecting, reuse session?
+                logger->warn("Session already exists for client {}:{}", client.ip, client.port);
+                return; // Session already exists
+            }
+            // Create a new session
+            logger->info("Creating new network session for client {}:{}", client.ip, client.port);
+            const auto session = std::make_shared<NetworkSession>(this, client, std::move(connection));
+            sessions[client] = session;
+        }
+    }
 }
 void stratos::BossThread::start() {
     if (running.exchange(true)) return;
@@ -179,7 +210,11 @@ void stratos::BossThread::start() {
         while (running) {
             try {
                 // Accept new connections
-                if (auto [socket, ip, port] = network->socketServer.accept(); socket != INVALID_SOCKET_FD) {
+                if (const auto client = network->socketServer.accept(); client.socket != INVALID_SOCKET_FD) {
+                    std::string ip = client.ip;
+                    int port = client.port;
+                    SocketFd socket = client.socket;
+
                     network->getLogger()->info("New connection from {}:{}", ip, port);
 
                     // Create a new session for the client
@@ -193,11 +228,18 @@ void stratos::BossThread::start() {
                         } else {
                             workers[connectionCount % workerThreads]->addConnection(connection);
                         }
+
+                        // Create a new network session
+                        network->createSession(connection);
                         connectionCount++;
                         network->logger->info("Client '{}:{} - {}' connected (MTU: {})", ip, port, socket, connection->getMtu());
                     } catch (std::exception& e) {
                         network->logger->error("Failed to connect client '{}:{}': {}", ip, port, e.what());
+#ifdef _WIN32
+                        closesocket(socket);
+#else
                         ::close(socket);
+#endif
                     }
                 }
             } catch (const std::exception& e) {
@@ -251,6 +293,7 @@ void stratos::WorkerThread::start() {
                         if (conn->handleReceive() == 0) { // non-blocking
                             // TODO: handle connection close
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
+                            conn->close();
                             removeConnection(conn);
                         }
                     }
