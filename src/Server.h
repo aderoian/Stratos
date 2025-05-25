@@ -51,7 +51,7 @@ public:
     void start();
     void shutdown();
     void tickProcessor();
-    void tick();
+    long tick(const long& tickTime);
 
 private:
     static std::unique_ptr<Server> _instance;
@@ -64,7 +64,6 @@ private:
 
     // Server TPS
     unsigned int tickCounter;
-    long nextTick;
     float currentTPS;
     float currentUse;
     std::array<float, 20> averageTPS;

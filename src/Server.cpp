@@ -113,23 +113,20 @@ void Server::shutdown() {
 }
 
 void Server::tickProcessor() {
-    nextTick = utils::currentTimeMillis();
-
-    while (running) {
-        tick();
-
-        if (int sleepTime = std::max(0L, (nextTick - utils::currentTimeMillis())); sleepTime > 0) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
+    do {
+        // Tick the server, calculate the time taken,
+        long tickTime = utils::currentTimeMillis();
+        if (const long tickDur = tick(tickTime); tickDur < TARGET_MILLIS_PER_TICK) {
+            // Sleep for the remaining time to maintain the target tick rate
+            if (long sleepTime = TARGET_MILLIS_PER_TICK - tickDur; sleepTime > 0) {
+                assert(sleepTime <= 50);
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
+            }
         }
-    }
+    } while (running);
 }
 
-void Server::tick() {
-    const long tickTime = utils::currentTimeMillis();
-    if ((tickTime - nextTick) < -25) {
-        return;
-    }
-
+long Server::tick(const long& tickTime) {
     ++tickCounter;
 
     // Tick server
@@ -144,10 +141,6 @@ void Server::tick() {
     averageTPS[index] = currentTPS;
     averageUse[index] = currentUse;
 
-    if ((nextTick - tickTime) < -1000) {
-        nextTick = now;
-    } else {
-        nextTick += TARGET_MILLIS_PER_TICK;
-    }
+    return now - tickTime;
 }
 } // namespace stratos
