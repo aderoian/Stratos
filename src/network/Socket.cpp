@@ -273,6 +273,7 @@ void stratos::TCPConnection::close() {
         ::close(socketFd);
 #endif
         socketFd = INVALID_SOCKET_FD;
+        closed = true;
     }
 }
 int stratos::setNonBlocking(SocketFd socketFd) {

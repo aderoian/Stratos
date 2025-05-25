@@ -128,9 +128,11 @@ class TCPConnection : public SocketConnection {
     void close() override;
 
     [[nodiscard]] int getMtu() const { return mtu; }
+    [[nodiscard]] bool isClosed() const { return closed; }
 
   protected:
     int mtu;
+    bool closed = false;
 };
 } // namespace stratos
 
