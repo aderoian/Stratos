@@ -166,7 +166,10 @@ stratos::ClientInfo stratos::TCPServer::accept() {
     return {INVALID_SOCKET_FD, "", -1};
 #elifdef __linux__
     epoll_event events[1];
-    int         result = epoll_wait(epollFd, events, 1, 10000); // 10 sec timeout
+    int result;
+    do {
+        result = epoll_wait(epollFd, events, 1, 10000); // 10 sec timeout
+    } while (result == -1 && errno == EINTR);
 
     if (result == -1) throw std::runtime_error("epoll_wait() failed (code: " + std::to_string(errno) + ": " + strerror(errno) + ").");
 

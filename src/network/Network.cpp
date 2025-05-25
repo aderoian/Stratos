@@ -317,17 +317,15 @@ void stratos::WorkerThread::start() {
 
                     if (it == connections.end()) continue;
                     auto& conn   = *it;
-                    bool  closed = false;
                     if (events[i].events & EPOLLIN) {
                         if (conn->handleReceive() == 0) {
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
+                            conn->close();
                             removeConnection(conn);
-                            ::close(fd);
-                            closed = true;
                         }
                     }
 
-                    if (!closed && events[i].events & EPOLLOUT) {
+                    if (!conn->isClosed() && events[i].events & EPOLLOUT) {
                         conn->flushSendQueue();
 
                         // If queue is empty, remove EPOLLOUT to prevent epoll wakeups
