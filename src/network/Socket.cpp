@@ -178,6 +178,7 @@ stratos::ClientInfo stratos::TCPServer::accept() {
         socklen_t   addrLen = sizeof(clientAddr);
         if (int clientSocket = ::accept(socketFd, reinterpret_cast<sockaddr*>(&clientAddr), &addrLen); clientSocket == -1) {
             if (errno != EWOULDBLOCK && errno != EAGAIN) throw std::runtime_error("accept() failed (code: " + std::to_string(errno) + ": " + strerror(errno) + ").");
+            return {INVALID_SOCKET_FD, "", -1};
         } else {
             if (setNonBlocking(clientSocket) == -1) {
                 ::close(clientSocket);
