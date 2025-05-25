@@ -79,7 +79,7 @@ std::shared_ptr<spdlog::logger> createLogger(const bool debug = false) {
     auto consoleSink = std::make_shared<spdlog::sinks::ansicolor_stdout_sink_mt>();
 #endif
 
-    const std::string pattern = "[%Y-%m-%d %H:%M:%S] [%^%l%$] %s:%# - %v";
+    const std::string pattern = "[%Y-%m-%d %H:%M:%S.%e] [thread %t] [%^%l%$] : - %v";
     fileSink->set_pattern(pattern);
     consoleSink->set_pattern(pattern);
 

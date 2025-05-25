@@ -20,12 +20,15 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include <atomic>
-#include <array>
-
+#include "network/Socket.h"
 #include "spdlog/spdlog.h"
 
+#include <array>
+#include <atomic>
+
 namespace stratos {
+class NetworkManager;
+
 class Server final {
 
 public:
@@ -34,7 +37,7 @@ public:
     static constexpr float TARGET_MILLIS_PER_TICK = TARGET_SECONDS_PER_TICK * 1000.0f;
 
     explicit Server(const std::shared_ptr<spdlog::logger>& logger);
-    ~Server() = default;
+    ~Server();
 
     [[nodiscard]] std::shared_ptr<spdlog::logger> getLogger() const;
     [[nodiscard]] bool isRunning() const;
@@ -48,22 +51,26 @@ public:
     void start();
     void shutdown();
     void tickProcessor();
-    void tick();
+    long tick(const long& tickTime);
 
 private:
     static std::unique_ptr<Server> _instance;
     std::shared_ptr<spdlog::logger> logger;
+
+    std::unique_ptr<NetworkManager> network;
 
     std::atomic<bool> running = false;
     long startTime;
 
     // Server TPS
     unsigned int tickCounter;
-    long nextTick;
     float currentTPS;
     float currentUse;
     std::array<float, 20> averageTPS;
     std::array<float, 20> averageUse;
+
+    std::string                address;
+    int                        port;
 };
 
 extern std::unique_ptr<Server> server;
