@@ -72,6 +72,55 @@ inline bool isReadable(const ByteVec& buffer, const size_t& offset, const size_t
     return true;
 }
 int countUTF16CodeUnits(const std::string& utf8);
+
+class PacketBuffer {
+    ByteVec buffer;
+    size_t offset;
+public:
+    PacketBuffer() : offset(0) {};
+    explicit PacketBuffer(const ByteVec& buffer) : buffer(buffer), offset(0) {};
+    explicit PacketBuffer(ByteVec&& buffer) : buffer(std::move(buffer)), offset(0) {};
+    PacketBuffer(const PacketBuffer&) = default;
+    PacketBuffer(PacketBuffer&&)      = default;
+    ~PacketBuffer() = default;
+
+    void clear() { buffer.clear(); offset = 0; }
+    void resize(const size_t size) { buffer.resize(size); }
+    void reserve(const size_t size) { buffer.reserve(size); }
+    void append(const ByteVec& data) { buffer.insert(buffer.end(), data.begin(), data.end()); }
+    void append(const ByteVec&& data) { buffer.insert(buffer.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end())); }
+
+    bool readBoolean() { return stratos::readBoolean(buffer, offset); }
+    int8_t readByte() { return stratos::readByte(buffer, offset); }
+    uint8_t readUnsignedByte() { return stratos::readUnsignedByte(buffer, offset); }
+    short readShort() { return stratos::readShort(buffer, offset); }
+    uint16_t readUnsignedShort() { return stratos::readUnsignedShort(buffer, offset); }
+    int readInt() { return stratos::readInt(buffer, offset); }
+    int64_t readLong() { return stratos::readLong(buffer, offset); }
+    float readFloat() { return stratos::readFloat(buffer, offset); }
+    double readDouble() { return stratos::readDouble(buffer, offset); }
+    std::string readString(const int maxChars) { return stratos::readString(buffer, offset, maxChars); }
+
+    void writeBoolean(const bool& value) { stratos::writeBoolean(buffer, value); }
+    void writeByte(const int8_t& value) { stratos::writeByte(buffer, value); }
+    void writeUnsignedByte(const uint8_t& value) { stratos::writeUnsignedByte(buffer, value); }
+    void writeShort(const short& value) { stratos::writeShort(buffer, value); }
+    void writeUnsignedShort(const uint16_t& value) { stratos::writeUnsignedShort(buffer, value); }
+    void writeInt(const int& value) { stratos::writeInt(buffer, value); }
+    void writeLong(const int64_t& value) { stratos::writeLong(buffer, value); }
+    void writeFloat(const float& value) { stratos::writeFloat(buffer, value); }
+    void writeDouble(const double& value) { stratos::writeDouble(buffer, value); }
+    void writeString(const std::string& value, int maxChars) { stratos::writeString(buffer, value, maxChars); }
+    void writeVarInt(const int& value) { stratos::writeVarInt(buffer, value); }
+    void writeVarLong(const int64_t& value) { stratos::writeVarLong(buffer, value); }
+
+    [[nodiscard]] const ByteVec& getBuffer() const { return buffer; }
+    [[nodiscard]] size_t         getOffset() const { return offset; }
+    [[nodiscard]] size_t         getSize() const { return buffer.size(); }
+    [[nodiscard]] bool           isEmpty() const { return buffer.empty(); }
+    [[nodiscard]] bool           isReadable() const { return offset < buffer.size(); }
+    [[nodiscard]] bool           isReadable(const size_t& bytes) const { return offset + bytes < buffer.size(); }
+};
 } // namespace stratos
 
 #endif
