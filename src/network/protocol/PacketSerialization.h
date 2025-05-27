@@ -20,7 +20,6 @@
 #ifndef PACKETSERIALIZATION_H
 #define PACKETSERIALIZATION_H
 #include <cstdint>
-#include <functional>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -74,19 +73,49 @@ int64_t readVarLong(const ByteVec& buffer, size_t& offset);
 // TODO: readPosition
 // TODO: readAngle
 // TODO: readUUID
-std::vector<uint64_t>      readBitSet(const ByteVec& buffer, size_t& offset);
-std::vector<bool>          readFixedBitSet(const ByteVec& buffer, size_t& offset, size_t length);
-template <typename T> bool readOptionalX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, T& readValue, bool isPresent = true);
-template <typename T> bool readPrefixedOptionalX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, T& readValue);
-template <typename T> std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, size_t count);
-template <typename T>
-std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&, int)>& readFunc, size_t count, int length);
-template <typename T> std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc);
-template <typename T> std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&, int)>& readFunc, int length);
-template <typename T, typename U>
-U readXEnum(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, std::function<U(const T&)> enumConverter);
-template <typename T> std::vector<T> readEnumSet(const ByteVec& buffer, size_t& offset, const std::function<T(const bool& bit)>& enumConverter, size_t length);
-ByteVec                              readByteArray(const ByteVec& buffer, size_t& offset, size_t length);
+std::vector<uint64_t> readBitSet(const ByteVec& buffer, size_t& offset);
+std::vector<bool>     readFixedBitSet(const ByteVec& buffer, size_t& offset, size_t length);
+template <typename T, typename ReadFunc> bool readOptionalX(const ByteVec& buffer, size_t& offset, const ReadFunc& readFunc, T& readValue, const bool isPresent) {
+    if (!isPresent) return false;
+    readValue = &readFunc(buffer, offset);
+    return true;
+}
+template <typename T, typename ReadFunc> bool readPrefixedOptionalX(const ByteVec& buffer, size_t& offset, const ReadFunc& readFunc, T& readValue) {
+    const bool isPresent = readBoolean(buffer, offset);
+    if (isPresent) readValue = readFunc(buffer, offset);
+    return isPresent;
+}
+template <typename T, typename ReadFunc> std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, const ReadFunc& readFunc, size_t count) {
+    std::vector<T> result;
+    result.reserve(count);
+    for (size_t i = 0; i < count; ++i) result.push_back(readFunc(buffer, offset));
+    return result;
+}
+template <typename T, typename ReadFunc>
+std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, const ReadFunc& readFunc, size_t count, int length) {
+    std::vector<T> result;
+    result.reserve(count);
+    for (size_t i = 0; i < count; ++i) result.push_back(readFunc(buffer, offset, length));
+    return result;
+}
+template <typename T, typename ReadFunc> std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const ReadFunc& readFunc) {
+    return readArrayOfX<T>(buffer, offset, readFunc, readVarInt(buffer, offset));
+}
+template <typename T, typename ReadFunc>
+std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const ReadFunc& readFunc, const int length) {
+    return readArrayOfX<T>(buffer, offset, readFunc, readVarInt(buffer, offset), length);
+}
+template <typename T, typename U, typename ReadFunc, typename EnumConverter>
+U readXEnum(const ByteVec& buffer, size_t& offset, const ReadFunc& readFunc, const EnumConverter& enumConverter) {
+    T value = readFunc(buffer, offset);
+    return enumConverter(value);
+}
+template <typename T, typename EnumConverter> std::vector<T> readEnumSet(const ByteVec& buffer, size_t& offset, const EnumConverter& enumConverter, const size_t length) {
+    std::vector<T> result;
+    for (bool bit : readFixedBitSet(buffer, offset, length)) result.push_back(enumConverter(bit));
+    return result;
+}
+ByteVec readByteArray(const ByteVec& buffer, size_t& offset, size_t length);
 // TODO: readIDOrX
 // TODO: readIDSet
 // TODO: readSoundEvent
@@ -107,17 +136,49 @@ void writeVarLong(ByteVec& buffer, int64_t value);
 // TODO: writeUUID
 void                       writeBitSet(ByteVec& buffer, const std::vector<uint64_t>& longs);
 void                       writeFixedBitSet(ByteVec& buffer, const std::vector<bool>& bits, size_t length);
-template <typename T> void writeOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&)>& writeFunc, bool isPresent = true);
-template <typename T> void writeOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&, int)>& writeFunc, bool isPresent = true, int length = 0);
-template <typename T> void writePrefixedOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&)>& writeFunc);
-template <typename T> void writePrefixedOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&, int)>& writeFunc, int length);
-template <typename T> void writeArrayOfX(ByteVec& buffer, const std::vector<T>& values, const std::function<void(ByteVec&, const T&)>& writeFunc);
-template <typename T> void writeArrayOfX(ByteVec& buffer, const std::vector<T>& values, const std::function<void(ByteVec&, const T&, int)>& writeFunc, int length);
-template <typename T> void writePrefixedArrayOfX(ByteVec& buffer, const std::vector<T>& values, const std::function<void(ByteVec&, const T&)>& writeFunc);
-template <typename T> void writeXEnum(ByteVec& buffer, const T& value, const std::function<void(ByteVec&, const T&)>& writeFunc);
-template <typename T> void writeXEnum(ByteVec& buffer, const T& value, void (*writeFunc)(ByteVec&, const T&, const int&), int length);
-void                       writeEnumSet(ByteVec& buffer, const std::vector<bool>& values);
-void                       writeByteArray(ByteVec& buffer, const ByteVec& values);
+template <typename T, typename WriteFunc> void writeOptionalX(ByteVec& buffer, const T* value, const WriteFunc& writeFunc, const bool isPresent) {
+    if (!isPresent || value == nullptr) return;
+    writeFunc(buffer, *value);
+}
+template <typename T, typename WriteFunc>
+void writeOptionalX(ByteVec& buffer, const T* value, const WriteFunc& writeFunc, const bool isPresent, const int length) {
+    if (!isPresent || value == nullptr) return;
+    writeFunc(buffer, *value, length);
+}
+template <typename T, typename WriteFunc> void writePrefixedOptionalX(ByteVec& buffer, const T* value, const WriteFunc& writeFunc) {
+    const bool present = value != nullptr;
+    writeBoolean(buffer, present);
+    if (!present) return;
+    writeFunc(buffer, *value);
+}
+template <typename T, typename WriteFunc> void writePrefixedOptionalX(ByteVec& buffer, const T* value, const WriteFunc& writeFunc, const int length) {
+    const bool present = value != nullptr;
+    writeBoolean(buffer, present);
+    if (!present) return;
+    writeFunc(buffer, *value, length);
+}
+template <typename T, typename WriteFunc> void writeArrayOfX(ByteVec& buffer, const std::vector<T>& values, const WriteFunc& writeFunc) {
+    for (const auto& value : values) {
+        writeFunc(buffer, value);
+    }
+}
+template <typename T, typename WriteFunc> void writeArrayOfX(ByteVec& buffer, const std::vector<T>& values, const WriteFunc& writeFunc, int length) {
+    for (const auto& value : values) {
+        writeFunc(buffer, value, length);
+    }
+}
+template <typename T, typename WriteFunc> void writePrefixedArrayOfX(ByteVec& buffer, const std::vector<T>& values, const WriteFunc& writeFunc) {
+    writeVarInt(buffer, static_cast<int>(values.size()));
+    writeArrayOfX(buffer, values, writeFunc);
+}
+template <typename T, typename WriteFunc> void writeXEnum(ByteVec& buffer, const T& value, const WriteFunc& writeFunc) {
+    writeFunc(buffer, value);
+}
+template <typename T, typename WriteFunc> void writeXEnum(ByteVec& buffer, const T& value, const WriteFunc& writeFunc, const int length) {
+    writeFunc(buffer, value, length);
+}
+void writeEnumSet(ByteVec& buffer, const std::vector<bool>& values);
+void writeByteArray(ByteVec& buffer, const ByteVec& values);
 // TODO: writeIDOrX
 // TODO: writeIDSet
 // TODO: writeSoundEvent
@@ -141,6 +202,8 @@ class PacketBuffer {
     PacketBuffer() : offset(0) {};
     explicit PacketBuffer(const ByteVec& buffer) : buffer(buffer), offset(0) {};
     explicit PacketBuffer(ByteVec&& buffer) : buffer(std::move(buffer)), offset(0) {};
+    PacketBuffer(const ByteVec& buffer, const int offset) : buffer(buffer), offset(offset) {};
+    PacketBuffer(ByteVec&& buffer, const int offset) : buffer(std::move(buffer)), offset(offset) {};
     PacketBuffer(const PacketBuffer&) = default;
     PacketBuffer(PacketBuffer&&)      = default;
     ~PacketBuffer()                   = default;
@@ -170,8 +233,7 @@ class PacketBuffer {
     std::vector<uint64_t> readBitSet() { return stratos::readBitSet(buffer, offset); }
     std::vector<bool>     readFixedBitSet(const size_t length) { return stratos::readFixedBitSet(buffer, offset, length); }
     // TODO: Read array of X, optional X, and so on get individual methods per type
-    template <typename T, typename U>
-    U readXEnum(const std::function<T(const ByteVec&, size_t&)>& readFunc, std::function<U(const T&)> enumConverter) {
+    template <typename T, typename U, typename ReadFunc, typename EnumConverter> U readXEnum(const ReadFunc& readFunc, const EnumConverter& enumConverter) {
         return stratos::readXEnum<T, U>(buffer, offset, readFunc, enumConverter);
     }
     ByteVec readByteArray(const size_t length) { return stratos::readByteArray(buffer, offset, length); }
@@ -192,11 +254,8 @@ class PacketBuffer {
     void writeBitSet(const std::vector<uint64_t>& longs) { stratos::writeBitSet(buffer, longs); }
     void writeFixedBitSet(const std::vector<bool>& bits, const size_t length) { stratos::writeFixedBitSet(buffer, bits, length); }
     // TODO: Write array of X, optional X, and so on get individual methods per type
-    template <typename T>
-    void writeXEnum(const T& value, const std::function<void(ByteVec&, const T&)>& writeFunc) {
-        stratos::writeXEnum<T>(buffer, value, writeFunc);
-    }
-    void writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
+    template <typename T, typename WriteFunc> void writeXEnum(const T& value, const WriteFunc& writeFunc) { stratos::writeXEnum<T>(buffer, value, writeFunc); }
+    void                       writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
 
     [[nodiscard]] const ByteVec& getBuffer() const { return buffer; }
     [[nodiscard]] size_t         getOffset() const { return offset; }

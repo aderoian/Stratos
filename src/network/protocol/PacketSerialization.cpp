@@ -61,9 +61,7 @@ int stratos::readInt(const ByteVec& buffer, size_t& offset) {
 int64_t stratos::readLong(const ByteVec& buffer, size_t& offset) {
     isReadable(buffer, offset, sizeof(long));
     int64_t result = 0;
-    for (int i = 0; i < 8; ++i) {
-        result |= static_cast<int64_t>(buffer[offset++]) << ((7 - i) * 8);
-    }
+    for (int i = 0; i < 8; ++i) result |= static_cast<int64_t>(buffer[offset++]) << ((7 - i) * 8);
     return result;
 }
 float stratos::readFloat(const ByteVec& buffer, size_t& offset) {
@@ -84,25 +82,17 @@ double stratos::readDouble(const ByteVec& buffer, size_t& offset) {
 }
 std::string stratos::readString(const ByteVec& buffer, size_t& offset, const int maxChars) {
     const uint32_t length = readVarInt(buffer, offset);
-
     if (length > maxChars * 3) throw PacketSerializationException("String: length exceeds UTF-8 byte size limit");
     if (offset + length > buffer.size()) throw PacketSerializationException("Buffer overflow: Tried reading beyond buffer size.");
-
     std::string str(buffer.begin() + offset, buffer.begin() + offset + length);
     offset += length;
-    if (const int utf16Units = countUTF16CodeUnits(str); utf16Units > maxChars) {
-        throw PacketSerializationException("String: character length exceeds maximum");
-    }
-
+    if (const int utf16Units = countUTF16CodeUnits(str); utf16Units > maxChars) throw PacketSerializationException("String: character length exceeds maximum");
     return str;
 }
 std::string stratos::readStringUTF16BE(const ByteVec& buffer, size_t& offset) {
-    if (offset + 2 > buffer.size()) {
-        throw std::out_of_range("StringUTF16BE: not enough bytes for length");
-    }
+    if (offset + 2 > buffer.size()) throw std::out_of_range("StringUTF16BE: not enough bytes for length");
     const uint16_t length = static_cast<uint16_t>(buffer[offset++]) << 8 | static_cast<uint16_t>(buffer[offset++]);
-    if (const size_t byteLength = length * 2; offset + byteLength > buffer.size())
-        throw PacketSerializationException("StringUTF16BE: not enough bytes for string content");
+    if (const size_t byteLength = length * 2; offset + byteLength > buffer.size()) throw PacketSerializationException("StringUTF16BE: not enough bytes for string content");
     std::u16string utf16;
     utf16.reserve(length);
     for (size_t i = 0; i < length; ++i) {
@@ -136,9 +126,7 @@ void stratos::writeInt(ByteVec& buffer, const int value) {
     buffer.push_back(static_cast<unsigned char>(value & 0xFF));
 }
 void stratos::writeLong(ByteVec& buffer, const int64_t value) {
-    for (int i = 7; i >= 0; --i) {
-        buffer.push_back(static_cast<unsigned char>(value >> (i * 8) & 0xFF));
-    }
+    for (int i = 7; i >= 0; --i) buffer.push_back(static_cast<unsigned char>(value >> (i * 8) & 0xFF));
 }
 void stratos::writeFloat(ByteVec& buffer, const float value) {
     uint32_t bits;
@@ -151,32 +139,24 @@ void stratos::writeFloat(ByteVec& buffer, const float value) {
 void stratos::writeDouble(ByteVec& buffer, const double value) {
     uint64_t bits;
     std::memcpy(&bits, &value, sizeof(double));
-    for (int i = 7; i >= 0; --i) {
-        buffer.push_back(static_cast<unsigned char>(bits >> (i * 8) & 0xFF));
-    }
+    for (int i = 7; i >= 0; --i) buffer.push_back(static_cast<unsigned char>(bits >> (i * 8) & 0xFF));
 }
 void stratos::writeString(ByteVec& buffer, const std::string& value, const int maxChars) {
-    if (const int utf16Units = countUTF16CodeUnits(value); utf16Units > maxChars) {
-        throw PacketSerializationException("String: exceeds character limit");
-    }
-
-    if (value.size() > maxChars * 3) {
-        throw PacketSerializationException("String: exceeds UTF-8 byte size limit");
-    }
-
-    auto length = static_cast<int32_t>(value.size());
+    if (const int utf16Units = countUTF16CodeUnits(value); utf16Units > maxChars) throw PacketSerializationException("String: exceeds character limit");
+    if (value.size() > maxChars * 3) throw PacketSerializationException("String: exceeds UTF-8 byte size limit");
+    const auto length = static_cast<int32_t>(value.size());
     writeVarInt(buffer, length);
     buffer.insert(buffer.end(), value.begin(), value.end());
 }
 void stratos::writeStringUTF16BE(ByteVec& buffer, const std::string& value) {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     const std::u16string                                              utf16  = convert.from_bytes(value);
-    const auto length = static_cast<uint16_t>(utf16.size());
+    const auto                                                        length = static_cast<uint16_t>(utf16.size());
     buffer.push_back(length >> 8 & 0xFF); // big-endian
     buffer.push_back(length & 0xFF);
     for (const char16_t& ch : utf16) {
-        buffer.push_back(ch >> 8 & 0xFF);  // high byte
-        buffer.push_back(ch & 0xFF);         // low byte
+        buffer.push_back(ch >> 8 & 0xFF); // high byte
+        buffer.push_back(ch & 0xFF);      // low byte
     }
 }
 int stratos::readVarInt(const ByteVec& buffer, size_t& offset) {
@@ -225,47 +205,6 @@ std::vector<bool> stratos::readFixedBitSet(const ByteVec& buffer, size_t& offset
     offset += byteLength;
     return bits;
 }
-template <typename T>
-bool stratos::readOptionalX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, T& readValue, const bool isPresent) {
-    if (!isPresent) return false;
-    readValue = &readFunc(buffer, offset);
-    return true;
-}
-template <typename T> bool stratos::readPrefixedOptionalX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, T& readValue) {
-    const bool isPresent = readBoolean(buffer, offset);
-    if (isPresent) readValue = readFunc(buffer, offset);
-    return isPresent;
-}
-template <typename T> std::vector<T> stratos::readArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, size_t count) {
-    std::vector<T> result;
-    result.reserve(count);
-    for (size_t i = 0; i < count; ++i) result.push_back(readFunc(buffer, offset));
-    return result;
-}
-template <typename T>
-std::vector<T> stratos::readArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&, int)>& readFunc, size_t count, int length) {
-    std::vector<T> result;
-    result.reserve(count);
-    for (size_t i = 0; i < count; ++i) result.push_back(readFunc(buffer, offset, length));
-    return result;
-}
-template <typename T> std::vector<T> stratos::readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc) {
-    return readArrayOfX<T>(buffer, offset, readFunc, readVarInt(buffer, offset));
-}
-template <typename T>
-std::vector<T> stratos::readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&, int)>& readFunc, const int length) {
-    return readArrayOfX<T>(buffer, offset, readFunc, readVarInt(buffer, offset), length);
-}
-template <typename T, typename U>
-U stratos::readXEnum(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, std::function<U(const T&)> enumConverter) {
-    T value = readFunc(buffer, offset);
-    return enumConverter(value);
-}
-template <typename T> std::vector<T> stratos::readEnumSet(const ByteVec& buffer, size_t& offset, const std::function<T(const bool& bit)>& enumConverter, const size_t length) {
-    std::vector<T> result;
-    for (bool bit : readFixedBitSet(buffer, offset, length)) result.push_back(enumConverter(bit));
-    return result;
-}
 stratos::ByteVec stratos::readByteArray(const ByteVec& buffer, size_t& offset, const size_t length) {
     ByteVec result;
     result.reserve(length);
@@ -295,9 +234,8 @@ void stratos::writeVarLong(ByteVec& buffer, int64_t value) {
 void stratos::writeBitSet(ByteVec& buffer, const std::vector<uint64_t>& longs) {
     const int length = static_cast<int>(longs.size());
     writeVarInt(buffer, length);
-    for (const uint64_t value : longs) {
+    for (const uint64_t value : longs)
         for (int i = 7; i >= 0; --i) buffer.push_back(value >> (i * 8) & 0xFF);
-    }
 }
 void stratos::writeFixedBitSet(ByteVec& buffer, const std::vector<bool>& bits, const size_t length) {
     const size_t byteLength = (length + 7) / 8;
@@ -308,58 +246,14 @@ void stratos::writeFixedBitSet(ByteVec& buffer, const std::vector<bool>& bits, c
         buffer.push_back(byte);
     }
 }
-template <typename T> void stratos::writeOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&)>& writeFunc, const bool isPresent) {
-    if (!isPresent || value == nullptr) return;
-    writeFunc(buffer, *value);
-}
-template <typename T>
-void stratos::writeOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&, int)>& writeFunc, const bool isPresent, const int length) {
-    if (!isPresent || value == nullptr) return;
-    writeFunc(buffer, *value, length);
-}
-template <typename T> void stratos::writePrefixedOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&)>& writeFunc) {
-    const bool present = value != nullptr;
-    writeBoolean(buffer, present);
-    if (!present) return;
-    writeFunc(buffer, *value);
-}
-template <typename T> void stratos::writePrefixedOptionalX(ByteVec& buffer, const T* value, const std::function<void(ByteVec&, const T&, int)>& writeFunc, const int length) {
-    const bool present = value != nullptr;
-    writeBoolean(buffer, present);
-    if (!present) return;
-    writeFunc(buffer, *value, length);
-}
-template <typename T> void stratos::writeArrayOfX(ByteVec& buffer, const std::vector<T>& values, const std::function<void(ByteVec&, const T&)>& writeFunc) {
-    for (const auto& value : values) {
-        writeFunc(buffer, value);
-    }
-}
-template <typename T> void stratos::writeArrayOfX(ByteVec& buffer, const std::vector<T>& values, const std::function<void(ByteVec&, const T&, int)>& writeFunc, int length) {
-    for (const auto& value : values) {
-        writeFunc(buffer, value, length);
-    }
-}
-template <typename T> void stratos::writePrefixedArrayOfX(ByteVec& buffer, const std::vector<T>& values, const std::function<void(ByteVec&, const T&)>& writeFunc) {
-    writeVarInt(buffer, static_cast<int>(values.size()));
-    writeArrayOfX(buffer, values, writeFunc);
-}
-template <typename T> void stratos::writeXEnum(ByteVec& buffer, const T& value, const std::function<void(ByteVec&, const T&)>& writeFunc) {
-    writeFunc(buffer, value);
-}
-template <typename T> void stratos::writeXEnum(ByteVec& buffer, const T& value, void (*writeFunc)(ByteVec&, const T&, const int&), const int length) {
-    writeFunc(buffer, value, length);
-}
 void stratos::writeByteArray(ByteVec& buffer, const ByteVec& values) {
     for (const auto& value : values) buffer.push_back(value);
 }
 int stratos::countUTF16CodeUnits(const std::string& utf8) {
     int    count = 0;
     size_t i     = 0;
-
     while (i < utf8.size()) {
-        unsigned char c = utf8[i];
-
-        if (c < 0x80) {
+        if (const unsigned char c = utf8[i]; c < 0x80) {
             ++i;
             ++count;
         } else if (c >> 5 == 0x6) {
@@ -375,6 +269,5 @@ int stratos::countUTF16CodeUnits(const std::string& utf8) {
             throw std::runtime_error("Invalid UTF-8 sequence");
         }
     }
-
     return count;
 }

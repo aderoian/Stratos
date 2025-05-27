@@ -20,6 +20,8 @@ set(SOURCES
         network/Network.cpp
         network/Socket.cpp
         network/protocol/PacketSerialization.cpp
+        network/protocol/Packet.cpp
+        network/protocol/PacketCodec.cpp
 )
 
 set(HEADERS
@@ -27,6 +29,8 @@ set(HEADERS
         network/Network.h
         network/Socket.h
         network/protocol/PacketSerialization.h
+        network/protocol/Packet.h
+        network/protocol/PacketCodec.h
 )
 
 # Project

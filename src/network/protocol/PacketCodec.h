@@ -32,6 +32,7 @@ namespace stratos {
 class ClientHandshake final : public ServerboundPacket {
   public:
     enum class Intent {
+        None = 0,
         Status = 0x01,
         Login = 0x02,
         Transfer = 0x03
@@ -43,7 +44,8 @@ class ClientHandshake final : public ServerboundPacket {
     uint16_t serverPort = 0;
     Intent intent = Intent::Status;
 
-    explicit ClientHandshake() : ServerboundPacket(ID) {}
+    explicit ClientHandshake() : Packet(ID), ServerboundPacket(ID) {}
+    ~ClientHandshake() override = default;
     void decrypt(PacketBuffer& buffer) override;
     void handle(NetworkSession& session) override;
 };
@@ -53,7 +55,8 @@ public:
     constexpr static int ID = 0xFE;
     uint8_t payload = 0x01; // Legacy server list ping payload
 
-    explicit LegacyServerListPing() : ServerboundPacket(ID) {}
+    explicit LegacyServerListPing() : Packet(ID), ServerboundPacket(ID) {}
+    ~LegacyServerListPing() override = default;
     void decrypt(PacketBuffer& buffer) override;
     void handle(NetworkSession& session) override;
 };
@@ -67,8 +70,10 @@ public:
     int onlinePlayers;
     int         maxPlayers;
 
+    LegacyServerListPong() : Packet(ID), ClientboundPacket(ID), protocolVersion(0), version(""), motd(""), onlinePlayers(0), maxPlayers(0) {}
     LegacyServerListPong(const int protocol_version, const std::string& version, const std::string& motd, const int online_players, const int max_players)
-        : ClientboundPacket(ID), protocolVersion(protocol_version), version(version), motd(motd), onlinePlayers(online_players), maxPlayers(max_players) {}
+        : Packet(ID), ClientboundPacket(ID), protocolVersion(protocol_version), version(version), motd(motd), onlinePlayers(online_players), maxPlayers(max_players) {}
+    ~LegacyServerListPong() override = default;
     void encrypt(PacketBuffer& buffer) override;
 };
 
@@ -79,22 +84,29 @@ public:
     constexpr static int ID = 0x00;
     std::string          jsonResponse;
 
-    explicit StatusResponse(std::string&& jsonResponse) : ClientboundPacket(ID), jsonResponse(std::move(jsonResponse)) {}
-    void encrypt(PacketBuffer& buffer) override { buffer.writeString(jsonResponse, 32767); }
+    StatusResponse() : Packet(ID), ClientboundPacket(ID), jsonResponse("") {}
+    explicit StatusResponse(std::string&& jsonResponse) : Packet(ID), ClientboundPacket(ID), jsonResponse(std::move(jsonResponse)) {}
+    ~StatusResponse() override = default;
+    void encrypt(PacketBuffer& buffer) override;
 };
 
 class PongResponse final : public ClientboundPacket {
+public:
     constexpr static int ID = 0x01;
     int64_t timestamp;
 
-    explicit PongResponse(const int64_t timestamp) : ClientboundPacket(ID), timestamp(timestamp) {}
-    void encrypt(PacketBuffer& buffer) override { buffer.writeLong(timestamp); }
+    PongResponse() : Packet(ID), ClientboundPacket(ID), timestamp(0) {}
+    explicit PongResponse(const int64_t timestamp) : Packet(ID), ClientboundPacket(ID), timestamp(timestamp) {}
+    ~PongResponse() override = default;
+    void encrypt(PacketBuffer& buffer) override;
 };
 
 class StatusRequest final : public ServerboundPacket {
 public:
     constexpr static int ID = 0x00;
-    explicit StatusRequest() : ServerboundPacket(ID) {}
+
+    explicit StatusRequest() : Packet(ID), ServerboundPacket(ID) {}
+    ~StatusRequest() override = default;
     void decrypt(PacketBuffer& buffer) override;
     void handle(NetworkSession& session) override;
 };
@@ -103,7 +115,8 @@ class PingRequest final : public ServerboundPacket {
   public:
     constexpr static int ID = 0x01;
 
-    explicit PingRequest() : ServerboundPacket(ID) {}
+    explicit PingRequest() : Packet(ID), ServerboundPacket(ID) {}
+    ~PingRequest() override = default;
     void decrypt(PacketBuffer& buffer) override;
     void handle(NetworkSession& session) override;
 };

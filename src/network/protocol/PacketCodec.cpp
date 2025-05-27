@@ -26,7 +26,7 @@ void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
     serverPort      = buffer.readUnsignedShort();
 
     // Read the intent
-    intent = buffer.readXEnum(std::function(readVarInt), std::function([](const int& value) -> Intent {
+    intent = buffer.readXEnum<int, Intent>(readVarInt, [](const int& value) -> Intent {
                                   switch (value) {
                                   case 0x01:
                                       return Intent::Status;
@@ -37,12 +37,23 @@ void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
                                   default:
                                       throw PacketSerializationException("Unknown intent value: " + std::to_string(value));
                                   }
-                              }));
+                              });
 }
-void stratos::ClientHandshake::handle(NetworkSession& session) {
-
-}
+void stratos::ClientHandshake::handle(NetworkSession& session) {}
+void stratos::LegacyServerListPing::decrypt(PacketBuffer& buffer) {}
+void stratos::LegacyServerListPing::handle(NetworkSession& session) {}
 void stratos::LegacyServerListPong::encrypt(PacketBuffer& buffer) {
-    const std::string payload = "§1\0" + std::to_string(protocolVersion) + "\0" + version + "\0" + motd + "\0" + "\0" + std::to_string(onlinePlayers) + "\0" + std::to_string(maxPlayers);
+    const std::string payload =
+        "§1\0" + std::to_string(protocolVersion) + "\0" + version + "\0" + motd + "\0" + "\0" + std::to_string(onlinePlayers) + "\0" + std::to_string(maxPlayers);
     buffer.writeStringUTF16BE(payload);
 }
+void stratos::StatusResponse::encrypt(PacketBuffer& buffer) {
+    buffer.writeString(jsonResponse, 32767);
+}
+void stratos::PongResponse::encrypt(PacketBuffer& buffer) {
+    buffer.writeLong(timestamp);
+}
+void stratos::StatusRequest::decrypt(PacketBuffer& buffer) {}
+void stratos::StatusRequest::handle(NetworkSession& session) {}
+void stratos::PingRequest::decrypt(PacketBuffer& buffer) {}
+void stratos::PingRequest::handle(NetworkSession& session) {}

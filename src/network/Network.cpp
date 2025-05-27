@@ -33,19 +33,77 @@ void stratos::NetworkSession::tick() {
 
     // Empty received queue
     // TODO: Should we always empty or consume a fix amount per tick?
-    ByteVec buffer;
+    processReceived();
+
+    // Attempt to empty the recvBuffer
+    handleRawReceived();
+}
+void stratos::NetworkSession::processReceived() {
     ByteVec segment;
     while (connection->receive(segment) > 0) {
-        buffer.insert(buffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.end()));
+        recvBuffer.insert(recvBuffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.end()));
         segment.clear();
     }
-
-    if (!buffer.empty())
-        handleReceived(buffer);
 }
-void stratos::NetworkSession::handleReceived(ByteVec& data) {
-    // TODO: Begin handling Java packets!!!
-    std::cout << "Received data from client " << sessionId.ip << ":" << sessionId.port << std::endl;
+void stratos::NetworkSession::handleRawReceived() {
+    size_t offset = 0;
+    while (recvBuffer.size() > 0) {
+        if (protocolState == Handshaking) {
+            // Attempt to read the LegacyServerListPing
+            try {
+                if (const uint8_t id = readUnsignedByte(recvBuffer, offset); id == LegacyServerListPing::ID) {
+                    PacketBuffer buffer(recvBuffer);
+                    LegacyServerListPing packet;
+                    packet.decrypt(buffer);
+                    packet.handle(*this);
+
+                    const size_t newOffset = buffer.getOffset();
+                    recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + newOffset);
+                    continue;
+                }
+            } catch (PacketSerializationException & ignored) {}
+        }
+
+        if (recvBuffer.size() < 6) {
+            // Not enough data to read a packet, wait for more data
+            return;
+        }
+
+        try {
+            const int packetLength = readVarInt(recvBuffer, offset);
+            if (packetLength < 0 || packetLength > recvBuffer.size() - offset) {
+                // Not enough data to read a full packet, wait for more data
+                return;
+            }
+
+            PacketBuffer packetBuffer(recvBuffer, offset);
+            try {
+                const int packetId = packetBuffer.readVarInt();
+                auto       packetKey = PacketKey{protocolState, Serverbound, packetId};
+                const auto packet = PacketRegistry::instance().create(packetKey);
+                if (!packet) {
+                    networkManager->getLogger()->error("Received unknown packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
+                    recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + offset + packetLength);
+                    return;
+                }
+
+                networkManager->getLogger()->info("Received packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
+                packet->decrypt(packetBuffer);
+                packet->handle(*this);
+            } catch (const PacketSerializationException &e) {
+                networkManager->getLogger()->error("Failed to read packet from client {}:{}: {}", sessionId.ip, sessionId.port, e.what());
+            } catch (const std::exception &e) {
+                networkManager->getLogger()->error("Encountered an exception when handing a packet for client {}:{}: {}", sessionId.ip, sessionId.port, e.what());
+            }
+
+            recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + offset + packetLength);
+        } catch (const PacketSerializationException& ignored) {
+            // Not enough data to read a packet, wait for more data
+            break;
+        } catch (const std::exception& e) {
+            networkManager->getLogger()->error("Failed to read packet from client {}:{}: {}", sessionId.ip, sessionId.port, e.what());
+        }
+    }
 }
 void stratos::NetworkSession::dispose() const {
     networkManager->getLogger()->info("Disposing network session for client {}:{}", sessionId.ip, sessionId.port);

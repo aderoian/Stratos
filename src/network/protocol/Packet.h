@@ -19,35 +19,102 @@
 
 #ifndef PACKET_H
 #define PACKET_H
+#include <functional>
+#include <memory>
 
 namespace stratos {
 class NetworkSession;
 class PacketBuffer;
 
+enum ProtocolState { Handshaking = 0x00, Status = 0x01, Login = 0x02, Configuration = 0x03, Play = 0x04 };
+enum PacketDirection { Clientbound = 0x00, Serverbound = 0x01 };
+
 class Packet {
 public:
     explicit Packet(const int id) : id(id) {}
-    virtual ~Packet();
+    virtual ~Packet() = default;
 
     int getId() const { return id; }
     virtual void decrypt(PacketBuffer& buffer) = 0;
     virtual void encrypt(PacketBuffer& buffer) = 0;
+    virtual void handle(NetworkSession& session) = 0;
 
     int id;
 };
 
 class ClientboundPacket : virtual public Packet {
-  public:
+public:
     explicit ClientboundPacket(const int id) : Packet(id) {}
-    virtual void decrypt(PacketBuffer& buffer) override {}
+    ~ClientboundPacket() override = default;
+    void decrypt(PacketBuffer& buffer) override {}
+    void handle(NetworkSession& session) override {}
 };
 
 class ServerboundPacket : virtual public Packet {
-  public:
+public:
     explicit ServerboundPacket(const int id) : Packet(id) {}
-    virtual void encrypt(PacketBuffer& buffer) override {}
-    virtual void handle(NetworkSession& session) = 0;
+    ~ServerboundPacket() override = default;
+    void encrypt(PacketBuffer& buffer) override {}
 };
+
+struct PacketKey {
+    int state;
+    int direction;
+    int id;
+
+    bool operator==(const PacketKey& other) const;
+};
+
+inline bool PacketKey::operator==(const PacketKey& other) const {
+    return state == other.state && direction == other.direction && id == other.id;
+}
+}
+
+template <>
+struct std::hash<stratos::PacketKey> {
+    std::size_t operator()(const stratos::PacketKey& key) const noexcept {
+        const std::size_t h1 = std::hash<int>()(key.state);
+        const std::size_t h2 = std::hash<int>()(key.direction);
+        const std::size_t h3 = std::hash<int>()(key.id);
+
+        std::size_t seed = h1;
+        seed ^= h2 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= h3 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        return seed;
+    }
+};
+
+namespace stratos {
+class PacketRegistry final {
+  public:
+    typedef std::function<std::unique_ptr<Packet>()> PacketFactory;
+
+    PacketRegistry();
+
+    static PacketRegistry& instance() {
+        static PacketRegistry registry;
+        return registry;
+    }
+
+    std::unique_ptr<Packet> create(const PacketKey& key);
+
+  private:
+    std::unordered_map<PacketKey, PacketFactory> factories ;
+
+    void setup();
+    void registerPacket(const PacketKey& key, PacketFactory factory);
+};
+
+inline PacketRegistry::PacketRegistry() : factories() {
+    setup();
+}
+inline std::unique_ptr<Packet> PacketRegistry::create(const PacketKey& key) {
+    if (const auto it = factories.find(key); it != factories.end()) return it->second();
+    return nullptr;
+}
+inline void PacketRegistry::registerPacket(const PacketKey& key, PacketFactory factory) {
+    factories[key] = std::move(factory);
+}
 
 } // namespace stratos
 

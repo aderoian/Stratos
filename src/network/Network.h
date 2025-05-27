@@ -20,6 +20,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 #include "concurrentqueue.h"
+#include "protocol/PacketCodec.h"
 #include "Socket.h"
 
 #include <memory>
@@ -123,9 +124,16 @@ class NetworkSession {
     SessionId       sessionId;
     std::shared_ptr<NetworkConnection>   connection;
 
+    ByteVec recvBuffer;
+
+    ProtocolState protocolState = Handshaking;
+    ClientHandshake::Intent sessionIntent = ClientHandshake::Intent::None;
     bool connected = true;
 
-    void handleReceived(ByteVec& data);
+    // Clears the received segments and moves the data to the recvBuffer
+    void processReceived();
+    // Handles the raw received data, frames data into received packet(s), then handles the packet(s) if any
+    void handleRawReceived();
     void dispose() const;
 
     friend class NetworkManager;
