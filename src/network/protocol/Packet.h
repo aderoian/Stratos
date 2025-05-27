@@ -36,14 +36,16 @@ public:
     int id;
 };
 
-class ClientboundPacket : public Packet {
+class ClientboundPacket : virtual public Packet {
   public:
     explicit ClientboundPacket(const int id) : Packet(id) {}
+    virtual void decrypt(PacketBuffer& buffer) override {}
 };
 
-class ServerboundPacket : public Packet {
+class ServerboundPacket : virtual public Packet {
   public:
     explicit ServerboundPacket(const int id) : Packet(id) {}
+    virtual void encrypt(PacketBuffer& buffer) override {}
     virtual void handle(NetworkSession& session) = 0;
 };
 

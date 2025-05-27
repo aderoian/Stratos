@@ -45,17 +45,19 @@ int64_t     readLong(const ByteVec& buffer, size_t& offset);
 float       readFloat(const ByteVec& buffer, size_t& offset);
 double      readDouble(const ByteVec& buffer, size_t& offset);
 std::string readString(const ByteVec& buffer, size_t& offset, int maxChars);
+std::string readStringUTF16BE(const ByteVec& buffer, size_t& offset);
 
-void writeBoolean(ByteVec& buffer, const bool& value);
-void writeByte(ByteVec& buffer, const int8_t& value);
-void writeUnsignedByte(ByteVec& buffer, const uint8_t& value);
-void writeShort(ByteVec& buffer, const short& value);
-void writeUnsignedShort(ByteVec& buffer, const uint16_t& value);
-void writeInt(ByteVec& buffer, const int& value);
-void writeLong(ByteVec& buffer, const int64_t& value);
-void writeFloat(ByteVec& buffer, const float& value);
-void writeDouble(ByteVec& buffer, const double& value);
+void writeBoolean(ByteVec& buffer, bool value);
+void writeByte(ByteVec& buffer, int8_t value);
+void writeUnsignedByte(ByteVec& buffer, uint8_t value);
+void writeShort(ByteVec& buffer, short value);
+void writeUnsignedShort(ByteVec& buffer, uint16_t value);
+void writeInt(ByteVec& buffer, int value);
+void writeLong(ByteVec& buffer, int64_t value);
+void writeFloat(ByteVec& buffer, float value);
+void writeDouble(ByteVec& buffer, double value);
 void writeString(ByteVec& buffer, const std::string& value, int maxChars);
+void writeStringUTF16BE(ByteVec& buffer, const std::string& value);
 
 // Minecraft type serialization functions
 int constexpr SEGMENT_BITS = 0x7F;
@@ -76,11 +78,11 @@ std::vector<uint64_t>      readBitSet(const ByteVec& buffer, size_t& offset);
 std::vector<bool>          readFixedBitSet(const ByteVec& buffer, size_t& offset, size_t length);
 template <typename T> bool readOptionalX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, T& readValue, bool isPresent = true);
 template <typename T> bool readPrefixedOptionalX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, T& readValue);
-template <typename T> std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, T const std::function<T(const ByteVec&, size_t&)>& readFunc, size_t count);
+template <typename T> std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, size_t count);
 template <typename T>
-std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, T const std::function<T(const ByteVec&, size_t&, int)>& readFunc, size_t count, int length);
-template <typename T> std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, T const std::function<T(const ByteVec&, size_t&)>& readFunc);
-template <typename T> std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, T const std::function<T(const ByteVec&, size_t&, int)>& readFunc, int length);
+std::vector<T> readArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&, int)>& readFunc, size_t count, int length);
+template <typename T> std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc);
+template <typename T> std::vector<T> readPrefixedArrayOfX(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&, int)>& readFunc, int length);
 template <typename T, typename U>
 U readXEnum(const ByteVec& buffer, size_t& offset, const std::function<T(const ByteVec&, size_t&)>& readFunc, std::function<U(const T&)> enumConverter);
 template <typename T> std::vector<T> readEnumSet(const ByteVec& buffer, size_t& offset, const std::function<T(const bool& bit)>& enumConverter, size_t length);
@@ -91,8 +93,8 @@ ByteVec                              readByteArray(const ByteVec& buffer, size_t
 // TODO: readChatType
 // TODO: readChunkData ??
 // TODO: readLightData ??
-void writeVarInt(ByteVec& buffer, int& value);
-void writeVarLong(ByteVec& buffer, int64_t& value);
+void writeVarInt(ByteVec& buffer, int value);
+void writeVarLong(ByteVec& buffer, int64_t value);
 // TODO: writeTextComponent
 // TODO: writeJSONTextComponent
 // TODO: writeIdentifier
@@ -162,28 +164,38 @@ class PacketBuffer {
     float                 readFloat() { return stratos::readFloat(buffer, offset); }
     double                readDouble() { return stratos::readDouble(buffer, offset); }
     std::string           readString(const int maxChars) { return stratos::readString(buffer, offset, maxChars); }
+    std::string           readStringUTF16BE() { return stratos::readStringUTF16BE(buffer, offset); }
     int                   readVarInt() { return stratos::readVarInt(buffer, offset); }
     int64_t               readVarLong() { return stratos::readVarLong(buffer, offset); }
     std::vector<uint64_t> readBitSet() { return stratos::readBitSet(buffer, offset); }
     std::vector<bool>     readFixedBitSet(const size_t length) { return stratos::readFixedBitSet(buffer, offset, length); }
     // TODO: Read array of X, optional X, and so on get individual methods per type
+    template <typename T, typename U>
+    U readXEnum(const std::function<T(const ByteVec&, size_t&)>& readFunc, std::function<U(const T&)> enumConverter) {
+        return stratos::readXEnum<T, U>(buffer, offset, readFunc, enumConverter);
+    }
     ByteVec readByteArray(const size_t length) { return stratos::readByteArray(buffer, offset, length); }
 
-    void writeBoolean(const bool& value) { stratos::writeBoolean(buffer, value); }
-    void writeByte(const int8_t& value) { stratos::writeByte(buffer, value); }
-    void writeUnsignedByte(const uint8_t& value) { stratos::writeUnsignedByte(buffer, value); }
-    void writeShort(const short& value) { stratos::writeShort(buffer, value); }
-    void writeUnsignedShort(const uint16_t& value) { stratos::writeUnsignedShort(buffer, value); }
-    void writeInt(const int& value) { stratos::writeInt(buffer, value); }
-    void writeLong(const int64_t& value) { stratos::writeLong(buffer, value); }
-    void writeFloat(const float& value) { stratos::writeFloat(buffer, value); }
-    void writeDouble(const double& value) { stratos::writeDouble(buffer, value); }
+    void writeBoolean(const bool value) { stratos::writeBoolean(buffer, value); }
+    void writeByte(const int8_t value) { stratos::writeByte(buffer, value); }
+    void writeUnsignedByte(const uint8_t value) { stratos::writeUnsignedByte(buffer, value); }
+    void writeShort(const short value) { stratos::writeShort(buffer, value); }
+    void writeUnsignedShort(const uint16_t value) { stratos::writeUnsignedShort(buffer, value); }
+    void writeInt(const int value) { stratos::writeInt(buffer, value); }
+    void writeLong(const int64_t value) { stratos::writeLong(buffer, value); }
+    void writeFloat(const float value) { stratos::writeFloat(buffer, value); }
+    void writeDouble(const double value) { stratos::writeDouble(buffer, value); }
     void writeString(const std::string& value, const int maxChars) { stratos::writeString(buffer, value, maxChars); }
-    void writeVarInt(int& value) { stratos::writeVarInt(buffer, value); }
-    void writeVarLong(int64_t& value) { stratos::writeVarLong(buffer, value); }
+    void writeStringUTF16BE(const std::string& value) { stratos::writeStringUTF16BE(buffer, value); }
+    void writeVarInt(int value) { stratos::writeVarInt(buffer, value); }
+    void writeVarLong(int64_t value) { stratos::writeVarLong(buffer, value); }
     void writeBitSet(const std::vector<uint64_t>& longs) { stratos::writeBitSet(buffer, longs); }
     void writeFixedBitSet(const std::vector<bool>& bits, const size_t length) { stratos::writeFixedBitSet(buffer, bits, length); }
     // TODO: Write array of X, optional X, and so on get individual methods per type
+    template <typename T>
+    void writeXEnum(const T& value, const std::function<void(ByteVec&, const T&)>& writeFunc) {
+        stratos::writeXEnum<T>(buffer, value, writeFunc);
+    }
     void writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
 
     [[nodiscard]] const ByteVec& getBuffer() const { return buffer; }
