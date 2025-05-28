@@ -32,6 +32,7 @@
 #include <unistd.h>
 #endif
 
+#include <cstdint>
 #include <cstring>
 #include <stdexcept>
 #include <vector>
@@ -244,7 +245,23 @@ int stratos::TCPConnection::receive(const int length, ByteVec& buffer) {
         if (err == ECONNRESET) return 0; // Connection reset by peer
 #endif
     }
+    if (bytes < 0) {
+        buffer.resize(0);
+        return bytes; // Return 0 or -1 to indicate closure or error
+    }
     buffer.resize(bytes);
+
+    // std::cout << "Received " << bytes << " bytes: ";
+    // for (int i = 0; i < bytes; ++i) {
+    //     printf("%02X ", buffer.data()[i]);
+    // }
+    // std::cout << "  |  ";
+    // for (size_t i = 0; i < bytes; ++i) {
+    //     const char c = (std::isprint(buffer.data()[i]) ? buffer.data()[i] : '.');
+    //     std::cout << c;
+    // }
+    // std::cout << std::endl;
+
     return bytes;
 }
 
@@ -256,6 +273,17 @@ int stratos::TCPConnection::receive(const int length, ByteVec& buffer) {
  * @return Number of bytes sent, or SOCKET_ERROR if an error occurred.
  */
 int stratos::TCPConnection::send(const ByteVec& buffer, const int length, const int flags) {
+    // std::cout << "Sending " << length << " bytes: ";
+    // for (int i = 0; i < buffer.size(); ++i) {
+    //     printf("%02X ", buffer.data()[i]);
+    // }
+    // std::cout << "  |  ";
+    // for (size_t i = 0; i < buffer.size(); ++i) {
+    //     const char c = (std::isprint(buffer.data()[i]) ? buffer.data()[i] : '.');
+    //     std::cout << c;
+    // }
+    // std::cout << std::endl;
+
     const int bytes = ::send(socketFd, reinterpret_cast<const char*>(buffer.data()), length, flags);
     if (bytes == SOCKET_ERROR) {
 #if _WIN32

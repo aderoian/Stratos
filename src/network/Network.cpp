@@ -38,6 +38,36 @@ void stratos::NetworkSession::tick() {
     // Attempt to empty the recvBuffer
     handleRawReceived();
 }
+void stratos::NetworkSession::send(const ByteVec& data) const {
+    if (!isStale()) connection->send(data);
+}
+void stratos::NetworkSession::send(ClientboundPacket& packet) const {
+    send(std::move(packet));
+}
+void stratos::NetworkSession::send(ClientboundPacket&& packet) const {
+    if (!isStale()) {
+        PacketBuffer buffer;
+        buffer.writeVarInt(packet.getId());
+        packet.encrypt(buffer);
+        connection->send(buffer.getBuffer());
+    }
+}
+void stratos::NetworkSession::sendLegacyPong() const {
+    send(LegacyServerListPong(47, "1.21.5", "A Minecraft Server", 0, 20));
+    connection->close();
+}
+void stratos::NetworkSession::handleClientHandshake(const ClientHandshake& packet) {
+    if (packet.intent == ClientHandshake::Intent::Status)
+        protocolState = Status;
+}
+void stratos::NetworkSession::handleStatusRequest() const {
+    if (protocolState == Status)
+        send(StatusResponse("{\"version\":{\"name\":\"1.21.5\",\"protocol\":770},\"players\":{\"max\":20,\"online\":0,\"sample\":[]},\"description\":{\"text\":\"A Minecraft Server\"}}"));
+}
+void stratos::NetworkSession::handlePingRequest(const int64_t timestamp) const {
+    if (protocolState == Status)
+        send(PongResponse(timestamp));
+}
 void stratos::NetworkSession::processReceived() {
     ByteVec segment;
     while (connection->receive(segment) > 0) {
@@ -46,13 +76,25 @@ void stratos::NetworkSession::processReceived() {
     }
 }
 void stratos::NetworkSession::handleRawReceived() {
+    // std::cout << "Handling raw received data (" << recvBuffer.size() << ")for client " << sessionId.ip << ":" << sessionId.port << ": ";
+    // for (int i = 0; i < recvBuffer.size(); ++i) {
+    //     printf("%02X ", recvBuffer.data()[i]);
+    // }
+    // std::cout << "  |  ";
+    // for (size_t i = 0; i < recvBuffer.size(); ++i) {
+    //     const char c = (std::isprint(recvBuffer.data()[i]) ? recvBuffer.data()[i] : '.');
+    //     std::cout << c;
+    // }
+    // std::cout << std::endl;
+
     size_t offset = 0;
     while (recvBuffer.size() > 0) {
         if (protocolState == Handshaking) {
             // Attempt to read the LegacyServerListPing
             try {
-                if (const uint8_t id = readUnsignedByte(recvBuffer, offset); id == LegacyServerListPing::ID) {
-                    PacketBuffer buffer(recvBuffer);
+                size_t legacyPingOffset = 0;
+                if (const uint8_t id = readUnsignedByte(recvBuffer, legacyPingOffset); id == LegacyServerListPing::ID) {
+                    PacketBuffer buffer(recvBuffer, legacyPingOffset);
                     LegacyServerListPing packet;
                     packet.decrypt(buffer);
                     packet.handle(*this);
@@ -64,14 +106,9 @@ void stratos::NetworkSession::handleRawReceived() {
             } catch (PacketSerializationException & ignored) {}
         }
 
-        if (recvBuffer.size() < 6) {
-            // Not enough data to read a packet, wait for more data
-            return;
-        }
-
         try {
             const int packetLength = readVarInt(recvBuffer, offset);
-            if (packetLength < 0 || packetLength > recvBuffer.size() - offset) {
+            if (packetLength <= 0 || packetLength > recvBuffer.size() - offset) {
                 // Not enough data to read a full packet, wait for more data
                 return;
             }
@@ -87,7 +124,7 @@ void stratos::NetworkSession::handleRawReceived() {
                     return;
                 }
 
-                networkManager->getLogger()->info("Received packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
+                //networkManager->getLogger()->info("Received packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
                 packet->decrypt(packetBuffer);
                 packet->handle(*this);
             } catch (const PacketSerializationException &e) {
@@ -120,26 +157,29 @@ int  stratos::NetworkConnection::receive(ByteVec& data) {
     return 0;
 }
 int stratos::NetworkConnection::send(const ByteVec& data) {
-    if (data.size() > mtu) {
+    ByteVec sendBuffer;
+    writeVarInt(sendBuffer, static_cast<int>(data.size()));
+    sendBuffer.insert(sendBuffer.end(), data.begin(), data.end());
+    if (sendBuffer.size() > mtu) {
         ByteVec buffer;
         buffer.reserve(mtu);
-        buffer.insert(buffer.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.begin() + mtu));
+        buffer.insert(buffer.end(), std::make_move_iterator(sendBuffer.begin()), std::make_move_iterator(sendBuffer.begin() + mtu));
         sendQueue.enqueue(buffer);
         return mtu;
     }
 
-    sendQueue.enqueue(data);
-    return static_cast<int>(data.size());
+    sendQueue.enqueue(sendBuffer);
+    return static_cast<int>(sendBuffer.size());
 }
 int stratos::NetworkConnection::handleReceive() {
     ByteVec buffer;
     ByteVec segment;
-    segment.reserve(4096);
+    segment.resize(mtu);
     int totalReceived = 0;
 
     while (true) {
         int received              = 0;
-        totalReceived += received = receive(4096, segment);
+        totalReceived += received = receive(mtu, segment);
         if (received == 0) {
             return 0;
         }

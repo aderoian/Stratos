@@ -119,6 +119,16 @@ class NetworkSession {
 
     void tick();
 
+    void send(const ByteVec& data) const;
+    void send(ClientboundPacket& packet) const;
+    void send(ClientboundPacket&& packet) const;
+
+    void sendLegacyPong() const;
+    void handleClientHandshake(const ClientHandshake& packet);
+    void handleStatusRequest() const;
+    void handlePingRequest(int64_t timestamp) const;
+
+
   private:
     NetworkManager* networkManager;
     SessionId       sessionId;

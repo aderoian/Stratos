@@ -115,6 +115,7 @@ class PingRequest final : public ServerboundPacket {
   public:
     constexpr static int ID = 0x01;
 
+    int64_t timestamp = 0;
     explicit PingRequest() : Packet(ID), ServerboundPacket(ID) {}
     ~PingRequest() override = default;
     void decrypt(PacketBuffer& buffer) override;
