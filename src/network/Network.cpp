@@ -21,6 +21,7 @@
 
 #include "spdlog/logger.h"
 
+#include <queue>
 #include <ranges>
 #ifdef __linux__
 #include <sys/epoll.h>
@@ -61,8 +62,10 @@ void stratos::NetworkSession::handleClientHandshake(const ClientHandshake& packe
         protocolState = Status;
 }
 void stratos::NetworkSession::handleStatusRequest() const {
-    if (protocolState == Status)
-        send(StatusResponse("{\"version\":{\"name\":\"1.21.5\",\"protocol\":770},\"players\":{\"max\":20,\"online\":0,\"sample\":[]},\"description\":{\"text\":\"A Minecraft Server\"}}"));
+    if (protocolState == Status) {
+        send(StatusResponse(
+            R"({"version":{"name":"1.21.5","protocol":770},"players":{"max":20,"online":0,"sample":[]},"description":{"text":"A Minecraft Server"}})"));
+    }
 }
 void stratos::NetworkSession::handlePingRequest(const int64_t timestamp) const {
     if (protocolState == Status)
@@ -76,17 +79,6 @@ void stratos::NetworkSession::processReceived() {
     }
 }
 void stratos::NetworkSession::handleRawReceived() {
-    // std::cout << "Handling raw received data (" << recvBuffer.size() << ")for client " << sessionId.ip << ":" << sessionId.port << ": ";
-    // for (int i = 0; i < recvBuffer.size(); ++i) {
-    //     printf("%02X ", recvBuffer.data()[i]);
-    // }
-    // std::cout << "  |  ";
-    // for (size_t i = 0; i < recvBuffer.size(); ++i) {
-    //     const char c = (std::isprint(recvBuffer.data()[i]) ? recvBuffer.data()[i] : '.');
-    //     std::cout << c;
-    // }
-    // std::cout << std::endl;
-
     size_t offset = 0;
     while (recvBuffer.size() > 0) {
         if (protocolState == Handshaking) {
@@ -124,7 +116,7 @@ void stratos::NetworkSession::handleRawReceived() {
                     return;
                 }
 
-                //networkManager->getLogger()->info("Received packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
+                networkManager->getLogger()->info("Received packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
                 packet->decrypt(packetBuffer);
                 packet->handle(*this);
             } catch (const PacketSerializationException &e) {
@@ -160,15 +152,12 @@ int stratos::NetworkConnection::send(const ByteVec& data) {
     ByteVec sendBuffer;
     writeVarInt(sendBuffer, static_cast<int>(data.size()));
     sendBuffer.insert(sendBuffer.end(), data.begin(), data.end());
-    if (sendBuffer.size() > mtu) {
-        ByteVec buffer;
-        buffer.reserve(mtu);
-        buffer.insert(buffer.end(), std::make_move_iterator(sendBuffer.begin()), std::make_move_iterator(sendBuffer.begin() + mtu));
-        sendQueue.enqueue(buffer);
-        return mtu;
-    }
-
     sendQueue.enqueue(sendBuffer);
+
+#ifdef __linux__
+    if (bool expected = false; dirty.compare_exchange_strong(expected, true))
+        eventLoop->notifySend(socketFd);
+#endif
     return static_cast<int>(sendBuffer.size());
 }
 int stratos::NetworkConnection::handleReceive() {
@@ -199,16 +188,15 @@ int stratos::NetworkConnection::flushSendQueue() {
     ByteVec buffer;
     buffer.reserve(mtu);
 
-    size_t bytesSent = 0;
+    int totalBytesSent = 0;
     while (sendQueue.try_dequeue(buffer)) {
-        if (send(buffer, static_cast<int>(buffer.size()), 0) == SOCKET_ERROR) {
+        const int bytesSent = send(buffer, static_cast<int>(buffer.size()), 0);
+        if (bytesSent == SOCKET_ERROR)
             return -1;
-        }
-
-        bytesSent += buffer.size();
+        totalBytesSent += bytesSent;
     }
 
-    return static_cast<int>(bytesSent);
+    return totalBytesSent;
 }
 bool stratos::NetworkManager::start() {
     if (running) throw std::runtime_error("Attempted to start NetworkManager while it is already running");
@@ -301,7 +289,7 @@ void stratos::NetworkManager::processIncomingConnections() {
 void stratos::BossThread::start() {
     if (running.exchange(true)) return;
 
-    workers = std::vector<std::unique_ptr<WorkerThread>>();
+    workers = std::vector<std::shared_ptr<WorkerThread>>();
     workers.reserve(workerThreads);
 
     thread = std::thread([this] {
@@ -317,13 +305,23 @@ void stratos::BossThread::start() {
 
                     // Create a new session for the client
                     try {
-                        const auto connection = std::make_shared<NetworkConnection>(socket, ip, port);
+                        std::shared_ptr<NetworkConnection> connection;
                         if (workers.size() < workerThreads) {
-                            auto worker = std::make_unique<WorkerThread>(network, workers.size());
+                            auto worker = std::make_shared<WorkerThread>(network, workers.size());
                             worker->start();
+#ifdef __linux__
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, worker);
+#else
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port);
+#endif
                             worker->addConnection(connection);
                             workers.push_back(std::move(worker));
                         } else {
+#ifdef __linux__
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, workers[connectionCount % workerThreads]);
+#else
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port);
+#endif
                             workers[connectionCount % workerThreads]->addConnection(connection);
                         }
 
@@ -377,7 +375,7 @@ void stratos::WorkerThread::start() {
 
                 for (const auto& conn : connections) {
                     FD_SET(conn->getFd(), &readSet);
-                    if (!conn->getSendQueue().size_approx()) FD_SET(conn->getFd(), &writeSet);
+                    if (conn->getSendQueue().size_approx() > 0) FD_SET(conn->getFd(), &writeSet);
                     if (conn->getFd() > maxFd) maxFd = conn->getFd();
                 }
 
@@ -400,6 +398,8 @@ void stratos::WorkerThread::start() {
                     }
                 }
 #elifdef __linux__
+                processSendNotifications();
+
                 constexpr int MAX_EVENTS = 64;
                 epoll_event   events[MAX_EVENTS];
 
@@ -429,7 +429,11 @@ void stratos::WorkerThread::start() {
                         // If queue is empty, remove EPOLLOUT to prevent epoll wakeups
                         epoll_event ev{};
                         ev.events = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
-                        if (conn->getSendQueue().size_approx() > 0) ev.events |= EPOLLOUT;
+                        if (conn->getSendQueue().size_approx() > 0) {
+                            ev.events |= EPOLLOUT;
+                        } else {
+                            conn->dirty.store(false);
+                        }
                         ev.data.fd = fd;
                         epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &ev);
                     }
@@ -467,6 +471,11 @@ void stratos::WorkerThread::removeConnection(const std::shared_ptr<NetworkConnec
     std::erase(connections, connection);
     connectionCount--;
 }
+#ifdef __linux__
+void stratos::WorkerThread::notifySend(const SocketFd& socketFd) {
+    sendNotifyQueue.enqueue(socketFd);
+}
+#endif
 void stratos::WorkerThread::processIncomingConnections() {
 
     std::lock_guard lock(connectionMutex);
@@ -490,3 +499,14 @@ void stratos::WorkerThread::processIncomingConnections() {
         }
     }
 }
+#ifdef __linux__
+void stratos::WorkerThread::processSendNotifications() {
+    SocketFd socketFd;
+    while (sendNotifyQueue.try_dequeue(socketFd)) {
+        epoll_event ev{};
+        ev.events = EPOLLIN | EPOLLOUT| EPOLLET; // Edge-triggered, no out until we have data to send
+        ev.data.fd = socketFd;
+        epoll_ctl(epollFd, EPOLL_CTL_MOD, socketFd, &ev);
+    }
+}
+#endif

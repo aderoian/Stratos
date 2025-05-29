@@ -87,7 +87,11 @@ class NetworkConnection final : public TCPConnection {
     using TCPConnection::receive;
     using TCPConnection::send;
 
+#ifdef __linux__
+    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), eventLoop(std::move(eventLoop)) {}
+#else
     NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port) : TCPConnection(socketFd, address, port) {}
+#endif
     ~NetworkConnection() override = default;
 
     [[nodiscard]] const moodycamel::ConcurrentQueue<ByteVec>& getSendQueue() const { return sendQueue; }
@@ -99,6 +103,10 @@ class NetworkConnection final : public TCPConnection {
   private:
     moodycamel::ConcurrentQueue<ByteVec> sendQueue = moodycamel::ConcurrentQueue<ByteVec>();
     moodycamel::ConcurrentQueue<ByteVec> receiveQueue = moodycamel::ConcurrentQueue<ByteVec>();
+#ifdef __linux__
+    std::atomic<bool> dirty = false; // Indicates if the connection has data to send
+    std::shared_ptr<WorkerThread> eventLoop;
+#endif
 
     int handleReceive();
     int flushSendQueue();
@@ -180,7 +188,7 @@ class BossThread final : public NetworkThread {
   private:
     int                                        workerThreads;
     int                                        connectionCount = 0;
-    std::vector<std::unique_ptr<WorkerThread>> workers;
+    std::vector<std::shared_ptr<WorkerThread>> workers;
 };
 
 class WorkerThread final : public NetworkThread {
@@ -191,6 +199,9 @@ class WorkerThread final : public NetworkThread {
 
     void addConnection(std::shared_ptr<NetworkConnection> connection);
     void removeConnection(const std::shared_ptr<NetworkConnection>& connection);
+#ifdef __linux__
+    void notifySend(const SocketFd& socketFd);
+#endif
 
     [[nodiscard]] int getId() const { return id; }
     [[nodiscard]] int getConnectionCount() const { return connectionCount; }
@@ -202,11 +213,14 @@ class WorkerThread final : public NetworkThread {
     std::mutex                                                      connectionMutex;
     std::vector<std::shared_ptr<NetworkConnection>>                 connections;
     moodycamel::ConcurrentQueue<std::shared_ptr<NetworkConnection>> inConnectionQueue;
-
-    void processIncomingConnections();
-
 #ifdef __linux__
     int epollFd = -1;
+    moodycamel::ConcurrentQueue<SocketFd> sendNotifyQueue;
+#endif
+
+    void processIncomingConnections();
+#ifdef __linux__
+    void processSendNotifications();
 #endif
 };
 } // namespace stratos
