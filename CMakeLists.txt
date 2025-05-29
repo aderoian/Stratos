@@ -16,16 +16,21 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 
 # Source files
 set(SOURCES
-        Stratos.cpp
         Server.cpp
         network/Network.cpp
         network/Socket.cpp
+        network/protocol/PacketSerialization.cpp
+        network/protocol/Packet.cpp
+        network/protocol/PacketCodec.cpp
 )
 
 set(HEADERS
         Server.h
         network/Network.h
         network/Socket.h
+        network/protocol/PacketSerialization.h
+        network/protocol/Packet.h
+        network/protocol/PacketCodec.h
 )
 
 # Project
@@ -43,10 +48,36 @@ target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/concurrentqueue
 )
-target_sources(${LOCAL_PROJECT_NAME} PRIVATE ${SOURCES} ${HEADERS})
+target_sources(${LOCAL_PROJECT_NAME} PRIVATE src/Stratos.cpp ${SOURCES} ${HEADERS})
 
 if (WIN32)
     target_link_libraries(Stratos PRIVATE iphlpapi ws2_32)
 endif ()
 
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
+
+# Testing
+enable_testing()
+
+add_executable("${LOCAL_PROJECT_NAME}Test" test/stratos_test.cpp)
+
+target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/concurrentqueue
+)
+target_sources("${LOCAL_PROJECT_NAME}Test" PRIVATE
+        ${SOURCES}
+        ${HEADERS}
+)
+
+if (WIN32)
+    target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE iphlpapi ws2_32)
+endif()
+
+set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
+
+add_test(NAME NetworkSerialization COMMAND "${LOCAL_PROJECT_NAME}Test" --network-serialization)

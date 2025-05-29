@@ -1,0 +1,123 @@
+/*
+ *
+ *               _____  _                 _
+ *              /  ___|| |               | |
+ *              \ `--. | |_  _ __   __ _ | |_   ___   ___
+ *               `--. \| __|| '__| / _` || __| / _ \ / __|
+ *              /\__/ /| |_ | |   | (_| || |_ | (_) |\__ \
+ *              \____/  \__||_|    \__,_| \__| \___/ |___/
+ *
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Copyright (C) 2025 Armen Deroian
+ *
+ */
+
+#include "network/protocol/PacketSerialization.h"
+
+#include <cassert>
+#include <iostream>
+#include <ostream>
+#include <string>
+void networkSerializationTest() {
+    std::cout << "Running network serialization test..." << std::endl;
+    stratos::ByteVec buffer;
+    size_t offset = 0;
+
+    // Test writing and reading a boolean
+    std::cout << "Testing boolean serialization..." << std::endl;
+    stratos::writeBoolean(buffer, true);
+    stratos::writeBoolean(buffer, false);
+    assert(stratos::readBoolean(buffer, offset) == true);
+    assert(stratos::readBoolean(buffer, offset) == false);
+
+    // Test writing and reading a byte
+    std::cout << "Testing byte serialization..." << std::endl;
+    stratos::writeByte(buffer, 42);
+    stratos::writeByte(buffer, -42);
+    stratos::writeUnsignedByte(buffer, 230);
+    assert(stratos::readByte(buffer, offset) == 42);
+    assert(stratos::readByte(buffer, offset) == -42);
+    assert(stratos::readUnsignedByte(buffer, offset) == 230);
+
+    // Test writing and reading a short
+    std::cout << "Testing short serialization..." << std::endl;
+    stratos::writeShort(buffer, 12345);
+    stratos::writeShort(buffer, -12345);
+    stratos::writeUnsignedShort(buffer, 54321);
+    assert(stratos::readShort(buffer, offset) == 12345);
+    assert(stratos::readShort(buffer, offset) == -12345);
+    assert(stratos::readUnsignedShort(buffer, offset) == 54321);
+
+    // Test writing and reading an int
+    std::cout << "Testing int serialization..." << std::endl;
+    stratos::writeInt(buffer, 123456789);
+    stratos::writeInt(buffer, -123456789);
+    assert(stratos::readInt(buffer, offset) == 123456789);
+    assert(stratos::readInt(buffer, offset) == -123456789);
+
+    // Test writing and reading a long
+    std::cout << "Testing long serialization..." << std::endl;
+    stratos::writeLong(buffer, 1234567890123456789LL);
+    stratos::writeLong(buffer, -1234567890123456789LL);
+    assert(stratos::readLong(buffer, offset) == 1234567890123456789LL);
+    assert(stratos::readLong(buffer, offset) == -1234567890123456789LL);
+
+    // Test writing and reading a float
+    std::cout << "Testing float serialization..." << std::endl;
+    stratos::writeFloat(buffer, 3.14f);
+    stratos::writeFloat(buffer, -3.14f);
+    assert(stratos::readFloat(buffer, offset) == 3.14f);
+    assert(stratos::readFloat(buffer, offset) == -3.14f);
+
+    // Test writing and reading a double
+    std::cout << "Testing double serialization..." << std::endl;
+    stratos::writeDouble(buffer, 3.141592653589793);
+    stratos::writeDouble(buffer, -3.141592653589793);
+    assert(stratos::readDouble(buffer, offset) == 3.141592653589793);
+    assert(stratos::readDouble(buffer, offset) == -3.141592653589793);
+
+    // Test writing and reading a VarInt
+    std::cout << "Testing VarInt serialization..." << std::endl;
+    stratos::writeVarInt(buffer, 123456);
+    stratos::writeVarInt(buffer, -123456);
+    assert(stratos::readVarInt(buffer, offset) == 123456);
+    assert(stratos::readVarInt(buffer, offset) == -123456);
+
+    // Test writing and reading a string
+    std::cout << "Testing string serialization..." << std::endl;
+    const std::string testString = "Hello, world!";
+    stratos::writeString(buffer, testString, 100);
+    const std::string testString2 = "Another test string with special characters: !@#$%^&*()";
+    stratos::writeString(buffer, testString2, 100);
+    std::string testString3 = "A string with a length that exceeds the maximum allowed length.";
+    try {
+        stratos::writeString(buffer, testString, 10);
+        assert(false); // Should not reach here
+    } catch (const stratos::PacketSerializationException& e) {
+
+    }
+    assert(stratos::readString(buffer, offset, 100) == testString);
+    assert(stratos::readString(buffer, offset, 100) == testString2);
+
+    // Test writing and reading a VarLong
+    std::cout << "Testing VarLong serialization..." << std::endl;
+    stratos::writeVarLong(buffer, 1234567890123456789LL);
+    stratos::writeVarLong(buffer, -1234567890123456789LL);
+    assert(stratos::readVarLong(buffer, offset) == 1234567890123456789LL);
+    assert(stratos::readVarLong(buffer, offset) == -1234567890123456789LL);
+}
+
+int main(const int argc, char **argv) {
+    for (int i = 1; i < argc; ++i) {
+        if (std::string arg = argv[i]; arg == "--network-serialization") {
+            networkSerializationTest();
+        }
+    }
+
+    return 0;
+}

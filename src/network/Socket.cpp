@@ -32,6 +32,7 @@
 #include <unistd.h>
 #endif
 
+#include <cstdint>
 #include <cstring>
 #include <stdexcept>
 #include <vector>
@@ -244,6 +245,10 @@ int stratos::TCPConnection::receive(const int length, ByteVec& buffer) {
         if (err == ECONNRESET) return 0; // Connection reset by peer
 #endif
     }
+    if (bytes < 0) {
+        buffer.resize(0);
+        return bytes; // Return 0 or -1 to indicate closure or error
+    }
     buffer.resize(bytes);
     return bytes;
 }
@@ -259,9 +264,9 @@ int stratos::TCPConnection::send(const ByteVec& buffer, const int length, const 
     const int bytes = ::send(socketFd, reinterpret_cast<const char*>(buffer.data()), length, flags);
     if (bytes == SOCKET_ERROR) {
 #if _WIN32
-        if (const int err = WSAGetLastError(); err == WSAEWOULDBLOCK)
+        if (int err = WSAGetLastError(); err == WSAEWOULDBLOCK)
 #else
-        if (const int err = errno; err == EAGAIN || err == EWOULDBLOCK)
+        if (int err = errno; err == EAGAIN || err == EWOULDBLOCK)
 #endif
             return 0;
         return SOCKET_ERROR;
@@ -289,7 +294,7 @@ int stratos::setNonBlocking(SocketFd socketFd) {
     return (flags != -1 && fcntl(socketFd, F_SETFL, flags | O_NONBLOCK) != -1) ? 0 : -1;
 #endif
 }
-int stratos::getMTUForSocket(const SocketFd socketFd) {
+size_t stratos::getMTUForSocket(const SocketFd socketFd) {
 #ifdef _WIN32
     sockaddr_in addr{};
     int         addrLen = sizeof(addr);

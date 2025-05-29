@@ -105,8 +105,8 @@ class TCPServer final : public SocketServer {
 #endif
 };
 
-int setNonBlocking(SocketFd socketFd);
-int getMTUForSocket(SocketFd socketFd);
+int    setNonBlocking(SocketFd socketFd);
+size_t getMTUForSocket(SocketFd socketFd);
 
 class SocketConnection : public Socket {
   public:
@@ -127,11 +127,11 @@ class TCPConnection : public SocketConnection {
     int  send(const ByteVec& buffer, int length, int flags) override;
     void close() override;
 
-    [[nodiscard]] int getMtu() const { return mtu; }
+    [[nodiscard]] size_t getMtu() const { return mtu; }
     [[nodiscard]] bool isClosed() const { return closed; }
 
   protected:
-    int mtu;
+    size_t mtu;
     bool closed = false;
 };
 } // namespace stratos
