@@ -20,6 +20,7 @@
 #include "PacketCodec.h"
 
 #include "network/Network.h"
+#include "network/NetworkClient.h"
 #include "PacketSerialization.h"
 
 void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {

@@ -18,6 +18,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(SOURCES
         Server.cpp
         network/Network.cpp
+        network/NetworkClient.cpp
         network/Socket.cpp
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
@@ -27,6 +28,7 @@ set(SOURCES
 set(HEADERS
         Server.h
         network/Network.h
+        network/NetworkClient.h
         network/Socket.h
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h

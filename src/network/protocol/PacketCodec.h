@@ -20,7 +20,6 @@
 #ifndef PACKETCODEC_H
 #define PACKETCODEC_H
 #include "Packet.h"
-#include "PacketSerialization.h"
 
 #include <cstdint>
 #include <string>
