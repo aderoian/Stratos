@@ -23,10 +23,13 @@
 #include "protocol/Packet.h"
 #include "protocol/PacketCodec.h"
 #include "Socket.h"
+#include "spdlog/spdlog.h"
 
 #include <memory>
+#include <optional>
 
 namespace stratos {
+class WorkerThread;
 using SessionId = ClientInfo;
 class NetworkManager;
 
@@ -36,28 +39,43 @@ class NetworkConnection final : public TCPConnection {
     using TCPConnection::send;
 
 #ifdef __linux__
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), eventLoop(std::move(eventLoop)) {}
+    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<spdlog::logger> logger, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), logger(std::move(logger)), eventLoop(std::move(eventLoop)) { changeState(Handshaking); }
 #else
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port) : TCPConnection(socketFd, address, port) {}
+    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<spdlog::logger> logger) : TCPConnection(socketFd, address, port), logger(std::move(logger)) { changeState(Handshaking); }
 #endif
     ~NetworkConnection() override = default;
 
-    [[nodiscard]] const moodycamel::ConcurrentQueue<ByteVec>& getSendQueue() const { return sendQueue; }
-    [[nodiscard]] const moodycamel::ConcurrentQueue<ByteVec>& getReceiveQueue() const { return receiveQueue; }
+    std::optional<std::unique_ptr<ServerboundPacket>> receivePacket();
+    void                                              sendPacket(std::unique_ptr<ClientboundPacket>&& packet);
+    int                                               handleReceive();
+    void changeState(ProtocolState newState);
+    bool                                              disconnect();
+    bool                                              close() override;
 
-    int receive(ByteVec& data);
-    int send(const ByteVec& data);
+    [[nodiscard]] bool hasSendData() const { return sendQueue.size_approx() > 0; }
+    [[nodiscard]] bool isDisconnected() const { return disconnected.load(std::memory_order_acquire); }
+    [[nodiscard]] ProtocolState getState() const { return state; }
+    [[nodiscard]] ClientHandshake::Intent getIntent() const { return intent; }
 
   private:
-    moodycamel::ConcurrentQueue<ByteVec> sendQueue = moodycamel::ConcurrentQueue<ByteVec>();
-    moodycamel::ConcurrentQueue<ByteVec> receiveQueue = moodycamel::ConcurrentQueue<ByteVec>();
+    ByteVec receiveBuf;
+    moodycamel::ConcurrentQueue<std::unique_ptr<ClientboundPacket>> sendQueue = moodycamel::ConcurrentQueue<std::unique_ptr<ClientboundPacket>>();
+    moodycamel::ConcurrentQueue<std::unique_ptr<ServerboundPacket>> receiveQueue = moodycamel::ConcurrentQueue<std::unique_ptr<ServerboundPacket>>();
+    std::atomic<bool> disconnected = false;
+
+    ProtocolState state;
+    ClientHandshake::Intent intent = ClientHandshake::Intent::None;
+    std::unique_ptr<PacketHandler> packetHandler;
+
+    std::shared_ptr<spdlog::logger> logger;
 #ifdef __linux__
     std::atomic<bool> dirty = false; // Indicates if the connection has data to send
     std::shared_ptr<WorkerThread> eventLoop;
 #endif
+    int flushReceive();
+    int flushSend();
 
-    int handleReceive();
-    int flushSendQueue();
+    bool handleLegacyPing();
 
     friend class WorkerThread;
 };
@@ -65,41 +83,28 @@ class NetworkConnection final : public TCPConnection {
 class NetworkSession {
   public:
     explicit NetworkSession(NetworkManager* networkManager, SessionId id, std::shared_ptr<NetworkConnection> connection)
-        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)) {}
+        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)), packetHandler(std::make_unique<PlayPacketHandler>(this)) {}
     ~NetworkSession() = default;
 
     [[nodiscard]] std::string getIp() const { return sessionId.ip; }
     [[nodiscard]] int         getPort() const { return sessionId.port; }
-    [[nodiscard]] bool        isConnected() const { return connected; }
-    [[nodiscard]] bool        isStale() const { return !connected && connection->isClosed(); }
+    [[nodiscard]] bool        isConnected() const { return !connection->isDisconnected(); }
+    [[nodiscard]] bool        isStale() const { return !isConnected() && connection->isClosed(); }
 
     void tick();
 
-    void send(const ByteVec& data) const;
-    void send(ClientboundPacket& packet) const;
-    void send(ClientboundPacket&& packet) const;
-
-    void sendLegacyPong() const;
-    void handleClientHandshake(const ClientHandshake& packet);
-    void handleStatusRequest() const;
-    void handlePingRequest(int64_t timestamp) const;
-
+    template <typename T> void send(T& packet) const { send(std::move(packet)); }
+    template <typename T> void send(T&& packet) const { connection->sendPacket(std::make_unique<T>(std::move(packet))); }
 
   private:
     NetworkManager* networkManager;
     SessionId       sessionId;
     std::shared_ptr<NetworkConnection>   connection;
 
-    ByteVec recvBuffer;
+    std::unique_ptr<PlayPacketHandler> packetHandler;
 
-    ProtocolState protocolState = Handshaking;
-    ClientHandshake::Intent sessionIntent = ClientHandshake::Intent::None;
-    bool connected = true;
-
-    // Clears the received segments and moves the data to the recvBuffer
+    // Processes received packets
     void processReceived();
-    // Handles the raw received data, frames data into received packet(s), then handles the packet(s) if any
-    void handleRawReceived();
     void dispose() const;
 
     friend class NetworkManager;

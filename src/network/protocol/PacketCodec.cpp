@@ -19,7 +19,6 @@
 
 #include "PacketCodec.h"
 
-#include "network/Network.h"
 #include "network/NetworkClient.h"
 #include "PacketSerialization.h"
 
@@ -30,20 +29,17 @@ void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
 
     // Read the intent
     intent = buffer.readXEnum<int, Intent>(readVarInt, [](const int& value) -> Intent {
-                                  switch (value) {
-                                  case 0x01:
-                                      return Intent::Status;
-                                  case 0x02:
-                                      return Intent::Login;
-                                  case 0x03:
-                                      return Intent::Transfer;
-                                  default:
-                                      throw PacketSerializationException("Unknown intent value: " + std::to_string(value));
-                                  }
-                              });
-}
-void stratos::ClientHandshake::handle(NetworkSession& session) {
-    session.handleClientHandshake(*this);
+        switch (value) {
+        case 0x01:
+            return Intent::Status;
+        case 0x02:
+            return Intent::Login;
+        case 0x03:
+            return Intent::Transfer;
+        default:
+            throw PacketSerializationException("Unknown intent value: " + std::to_string(value));
+        }
+    });
 }
 void stratos::LegacyServerListPing::decrypt(PacketBuffer& buffer) {
     payload = buffer.readByte();
@@ -55,9 +51,6 @@ void stratos::LegacyServerListPing::decrypt(PacketBuffer& buffer) {
     buffer.readByte(); // Protocol version
     buffer.readStringUTF16BE(); // Server address
     buffer.readInt(); // Server port
-}
-void stratos::LegacyServerListPing::handle(NetworkSession& session) {
-    session.sendLegacyPong();
 }
 void stratos::LegacyServerListPong::encrypt(PacketBuffer& buffer) {
     buffer.writeByte(0xFF); // Kick packet identifier
@@ -72,12 +65,36 @@ void stratos::PongResponse::encrypt(PacketBuffer& buffer) {
     buffer.writeLong(timestamp);
 }
 void stratos::StatusRequest::decrypt(PacketBuffer& buffer) {}
-void stratos::StatusRequest::handle(NetworkSession& session) {
-    session.handleStatusRequest();
-}
 void stratos::PingRequest::decrypt(PacketBuffer& buffer) {
     timestamp = buffer.readLong();
 }
-void stratos::PingRequest::handle(NetworkSession& session) {
-    session.handlePingRequest(timestamp);
+bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
+    std::cout << "Handling ClientHandshake packet from " << connection->getAddress() << ":" << connection->getPort() << std::endl;
+    switch (packet.intent) {
+    case ClientHandshake::Intent::Status:
+        connection->changeState(Status);
+        break;
+    case ClientHandshake::Intent::Login:
+    case ClientHandshake::Intent::Transfer: // TODO: Figure out how to handle transfer
+        connection->changeState(Login);
+    default:;
+    }
+    return true;
+}
+bool stratos::HandshakePacketHandler::handle(LegacyServerListPing& packet) {
+    connection->sendPacket(std::make_unique<LegacyServerListPong>(47, "1.21.5", "A Minecraft Server", 0, 20)); // TODO: Replace with actual server info
+    connection->disconnect();
+    return true;
+}
+bool stratos::StatusPacketHandler::handle(StatusRequest& packet) {
+    std::cout << "Handling StatusRequest packet from " << connection->getAddress() << ":" << connection->getPort() << std::endl;
+    if (connection->getState() == Status)
+        connection->sendPacket(std::make_unique<StatusResponse>(
+            R"({"version":{"name":"1.21.5","protocol":770},"players":{"max":20,"online":0,"sample":[]},"description":{"text":"A Minecraft Server"}})"));
+    return true;
+}
+bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
+    if (connection->getState() == Status)
+        connection->sendPacket(std::make_unique<PongResponse>(packet.timestamp));
+    return true;
 }

@@ -23,6 +23,7 @@
 #include <memory>
 
 namespace stratos {
+class PacketHandler;
 class NetworkSession;
 class PacketBuffer;
 
@@ -37,17 +38,19 @@ public:
     int getId() const { return id; }
     virtual void decrypt(PacketBuffer& buffer) = 0;
     virtual void encrypt(PacketBuffer& buffer) = 0;
-    virtual void handle(NetworkSession& session) = 0;
+    virtual bool accept(PacketHandler& handler) = 0;
 
     int id;
 };
+
+
 
 class ClientboundPacket : virtual public Packet {
 public:
     explicit ClientboundPacket(const int id) : Packet(id) {}
     ~ClientboundPacket() override = default;
     void decrypt(PacketBuffer& buffer) override {}
-    void handle(NetworkSession& session) override {}
+    bool accept(PacketHandler& handler) override { return false; } // Clientbound packets are not handled by handlers
 };
 
 class ServerboundPacket : virtual public Packet {

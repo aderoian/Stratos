@@ -66,7 +66,6 @@ void stratos::NetworkManager::tick() {
         session->tick();
         if (session->isStale()) {
             staleSessions.push_back(sessionId);
-            session->dispose();
         }
     }
 
@@ -139,25 +138,25 @@ void stratos::BossThread::start() {
                             auto worker = std::make_shared<WorkerThread>(network, workers.size());
                             worker->start();
 #ifdef __linux__
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port, worker);
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger(), worker);
 #else
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port);
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger());
 #endif
                             worker->addConnection(connection);
                             workers.push_back(std::move(worker));
                         } else {
 #ifdef __linux__
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port, workers[connectionCount % workerThreads]);
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger(), workers[connectionCount % workerThreads]);
 #else
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port);
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger());
 #endif
                             workers[connectionCount % workerThreads]->addConnection(connection);
                         }
 
                         // Create a new network session
-                        network->createSession(connection);
+                        //network->createSession(connection);
                         connectionCount++;
-                        network->logger->info("Client '{}:{} - {}' connected (MTU: {})", ip, port, socket, connection->getMtu());
+                        network->logger->info("Client '{}:{} - {}' connected", ip, port, socket);
                     } catch (std::exception& e) {
                         network->logger->error("Failed to connect client '{}:{}': {}", ip, port, e.what());
 #ifdef _WIN32
@@ -204,7 +203,7 @@ void stratos::WorkerThread::start() {
 
                 for (const auto& conn : connections) {
                     FD_SET(conn->getFd(), &readSet);
-                    if (conn->getSendQueue().size_approx() > 0) FD_SET(conn->getFd(), &writeSet);
+                    if (conn->hasSendData()) FD_SET(conn->getFd(), &writeSet);
                     if (conn->getFd() > maxFd) maxFd = conn->getFd();
                 }
 
@@ -214,16 +213,26 @@ void stratos::WorkerThread::start() {
                 select(maxFd + 1, &readSet, &writeSet, nullptr, &timeout);
 
                 for (const auto& conn : connections) {
+                    if (!conn) continue;
                     if (FD_ISSET(conn->getFd(), &readSet)) {
+                        std::cout << "\nHandling receive for client " << conn->getAddress() << ":" << conn->getPort() << std::endl;
                         if (conn->handleReceive() == 0) { // non-blocking
                             // TODO: handle connection close
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
                             conn->close();
                             removeConnection(conn);
+                            continue; // Skip further processing for this connection
                         }
                     }
                     if (FD_ISSET(conn->getFd(), &writeSet)) {
-                        conn->flushSendQueue(); // try sending pending buffers
+                        conn->flushSend(); // try sending pending buffers
+                    }
+
+                    // Handle server -> client disconnects
+                    if (conn->isDisconnected()) {
+                        network->getLogger()->info("Client {}:{} disconnected", conn->getAddress(), conn->getPort());
+                        conn->close();
+                        removeConnection(conn);
                     }
                 }
 #elifdef __linux__
@@ -249,22 +258,31 @@ void stratos::WorkerThread::start() {
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
                             conn->close();
                             removeConnection(conn);
+                            continue; // Skip further processing for this connection
                         }
                     }
 
                     if (!conn->isClosed() && events[i].events & EPOLLOUT) {
-                        conn->flushSendQueue();
+                        conn->flushSend();
 
                         // If queue is empty, remove EPOLLOUT to prevent epoll wakeups
                         epoll_event ev{};
                         ev.events = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
-                        if (conn->getSendQueue().size_approx() > 0) {
+                        if (conn->hasSendData()) {
                             ev.events |= EPOLLOUT;
                         } else {
-                            conn->dirty.store(false);
+                            bool expected = true;
+                            conn->dirty.compare_exchange_strong(expected, false);
                         }
                         ev.data.fd = fd;
                         epoll_ctl(epollFd, EPOLL_CTL_MOD, fd, &ev);
+                    }
+
+                    // Handle server -> client disconnects
+                    if (conn->isDisconnected()) {
+                        network->getLogger()->info("Client {}:{} disconnected", conn->getAddress(), conn->getPort());
+                        conn->close();
+                        removeConnection(conn);
                     }
                 }
 #endif
@@ -302,6 +320,7 @@ void stratos::WorkerThread::removeConnection(const std::shared_ptr<NetworkConnec
 }
 #ifdef __linux__
 void stratos::WorkerThread::notifySend(const SocketFd& socketFd) {
+    std::cout <<"Notify send for socket " << socketFd << std::endl;
     sendNotifyQueue.enqueue(socketFd);
 }
 #endif

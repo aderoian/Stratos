@@ -25,174 +25,183 @@
 
 namespace stratos {
 void NetworkSession::tick() {
-    if (!connected) return;
-
-    if (connection->isClosed()) connected = false; // TODO: Handle connection close
+    if (!isConnected()) return;
 
     // Empty received queue
     // TODO: Should we always empty or consume a fix amount per tick?
     processReceived();
-
-    // Attempt to empty the recvBuffer
-    handleRawReceived();
-}
-void NetworkSession::send(const ByteVec& data) const {
-    if (!isStale()) connection->send(data);
-}
-void NetworkSession::send(ClientboundPacket& packet) const {
-    send(std::move(packet));
-}
-void NetworkSession::send(ClientboundPacket&& packet) const {
-    if (!isStale()) {
-        PacketBuffer buffer;
-        buffer.writeVarInt(packet.getId());
-        packet.encrypt(buffer);
-        connection->send(buffer.getBuffer());
-    }
-}
-void NetworkSession::sendLegacyPong() const {
-    send(LegacyServerListPong(47, "1.21.5", "A Minecraft Server", 0, 20));
-    connection->close();
-}
-void NetworkSession::handleClientHandshake(const ClientHandshake& packet) {
-    if (packet.intent == ClientHandshake::Intent::Status)
-        protocolState = Status;
-}
-void NetworkSession::handleStatusRequest() const {
-    if (protocolState == Status) {
-        send(StatusResponse(
-            R"({"version":{"name":"1.21.5","protocol":770},"players":{"max":20,"online":0,"sample":[]},"description":{"text":"A Minecraft Server"}})"));
-    }
-}
-void NetworkSession::handlePingRequest(const int64_t timestamp) const {
-    if (protocolState == Status)
-        send(PongResponse(timestamp));
 }
 void NetworkSession::processReceived() {
-    ByteVec segment;
-    while (connection->receive(segment) > 0) {
-        recvBuffer.insert(recvBuffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.end()));
-        segment.clear();
+    while (true) {
+        std::optional<std::unique_ptr<ServerboundPacket>> optionalPacket = connection->receivePacket();
+        if (!optionalPacket) break; // No more packets to process
+        if (auto packet = std::move(*optionalPacket); !packetHandler->handle(*packet)) {
+            networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);
+        }
     }
 }
-void NetworkSession::handleRawReceived() {
-    size_t offset = 0;
-    while (recvBuffer.size() > 0) {
-        if (protocolState == Handshaking) {
-            // Attempt to read the LegacyServerListPing
-            try {
-                size_t legacyPingOffset = 0;
-                if (const uint8_t id = readUnsignedByte(recvBuffer, legacyPingOffset); id == LegacyServerListPing::ID) {
-                    PacketBuffer buffer(recvBuffer, legacyPingOffset);
-                    LegacyServerListPing packet;
-                    packet.decrypt(buffer);
-                    packet.handle(*this);
+std::optional<std::unique_ptr<ServerboundPacket>> NetworkConnection::receivePacket() {
+    if (isDisconnected()) return std::nullopt;
+    if (std::unique_ptr<ServerboundPacket> packet; receiveQueue.try_dequeue(packet)) {
+        return std::move(packet);
+    }
+    return std::nullopt;
+}
+void NetworkConnection::sendPacket(std::unique_ptr<ClientboundPacket>&& packet) {
+    if (isDisconnected()) return;
+    sendQueue.enqueue(std::move(packet));
+#ifdef __linux__
+    if (bool expected = false; dirty.compare_exchange_strong(expected, true)) eventLoop->notifySend(socketFd);
+#endif
+}
+int NetworkConnection::handleReceive() {
+    const int received = flushReceive();
+    if (received <= 0) return received; // Connection closed or error
 
-                    const size_t newOffset = buffer.getOffset();
-                    recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + newOffset);
-                    continue;
-                }
-            } catch (PacketSerializationException & ignored) {}
+    std::cout << "Received " << received << " bytes from client " << address << ":" << port << std::endl;
+    for (int i = 0; i < receiveBuf.size(); ++i) {
+        printf("%02X ", receiveBuf.data()[i]);
+    }
+    std::cout << std::endl;
+
+    size_t offset = 0;
+    while (!receiveBuf.empty()) {
+        if (handleLegacyPing()) {
+            // Legacy ping handled, continue to next iteration
+            continue;
         }
 
         try {
-            const int packetLength = readVarInt(recvBuffer, offset);
-            if (packetLength <= 0 || packetLength > recvBuffer.size() - offset) {
+            const int packetLength = readVarInt(receiveBuf, offset);
+            if (packetLength <= 0 || packetLength > receiveBuf.size() - offset) {
                 // Not enough data to read a full packet, wait for more data
-                return;
+                return received;
             }
 
-            PacketBuffer packetBuffer(recvBuffer, offset);
+            PacketBuffer packetBuffer(receiveBuf, offset);
             try {
-                const int packetId = packetBuffer.readVarInt();
-                auto       packetKey = PacketKey{protocolState, Serverbound, packetId};
-                const auto packet = PacketRegistry::instance().create(packetKey);
+                const int  packetId  = packetBuffer.readVarInt();
+                auto       packetKey = PacketKey{state, Serverbound, packetId};
+                auto packet    = PacketRegistry::instance().create(packetKey);
                 if (!packet) {
-                    networkManager->getLogger()->error("Received unknown packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
-                    recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + offset + packetLength);
-                    return;
+                    logger->error("Received unknown packet with ID {} from client {}:{}", packetId, address, port);
+                    receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + offset + packetLength);
+                    return received;
                 }
 
-                networkManager->getLogger()->info("Received packet with ID {} from client {}:{}", packetId, sessionId.ip, sessionId.port);
+                logger->info("Received packet with ID {} from client {}:{}", packetId, address, port);
                 packet->decrypt(packetBuffer);
-                packet->handle(*this);
-            } catch (const PacketSerializationException &e) {
-                networkManager->getLogger()->error("Failed to read packet from client {}:{}: {}", sessionId.ip, sessionId.port, e.what());
-            } catch (const std::exception &e) {
-                networkManager->getLogger()->error("Encountered an exception when handing a packet for client {}:{}: {}", sessionId.ip, sessionId.port, e.what());
+                if (!packet->accept(*packetHandler)) {
+                    std::unique_ptr<ServerboundPacket> casted{
+                        dynamic_cast<ServerboundPacket*>(packet.release())
+                    };
+                    receiveQueue.enqueue(std::move(casted)); // Enqueue the packet for further processing
+                }
+            } catch (const PacketSerializationException& e) {
+                logger->error("Failed to read packet from client {}:{}: {}", address, port, e.what());
+            } catch (const std::exception& e) {
+                logger->error("Encountered an exception when handing a packet for client {}:{}: {}", address, port, e.what());
             }
 
-            recvBuffer.erase(recvBuffer.begin(), recvBuffer.begin() + offset + packetLength);
-        } catch (const PacketSerializationException& ignored) {
+            receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + offset + packetLength);
+            offset = 0; // Reset offset for the next packet
+        } catch (const PacketSerializationException& ignored) { // Failed to read packet length
             // Not enough data to read a packet, wait for more data
             break;
         } catch (const std::exception& e) {
-            networkManager->getLogger()->error("Failed to read packet from client {}:{}: {}", sessionId.ip, sessionId.port, e.what());
+            logger->error("Failed to read packet from client {}:{}: {}", address, port, e.what());
         }
     }
+    return received;
 }
-void NetworkSession::dispose() const {
-    networkManager->getLogger()->info("Disposing network session for client {}:{}", sessionId.ip, sessionId.port);
-    ByteVec buffer;
-    while (connection->receive(buffer) > 0) {
-        buffer.clear();
-    } // Empty the received queue
-}
-int  NetworkConnection::receive(ByteVec& data) {
-    if (ByteVec buffer; receiveQueue.try_dequeue(buffer)) {
-        data = std::move(buffer);
-        return static_cast<int>(data.size());
+void NetworkConnection::changeState(const ProtocolState newState) {
+    state = newState;
+    switch (state) {
+    case Handshaking:
+        packetHandler = std::make_unique<HandshakePacketHandler>(this);
+        receiveBuf.reserve(512);
+        break;
+    case Status:
+        packetHandler = std::make_unique<StatusPacketHandler>(this);
+        receiveBuf.reserve(512);
+        break;
+    case Login:
+        packetHandler = std::make_unique<LoginPacketHandler>(this);
+        receiveBuf.reserve(512);
+        break;
+    case Configuration:
+        packetHandler = std::make_unique<ConfigurationPacketHandler>(this);
+        receiveBuf.reserve(1024);
+        break;
+    case Play:
+        packetHandler = std::make_unique<PacketHandler>(); // Network connection does not handle play packets directly
+        receiveBuf.reserve(4096);
     }
-    return 0;
 }
-int NetworkConnection::send(const ByteVec& data) {
-    ByteVec sendBuffer;
-    writeVarInt(sendBuffer, static_cast<int>(data.size()));
-    sendBuffer.insert(sendBuffer.end(), data.begin(), data.end());
-    sendQueue.enqueue(sendBuffer);
+bool NetworkConnection::disconnect() {
+    if (bool expected = false; !disconnected.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) return false;
+    return true;
+}
+bool NetworkConnection::close() {
+    if (TCPConnection::close()) {
+        bool expected = false;
+        disconnected.compare_exchange_strong(expected, true, std::memory_order_acq_rel);
 
-#ifdef __linux__
-    if (bool expected = false; dirty.compare_exchange_strong(expected, true))
-        eventLoop->notifySend(socketFd);
-#endif
-    return static_cast<int>(sendBuffer.size());
+        // Clear queues and buffers
+        receiveBuf.clear();
+        std::unique_ptr<ServerboundPacket> receiveConsumer;
+        while (receiveQueue.try_dequeue(receiveConsumer)) {}
+        std::unique_ptr<ClientboundPacket> sendConsumer;
+        while (sendQueue.try_dequeue(sendConsumer)) {}
+        return true;
+    }
+    return false;
 }
-int NetworkConnection::handleReceive() {
-    ByteVec buffer;
-    ByteVec segment;
-    segment.resize(mtu);
+int NetworkConnection::flushReceive () {
     int totalReceived = 0;
-
+    ByteVec segment;
+    segment.resize(1050);
     while (true) {
-        int received              = 0;
-        totalReceived += received = receive(mtu, segment);
-        if (received == 0) {
-            return 0;
-        }
-        if (received < 0) {
-            if (totalReceived < 0) {
-                return -1;
-            }
-            receiveQueue.enqueue(std::move(buffer));
-            return totalReceived;
-        }
+        const int received = receive(1050, segment);
+        if (received == 0) return 0; // Connection closed
+        if (received < 0) break;
 
-        buffer.insert(buffer.end(), std::make_move_iterator(segment.begin()), std::make_move_iterator(segment.begin() + received));
+        totalReceived += received;
+        receiveBuf.insert(receiveBuf.end(), segment.begin(), segment.begin() + received);
         segment.clear();
     }
+    return totalReceived > 0 ? totalReceived : -1;
 }
-int NetworkConnection::flushSendQueue() {
-    ByteVec buffer;
-    buffer.reserve(mtu);
-
-    int totalBytesSent = 0;
-    while (sendQueue.try_dequeue(buffer)) {
-        const int bytesSent = send(buffer, static_cast<int>(buffer.size()), 0);
-        if (bytesSent == SOCKET_ERROR)
-            return -1;
-        totalBytesSent += bytesSent;
+int NetworkConnection::flushSend() {
+    ByteVec                            sendBuffer;
+    std::unique_ptr<ClientboundPacket> packet;
+    while (sendQueue.try_dequeue(packet)) {
+        if (!packet) continue; // Skip empty packets
+        PacketBuffer pkBuf;
+        pkBuf.writeVarInt(packet->getId());
+        packet->encrypt(pkBuf);
+        writeVarInt(sendBuffer, static_cast<int>(pkBuf.getSize()));
+        sendBuffer.insert(sendBuffer.end(), pkBuf.begin(), pkBuf.end());
     }
 
-    return totalBytesSent;
+    if (sendBuffer.empty()) return 0;
+    return send(sendBuffer, sendBuffer.size(), 0);
+}
+bool NetworkConnection::handleLegacyPing() {
+    if (state != Handshaking) return false;
+    try {
+        size_t legacyPingOffset = 0;
+        if (const uint8_t id = readUnsignedByte(receiveBuf, legacyPingOffset); id == LegacyServerListPing::ID) {
+            PacketBuffer buffer(receiveBuf, legacyPingOffset);
+            LegacyServerListPing packet;
+            packet.decrypt(buffer);
+
+            packetHandler->handle(packet); // Handle legacy ping packet
+            const size_t newOffset = buffer.getOffset();
+            receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + newOffset);
+            return true; // Legacy ping handled
+        }
+    } catch (PacketSerializationException & ignored) {}
+    return false; // No legacy ping found
 }
 } // stratos

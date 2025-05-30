@@ -231,7 +231,7 @@ stratos::TCPServer::~TCPServer() {
  * @throws runtime_error if a SOCKET_ERROR occurs.
  */
 int stratos::TCPConnection::receive(const int length, ByteVec& buffer) {
-    if (!buffer.data() || length <= 0) return SOCKET_ERROR;
+    if (length <= 0) return SOCKET_ERROR;
 
     const int bytes = recv(socketFd, reinterpret_cast<char*>(buffer.data()), length, 0);
     if (bytes == SOCKET_ERROR) {
@@ -274,16 +274,17 @@ int stratos::TCPConnection::send(const ByteVec& buffer, const int length, const 
     return bytes;
 }
 
-void stratos::TCPConnection::close() {
-    if (socketFd != INVALID_SOCKET_FD) {
+bool stratos::TCPConnection::close() {
+    if (bool expected = false; closed.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
 #ifdef _WIN32
         closesocket(socketFd);
 #else
         ::close(socketFd);
 #endif
         socketFd = INVALID_SOCKET_FD;
-        closed = true;
+        return true;
     }
+    return false;
 }
 int stratos::setNonBlocking(SocketFd socketFd) {
 #ifdef _WIN32

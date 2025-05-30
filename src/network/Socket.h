@@ -26,6 +26,7 @@
 #else
 #include <sys/socket.h>
 #endif
+#include <atomic>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -114,7 +115,7 @@ class SocketConnection : public Socket {
 
     virtual int  receive(int length, ByteVec& buffer)               = 0;
     virtual int  send(const ByteVec& buffer, int length, int flags) = 0;
-    virtual void close()                                            = 0;
+    virtual bool close()                                            = 0;
 };
 
 class TCPConnection : public SocketConnection {
@@ -124,12 +125,12 @@ class TCPConnection : public SocketConnection {
 
     int  receive(int length, ByteVec& buffer) override;
     int  send(const ByteVec& buffer, int length, int flags) override;
-    void close() override;
+    bool close() override;
 
-    [[nodiscard]] bool isClosed() const { return closed; }
+    [[nodiscard]] bool isClosed() const { return closed.load(std::memory_order_acquire); }
 
   protected:
-    bool closed = false;
+    std::atomic<bool> closed = false;
 };
 } // namespace stratos
 
