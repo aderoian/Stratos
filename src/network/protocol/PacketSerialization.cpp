@@ -21,7 +21,6 @@
 
 #include "utils/Types.h"
 
-#include <array>
 #include <codecvt>
 #include <cstring>
 #include <locale>
@@ -186,22 +185,6 @@ int64_t stratos::readVarLong(const ByteVec& buffer, size_t& offset) {
     }
     return value;
 }
-stratos::Identifier stratos::readIdentifier(const ByteVec& buffer, size_t& offset) {
-    std::string  rawIdentifier = readString(buffer, offset, 32767);
-    const size_t colonPos      = rawIdentifier.find(':');
-    if (colonPos == std::string::npos) throw PacketSerializationException("Identifier: missing namespace separator ':'");
-    return {
-        rawIdentifier.substr(0, colonPos), // namespace
-        rawIdentifier.substr(colonPos + 1) // name
-    };
-}
-stratos::UUID         stratos::readUUID(const ByteVec& buffer, size_t& offset) {
-    isReadable(buffer, offset, 16);
-    UUID uuid;
-    std::copy(buffer.begin() + offset, buffer.begin() + offset + 16, uuid.begin());
-    offset += 16;
-    return uuid;
-}
 std::vector<uint64_t> stratos::readBitSet(const ByteVec& buffer, size_t& offset) {
     const uint32_t        length = readVarInt(buffer, offset);
     std::vector<uint64_t> longs(length);
@@ -250,13 +233,6 @@ void stratos::writeVarLong(ByteVec& buffer, int64_t value) {
         value = static_cast<uint64_t>(value) >> 7;
     }
 }
-void stratos::writeIdentifier(ByteVec& buffer, const Identifier& identifier) {
-    const std::string fullIdent = identifier.namespaceName + ":" + identifier.name;
-    writeString(buffer, fullIdent, 32767);
-}
-void stratos::writeUUID(ByteVec& buffer, const UUID& uuid) {
-    for (const auto& byte : uuid) buffer.push_back(byte);
-}
 void stratos::writeBitSet(ByteVec& buffer, const std::vector<uint64_t>& longs) {
     const int length = static_cast<int>(longs.size());
     writeVarInt(buffer, length);
@@ -296,4 +272,27 @@ int stratos::countUTF16CodeUnits(const std::string& utf8) {
         }
     }
     return count;
+}
+stratos::Identifier stratos::PacketBuffer::readIdentifier() {
+    std::string  rawIdentifier = stratos::readString(buffer, offset, 32767);
+    const size_t colonPos      = rawIdentifier.find(':');
+    if (colonPos == std::string::npos) throw PacketSerializationException("Identifier: missing namespace separator ':'");
+    return {
+        rawIdentifier.substr(0, colonPos), // namespace
+        rawIdentifier.substr(colonPos + 1) // name
+    };
+}
+stratos::UUID       stratos::PacketBuffer::readUUID() {
+    stratos::isReadable(buffer, offset, 16);
+    UUID uuid;
+    std::copy(buffer.begin() + offset, buffer.begin() + offset + 16, uuid.begin());
+    offset += 16;
+    return uuid;
+}
+void stratos::PacketBuffer::writeIdentifier(const Identifier& identifier) {
+    const std::string fullIdent = identifier.namespaceName + ":" + identifier.name;
+    stratos::writeString(buffer, fullIdent, 32767);
+}
+void stratos::PacketBuffer::writeUUID(const UUID& uuid) {
+    for (const auto& byte : uuid) buffer.push_back(byte);
 }
