@@ -68,6 +68,16 @@ void stratos::StatusRequest::decrypt(PacketBuffer& buffer) {}
 void stratos::PingRequest::decrypt(PacketBuffer& buffer) {
     timestamp = buffer.readLong();
 }
+void stratos::LoginStart::decrypt(PacketBuffer& buffer) {}
+void stratos::EncryptionResponse::decrypt(PacketBuffer& buffer) {}
+void stratos::LoginPluginResponse::decrypt(PacketBuffer& buffer) {}
+void stratos::LoginCookieResponse::decrypt(PacketBuffer& buffer) {}
+void stratos::LoginDisconnect::encrypt(PacketBuffer& buffer) {}
+void stratos::EncryptionRequest::encrypt(PacketBuffer& buffer) {}
+void stratos::LoginSuccess::encrypt(PacketBuffer& buffer) {}
+void stratos::SetCompression::encrypt(PacketBuffer& buffer) {}
+void stratos::LoginPluginRequest::encrypt(PacketBuffer& buffer) {}
+void stratos::LoginCookieRequest::encrypt(PacketBuffer& buffer) {}
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
     case ClientHandshake::Intent::Status:
@@ -96,3 +106,8 @@ bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
         connection->sendPacket(std::make_unique<PongResponse>(packet.timestamp));
     return true;
 }
+bool stratos::LoginPacketHandler::handle(LoginStart& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(EncryptionRequest& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(LoginCookieResponse& packet) { return false; }
