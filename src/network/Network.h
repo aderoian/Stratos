@@ -82,81 +82,6 @@ class NetworkManager final {
     friend class BossThread;
 };
 
-class NetworkConnection final : public TCPConnection {
-  public:
-    using TCPConnection::receive;
-    using TCPConnection::send;
-
-#ifdef __linux__
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), eventLoop(std::move(eventLoop)) {}
-#else
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port) : TCPConnection(socketFd, address, port) {}
-#endif
-    ~NetworkConnection() override = default;
-
-    [[nodiscard]] const moodycamel::ConcurrentQueue<ByteVec>& getSendQueue() const { return sendQueue; }
-    [[nodiscard]] const moodycamel::ConcurrentQueue<ByteVec>& getReceiveQueue() const { return receiveQueue; }
-
-    int receive(ByteVec& data);
-    int send(const ByteVec& data);
-
-  private:
-    moodycamel::ConcurrentQueue<ByteVec> sendQueue = moodycamel::ConcurrentQueue<ByteVec>();
-    moodycamel::ConcurrentQueue<ByteVec> receiveQueue = moodycamel::ConcurrentQueue<ByteVec>();
-#ifdef __linux__
-    std::atomic<bool> dirty = false; // Indicates if the connection has data to send
-    std::shared_ptr<WorkerThread> eventLoop;
-#endif
-
-    int handleReceive();
-    int flushSendQueue();
-
-    friend class WorkerThread;
-};
-
-class NetworkSession {
-  public:
-    explicit NetworkSession(NetworkManager* networkManager, SessionId id, std::shared_ptr<NetworkConnection> connection)
-        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)) {}
-    ~NetworkSession() = default;
-
-    [[nodiscard]] std::string getIp() const { return sessionId.ip; }
-    [[nodiscard]] int         getPort() const { return sessionId.port; }
-    [[nodiscard]] bool        isConnected() const { return connected; }
-    [[nodiscard]] bool        isStale() const { return !connected && connection->isClosed(); }
-
-    void tick();
-
-    void send(const ByteVec& data) const;
-    void send(ClientboundPacket& packet) const;
-    void send(ClientboundPacket&& packet) const;
-
-    void sendLegacyPong() const;
-    void handleClientHandshake(const ClientHandshake& packet);
-    void handleStatusRequest() const;
-    void handlePingRequest(int64_t timestamp) const;
-
-
-  private:
-    NetworkManager* networkManager;
-    SessionId       sessionId;
-    std::shared_ptr<NetworkConnection>   connection;
-
-    ByteVec recvBuffer;
-
-    ProtocolState protocolState = Handshaking;
-    ClientHandshake::Intent sessionIntent = ClientHandshake::Intent::None;
-    bool connected = true;
-
-    // Clears the received segments and moves the data to the recvBuffer
-    void processReceived();
-    // Handles the raw received data, frames data into received packet(s), then handles the packet(s) if any
-    void handleRawReceived();
-    void dispose() const;
-
-    friend class NetworkManager;
-};
-
 class NetworkThread {
   public:
     explicit NetworkThread(NetworkManager* network) : network(network) {}
@@ -198,10 +123,8 @@ class WorkerThread final : public NetworkThread {
     void stop() override;
 
     void addConnection(std::shared_ptr<NetworkConnection> connection);
-    void removeConnection(const std::shared_ptr<NetworkConnection>& connection);
-#ifdef __linux__
+    void removeConnection(SocketFd connection);
     void notifySend(const SocketFd& socketFd);
-#endif
 
     [[nodiscard]] int getId() const { return id; }
     [[nodiscard]] int getConnectionCount() const { return connectionCount; }
@@ -211,17 +134,17 @@ class WorkerThread final : public NetworkThread {
     int connectionCount = 0;
 
     std::mutex                                                      connectionMutex;
-    std::vector<std::shared_ptr<NetworkConnection>>                 connections;
+    std::unordered_map<SocketFd, std::shared_ptr<NetworkConnection>> connections;
     moodycamel::ConcurrentQueue<std::shared_ptr<NetworkConnection>> inConnectionQueue;
-#ifdef __linux__
-    int epollFd = -1;
     moodycamel::ConcurrentQueue<SocketFd> sendNotifyQueue;
+#ifdef __WIN32
+    std::vector<WSAPOLLFD> connectionPollFds;
+#elifdef __linux__
+    int epollFd = -1;
 #endif
 
     void processIncomingConnections();
-#ifdef __linux__
     void processSendNotifications();
-#endif
 };
 } // namespace stratos
 

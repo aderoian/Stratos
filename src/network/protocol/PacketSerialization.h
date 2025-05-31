@@ -216,6 +216,8 @@ class PacketBuffer {
     void reserve(const size_t size) { buffer.reserve(size); }
     void append(const ByteVec& data) { buffer.insert(buffer.end(), data.begin(), data.end()); }
     void append(const ByteVec&& data) { buffer.insert(buffer.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end())); }
+    auto begin() { return buffer.begin(); }
+    auto end() { return buffer.end(); }
 
     bool                  readBoolean() { return stratos::readBoolean(buffer, offset); }
     int8_t                readByte() { return stratos::readByte(buffer, offset); }

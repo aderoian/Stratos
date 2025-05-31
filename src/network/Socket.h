@@ -26,6 +26,7 @@
 #else
 #include <sys/socket.h>
 #endif
+#include <atomic>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -106,7 +107,6 @@ class TCPServer final : public SocketServer {
 };
 
 int    setNonBlocking(SocketFd socketFd);
-size_t getMTUForSocket(SocketFd socketFd);
 
 class SocketConnection : public Socket {
   public:
@@ -115,24 +115,22 @@ class SocketConnection : public Socket {
 
     virtual int  receive(int length, ByteVec& buffer)               = 0;
     virtual int  send(const ByteVec& buffer, int length, int flags) = 0;
-    virtual void close()                                            = 0;
+    virtual bool close()                                            = 0;
 };
 
 class TCPConnection : public SocketConnection {
   public:
-    TCPConnection(const SocketFd socketFd, const std::string& address, const int& port) : SocketConnection(socketFd, address, port) { mtu = getMTUForSocket(socketFd); }
+    TCPConnection(const SocketFd socketFd, const std::string& address, const int& port) : SocketConnection(socketFd, address, port) {}
     ~TCPConnection() override = default;
 
     int  receive(int length, ByteVec& buffer) override;
     int  send(const ByteVec& buffer, int length, int flags) override;
-    void close() override;
+    bool close() override;
 
-    [[nodiscard]] size_t getMtu() const { return mtu; }
-    [[nodiscard]] bool isClosed() const { return closed; }
+    [[nodiscard]] bool isClosed() const { return closed.load(std::memory_order_acquire); }
 
   protected:
-    size_t mtu;
-    bool closed = false;
+    std::atomic<bool> closed = false;
 };
 } // namespace stratos
 

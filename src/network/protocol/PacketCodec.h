@@ -20,17 +20,36 @@
 #ifndef PACKETCODEC_H
 #define PACKETCODEC_H
 #include "Packet.h"
-#include "PacketSerialization.h"
 
 #include <cstdint>
 #include <string>
 
 namespace stratos {
+class PingRequest;
+class StatusRequest;
+class LegacyServerListPing;
+class ClientHandshake;
+class NetworkConnection;
+
+class PacketHandler {
+public:
+    virtual ~PacketHandler() = default;
+    virtual bool handle(Packet&) { return false; }
+
+    virtual bool handle(ClientHandshake&) { return false; }
+    virtual bool handle(LegacyServerListPing&) { return false; }
+    virtual bool handle(StatusRequest&) { return false; }
+    virtual bool handle(PingRequest&) { return false; }
+};
+
+#define PACKET_ACCEPT \
+bool accept(PacketHandler& handler) override { return handler.handle(*this); }
 
 // Handshake Packets
 
 class ClientHandshake final : public ServerboundPacket {
   public:
+    PACKET_ACCEPT
     enum class Intent {
         None = 0,
         Status = 0x01,
@@ -47,18 +66,17 @@ class ClientHandshake final : public ServerboundPacket {
     explicit ClientHandshake() : Packet(ID), ServerboundPacket(ID) {}
     ~ClientHandshake() override = default;
     void decrypt(PacketBuffer& buffer) override;
-    void handle(NetworkSession& session) override;
 };
 
 class LegacyServerListPing final : public ServerboundPacket {
 public:
+    PACKET_ACCEPT
     constexpr static int ID = 0xFE;
     uint8_t payload = 0x01; // Legacy server list ping payload
 
     explicit LegacyServerListPing() : Packet(ID), ServerboundPacket(ID) {}
     ~LegacyServerListPing() override = default;
     void decrypt(PacketBuffer& buffer) override;
-    void handle(NetworkSession& session) override;
 };
 
 class LegacyServerListPong final : public ClientboundPacket {
@@ -103,25 +121,67 @@ public:
 
 class StatusRequest final : public ServerboundPacket {
 public:
+    PACKET_ACCEPT
     constexpr static int ID = 0x00;
 
     explicit StatusRequest() : Packet(ID), ServerboundPacket(ID) {}
     ~StatusRequest() override = default;
     void decrypt(PacketBuffer& buffer) override;
-    void handle(NetworkSession& session) override;
 };
 
 class PingRequest final : public ServerboundPacket {
   public:
+    PACKET_ACCEPT
     constexpr static int ID = 0x01;
 
     int64_t timestamp = 0;
     explicit PingRequest() : Packet(ID), ServerboundPacket(ID) {}
     ~PingRequest() override = default;
     void decrypt(PacketBuffer& buffer) override;
-    void handle(NetworkSession& session) override;
 };
 
+class HandshakePacketHandler final : public PacketHandler {
+public:
+    using PacketHandler::handle;
+    explicit HandshakePacketHandler(NetworkConnection* connection) : connection(std::move(connection)) {}
+    bool handle(ClientHandshake& packet) override;
+    bool handle(LegacyServerListPing& packet) override;
+protected:
+    NetworkConnection* connection;
+};
+
+class StatusPacketHandler final : public PacketHandler {
+public:
+    using PacketHandler::handle;
+    explicit StatusPacketHandler(NetworkConnection* connection) : connection(std::move(connection)) {}
+    bool handle(StatusRequest& packet) override;
+    bool handle(PingRequest& packet) override;
+protected:
+    NetworkConnection* connection;
+};
+
+class LoginPacketHandler final : public PacketHandler {
+public:
+    using PacketHandler::handle;
+    explicit LoginPacketHandler(NetworkConnection* connection) : connection(std::move(connection)) {}
+protected:
+    NetworkConnection* connection;
+};
+
+class ConfigurationPacketHandler final : public PacketHandler {
+public:
+    using PacketHandler::handle;
+    explicit ConfigurationPacketHandler(NetworkConnection* connection) : connection(std::move(connection)) {}
+protected:
+    NetworkConnection* connection;
+};
+
+class PlayPacketHandler final : public PacketHandler {
+public:
+    explicit PlayPacketHandler(NetworkSession* session) : PacketHandler(), session(std::move(session)) {}
+private:
+    NetworkSession* session;
+};
 
 } // namespace stratos
 
