@@ -282,12 +282,39 @@ stratos::Identifier stratos::PacketBuffer::readIdentifier() {
         rawIdentifier.substr(colonPos + 1) // name
     };
 }
-stratos::UUID       stratos::PacketBuffer::readUUID() {
+stratos::UUID stratos::PacketBuffer::readUUID() {
     stratos::isReadable(buffer, offset, 16);
     UUID uuid;
     std::copy(buffer.begin() + offset, buffer.begin() + offset + 16, uuid.begin());
     offset += 16;
     return uuid;
+}
+std::vector<uint8_t> stratos::PacketBuffer::readPrefixedByteArray() {
+    return stratos::readByteArray(buffer, offset, stratos::readVarInt(buffer, offset));
+}
+std::vector<stratos::LoginProperty> stratos::PacketBuffer::readLoginProperty() {
+    const int length = stratos::readVarInt(buffer, offset);
+    if (length < 0 || length > 16)
+        throw PacketSerializationException("LoginProperty: invalid length " + std::to_string(length));
+    std::vector<LoginProperty> properties;
+    properties.resize(length);
+    for (int i = 0; i < length; ++i)
+        properties[i] = {stratos::readString(buffer, offset, 16), stratos::readString(buffer, offset, 32767), readPrefixedOptionalString(1024)};
+    return properties;
+}
+std::optional<std::string> stratos::PacketBuffer::readPrefixedOptionalString(const int maxChars) {
+    return stratos::readBoolean(buffer, offset) ? std::make_optional(stratos::readString(buffer, offset, maxChars)) : std::nullopt;
+}
+std::vector<uint8_t> stratos::PacketBuffer::readInferredByteArray() {
+    std::vector<uint8_t> result;
+    while (offset < buffer.size()) result.push_back(stratos::readByte(buffer, offset));
+    return result;
+}
+std::optional<std::vector<uint8_t>> stratos::PacketBuffer::readPrefixedOptionalInferredByteArray() {
+    return stratos::readBoolean(buffer, offset) ? std::make_optional(readInferredByteArray()) : std::nullopt;
+}
+std::optional<std::vector<uint8_t>> stratos::PacketBuffer::readPrefixedOptionalPrefixedByteArray() {
+    return stratos::readBoolean(buffer, offset) ? std::make_optional(readPrefixedByteArray()) : std::nullopt;
 }
 void stratos::PacketBuffer::writeIdentifier(const Identifier& identifier) {
     const std::string fullIdent = identifier.namespaceName + ":" + identifier.name;
@@ -295,4 +322,40 @@ void stratos::PacketBuffer::writeIdentifier(const Identifier& identifier) {
 }
 void stratos::PacketBuffer::writeUUID(const UUID& uuid) {
     for (const auto& byte : uuid) buffer.push_back(byte);
+}
+void stratos::PacketBuffer::writePrefixedByteArray(const std::vector<uint8_t>& bytes) {
+    stratos::writeVarInt(buffer, static_cast<int>(bytes.size()));
+    stratos::writeByteArray(buffer, bytes);
+}
+void stratos::PacketBuffer::writeLoginProperty(const std::vector<LoginProperty>& properties) {
+    stratos::writeVarInt(buffer, static_cast<int>(properties.size()));
+    for (const auto& [name, value, signature] : properties) {
+        stratos::writeString(buffer, name, 16);
+        stratos::writeString(buffer, value, 32767);
+        writePrefixedOptionalString(signature, 1024);
+    }
+}
+void stratos::PacketBuffer::writePrefixedOptionalString(const std::optional<std::string>& str, const int maxChars) {
+    if (str) {
+        stratos::writeBoolean(buffer, true);
+        stratos::writeString(buffer, *str, maxChars);
+    } else {
+        stratos::writeBoolean(buffer, false);
+    }
+}
+void stratos::PacketBuffer::writePrefixedOptionalByteArray(const std::optional<std::vector<uint8_t>>& bytes) {
+    if (bytes) {
+        stratos::writeBoolean(buffer, true);
+        stratos::writeByteArray(buffer, *bytes);
+    } else {
+        stratos::writeBoolean(buffer, false);
+    }
+}
+void stratos::PacketBuffer::writePrefixedOptionalPrefixedByteArray(const std::optional<std::vector<uint8_t>>& bytes) {
+    if (bytes) {
+        stratos::writeBoolean(buffer, true);
+        writePrefixedByteArray(*bytes);
+    } else {
+        stratos::writeBoolean(buffer, false);
+    }
 }

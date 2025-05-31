@@ -137,6 +137,12 @@ class PacketBuffer {
     template <typename T, typename ReadFunc>
     T readVarIntEnum(const ReadFunc& enumMapper) { return enumMapper(stratos::readVarInt(buffer, offset)); }
     ByteVec readByteArray(const size_t length) { return stratos::readByteArray(buffer, offset, length); }
+    std::vector<uint8_t> readPrefixedByteArray();
+    std::vector<LoginProperty> readLoginProperty();
+    std::optional<std::string> readPrefixedOptionalString(int maxChars);
+    std::vector<uint8_t> readInferredByteArray();
+    std::optional<std::vector<uint8_t>> readPrefixedOptionalInferredByteArray();
+    std::optional<std::vector<uint8_t>> readPrefixedOptionalPrefixedByteArray();
 
     void writeBoolean(const bool value) { stratos::writeBoolean(buffer, value); }
     void writeByte(const int8_t value) { stratos::writeByte(buffer, value); }
@@ -164,6 +170,11 @@ class PacketBuffer {
     void writeBitSet(const std::vector<uint64_t>& longs) { stratos::writeBitSet(buffer, longs); }
     void writeFixedBitSet(const std::vector<bool>& bits, const size_t length) { stratos::writeFixedBitSet(buffer, bits, length); }
     void                       writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
+    void writePrefixedByteArray(const std::vector<uint8_t>& bytes);
+    void writeLoginProperty(const std::vector<LoginProperty>& properties);
+    void writePrefixedOptionalString(const std::optional<std::string>& str, int maxChars);
+    void writePrefixedOptionalByteArray(const std::optional<std::vector<uint8_t>>& bytes);
+    void writePrefixedOptionalPrefixedByteArray(const std::optional<std::vector<uint8_t>>& bytes);
 
     [[nodiscard]] const ByteVec& getBuffer() const { return buffer; }
     [[nodiscard]] size_t         getOffset() const { return offset; }

@@ -28,7 +28,7 @@ void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
     serverPort      = buffer.readUnsignedShort();
 
     // Read the intent
-    intent = buffer.readXEnum<int, Intent>(readVarInt, [](const int& value) -> Intent {
+    intent = buffer.readVarIntEnum<Intent>([](const int& value) -> Intent {
         switch (value) {
         case 0x01:
             return Intent::Status;
@@ -68,16 +68,46 @@ void stratos::StatusRequest::decrypt(PacketBuffer& buffer) {}
 void stratos::PingRequest::decrypt(PacketBuffer& buffer) {
     timestamp = buffer.readLong();
 }
-void stratos::LoginStart::decrypt(PacketBuffer& buffer) {}
-void stratos::EncryptionResponse::decrypt(PacketBuffer& buffer) {}
-void stratos::LoginPluginResponse::decrypt(PacketBuffer& buffer) {}
-void stratos::LoginCookieResponse::decrypt(PacketBuffer& buffer) {}
-void stratos::LoginDisconnect::encrypt(PacketBuffer& buffer) {}
-void stratos::EncryptionRequest::encrypt(PacketBuffer& buffer) {}
-void stratos::LoginSuccess::encrypt(PacketBuffer& buffer) {}
-void stratos::SetCompression::encrypt(PacketBuffer& buffer) {}
-void stratos::LoginPluginRequest::encrypt(PacketBuffer& buffer) {}
-void stratos::LoginCookieRequest::encrypt(PacketBuffer& buffer) {}
+void stratos::LoginStart::decrypt(PacketBuffer& buffer) {
+    name = buffer.readString(16);
+    uuid = buffer.readUUID();
+}
+void stratos::EncryptionResponse::decrypt(PacketBuffer& buffer) {
+    sharedSecret = buffer.readByteArray(buffer.readVarInt());
+    verifyToken  = buffer.readByteArray(buffer.readVarInt());
+}
+void stratos::LoginPluginResponse::decrypt(PacketBuffer& buffer) {
+    messageId = buffer.readVarInt();
+    data = buffer.readPrefixedOptionalInferredByteArray();
+}
+void stratos::LoginCookieResponse::decrypt(PacketBuffer& buffer) {
+    cookie = buffer.readIdentifier();
+    payload = buffer.readPrefixedOptionalPrefixedByteArray();
+}
+void stratos::LoginDisconnect::encrypt(PacketBuffer& buffer) {
+    buffer.writeString(reason, 32767);
+}
+void stratos::EncryptionRequest::encrypt(PacketBuffer& buffer) {
+    buffer.writeString(serverId, 20);
+    buffer.writePrefixedByteArray(publicKey);
+    buffer.writePrefixedByteArray(verifyToken);
+}
+void stratos::LoginSuccess::encrypt(PacketBuffer& buffer) {
+    buffer.writeUUID(uuid);
+    buffer.writeString(username, 16);
+    buffer.writeLoginProperty(properties);
+}
+void stratos::SetCompression::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(threshold);
+}
+void stratos::LoginPluginRequest::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(messageId);
+    buffer.writeIdentifier(channel);
+    buffer.writeByteArray(data);
+}
+void stratos::LoginCookieRequest::encrypt(PacketBuffer& buffer) {
+    buffer.writeIdentifier(cookie);
+}
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
     case ClientHandshake::Intent::Status:
@@ -109,5 +139,8 @@ bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
 bool stratos::LoginPacketHandler::handle(LoginStart& packet) { return false; }
 bool stratos::LoginPacketHandler::handle(EncryptionRequest& packet) { return false; }
 bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }
-bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) {
+    connection->changeState(Configuration);
+    return true;
+}
 bool stratos::LoginPacketHandler::handle(LoginCookieResponse& packet) { return false; }

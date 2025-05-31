@@ -23,6 +23,7 @@
 #include "utils/Types.h"
 
 #include <cstdint>
+#include <optional>
 #include <string>
 
 namespace stratos {
@@ -186,7 +187,7 @@ public:
     constexpr static int ID = 0x02;
 
     int messageId; // VarInt
-    std::vector<uint8_t> data; // prefixed optional ByteArray
+    std::optional<std::vector<uint8_t>> data; // prefixed optional ByteArray
     LoginPluginResponse() : Packet(ID), ServerboundPacket(ID), messageId(0), data() {}
     ~LoginPluginResponse() override = default;
     void decrypt(PacketBuffer& buffer) override;
@@ -208,7 +209,7 @@ public:
     constexpr static int ID = 0x04;
 
     Identifier cookie;
-    std::vector<uint8_t> payload; // prefixed optional ByteArray
+    std::optional<std::vector<uint8_t>> payload; // prefixed optional ByteArray
     LoginCookieResponse() : Packet(ID), ServerboundPacket(ID), cookie({"",""}), payload() {}
     ~LoginCookieResponse() override = default;
     void decrypt(PacketBuffer& buffer) override;
@@ -230,8 +231,8 @@ public:
     constexpr static int ID = 0x01;
 
     std::string serverId; // String(20)
-    std::vector<uint8_t> publicKey; // ByteArray
-    std::vector<uint8_t> verifyToken; // ByteArray
+    std::vector<uint8_t> publicKey; // prefixed ByteArray
+    std::vector<uint8_t> verifyToken; // prefixed ByteArray
     EncryptionRequest() : Packet(ID), ClientboundPacket(ID), serverId(""), publicKey(), verifyToken() {}
     EncryptionRequest(std::string&& serverId, std::vector<uint8_t>&& publicKey, std::vector<uint8_t>&& verifyToken)
         : Packet(ID), ClientboundPacket(ID), serverId(std::move(serverId)), publicKey(std::move(publicKey)), verifyToken(std::move(verifyToken)) {}
@@ -241,19 +242,14 @@ public:
 
 class LoginSuccess final : public ClientboundPacket {
 public:
-    struct Property {
-        std::string name; // String(16)
-        std::string value; // String(32767)
-        std::string signature; // String(1024), prefixed optional
-    };
 
     constexpr static int ID = 0x02;
 
     UUID uuid;
     std::string username; // String(16)
-    std::vector<Property> properties; // prefixed array(16)
+    std::vector<LoginProperty> properties; // prefixed array(16)
     LoginSuccess() : Packet(ID), ClientboundPacket(ID), uuid(), username(""), properties() {}
-    LoginSuccess(const UUID& uuid, std::string&& username, std::vector<Property>&& properties)
+    LoginSuccess(const UUID& uuid, std::string&& username, std::vector<LoginProperty>&& properties)
         : Packet(ID), ClientboundPacket(ID), uuid(uuid), username(std::move(username)), properties(std::move(properties)) {}
     ~LoginSuccess() override = default;
     void encrypt(PacketBuffer& buffer) override;

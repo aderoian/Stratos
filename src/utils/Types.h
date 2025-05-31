@@ -19,6 +19,7 @@
 
 #ifndef TYPES_H
 #define TYPES_H
+#include <optional>
 #include <string>
 
 namespace stratos {
@@ -36,6 +37,12 @@ struct Identifier {
     bool operator!=(const Identifier& other) const {
         return !(*this == other);
     }
+};
+
+struct LoginProperty {
+    std::string name; // String(16)
+    std::string value; // String(32767)
+    std::optional<std::string> signature; // String(1024), prefixed optional
 };
 
 }
