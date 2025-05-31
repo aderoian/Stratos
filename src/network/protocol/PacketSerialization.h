@@ -25,6 +25,7 @@
 #include <vector>
 
 namespace stratos {
+struct Identifier;
 using ByteVec = std::vector<unsigned char>;
 
 class PacketSerializationException final : public std::logic_error {
@@ -65,7 +66,7 @@ int     readVarInt(const ByteVec& buffer, size_t& offset);
 int64_t readVarLong(const ByteVec& buffer, size_t& offset);
 // TODO: readTextComponent
 // TODO: readJSONTextComponent
-// TODO: readIdentifier
+Identifier readIdentifier(const ByteVec& buffer, size_t& offset);
 // TODO: readEntityMetaData
 // TODO: readSlot
 // TODO: readHashedSlot
@@ -126,7 +127,7 @@ void writeVarInt(ByteVec& buffer, int value);
 void writeVarLong(ByteVec& buffer, int64_t value);
 // TODO: writeTextComponent
 // TODO: writeJSONTextComponent
-// TODO: writeIdentifier
+void writeIdentifier(ByteVec& buffer, const Identifier& identifier);
 // TODO: writeEntityMetaData
 // TODO: writeSlot
 // TODO: writeHashedSlot
