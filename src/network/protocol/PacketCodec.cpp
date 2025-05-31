@@ -21,6 +21,7 @@
 
 #include "network/NetworkClient.h"
 #include "PacketSerialization.h"
+#include "utils/UUID.h"
 
 void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
     protocolVersion = buffer.readVarInt();
@@ -136,11 +137,16 @@ bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
         connection->sendPacket(std::make_unique<PongResponse>(packet.timestamp));
     return true;
 }
-bool stratos::LoginPacketHandler::handle(LoginStart& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(LoginStart& packet) {
+    connection->updateSessionInfo({packet.name, generateOfflineUUID(packet.name)});
+    connection->sendPacket(std::make_unique<LoginSuccess>(packet.uuid, std::move(packet.name), std::vector<LoginProperty>()));
+    return true;
+}
 bool stratos::LoginPacketHandler::handle(EncryptionRequest& packet) { return false; }
 bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }
 bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) {
     connection->changeState(Configuration);
+    std::cout << "Login acknowledged, changing state to Configuration." << std::endl;
     return true;
 }
 bool stratos::LoginPacketHandler::handle(LoginCookieResponse& packet) { return false; }

@@ -141,12 +141,22 @@ bool NetworkConnection::close() {
         // Clear queues and buffers
         receiveBuf.clear();
         std::unique_ptr<ServerboundPacket> receiveConsumer;
-        while (receiveQueue.try_dequeue(receiveConsumer)) {}
+        while (receiveQueue.try_dequeue(receiveConsumer)) {
+        }
         std::unique_ptr<ClientboundPacket> sendConsumer;
-        while (sendQueue.try_dequeue(sendConsumer)) {}
+        while (sendQueue.try_dequeue(sendConsumer)) {
+        }
         return true;
     }
     return false;
+}
+void NetworkConnection::updateSessionInfo(SessionInfo&& info) {
+    if (sessionInfo) {
+        sessionInfo->username = std::move(info.username);
+        sessionInfo->uuid     = std::move(info.uuid);
+    } else {
+        sessionInfo = std::make_unique<SessionInfo>(std::move(info));
+    }
 }
 int NetworkConnection::flushReceive () {
     int totalReceived = 0;

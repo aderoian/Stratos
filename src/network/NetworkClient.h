@@ -33,6 +33,11 @@ class WorkerThread;
 using SessionId = ClientInfo;
 class NetworkManager;
 
+struct SessionInfo {
+    std::string username;
+    UUID uuid;
+};
+
 class NetworkConnection final : public TCPConnection {
   public:
     using TCPConnection::receive;
@@ -52,6 +57,8 @@ class NetworkConnection final : public TCPConnection {
     [[nodiscard]] bool isDisconnected() const { return disconnected.load(std::memory_order_acquire); }
     [[nodiscard]] ProtocolState getState() const { return state; }
     [[nodiscard]] ClientHandshake::Intent getIntent() const { return intent; }
+    [[nodiscard]] std::optional<std::reference_wrapper<SessionInfo>> getSessionInfo() const { return sessionInfo ? std::make_optional(std::ref(*sessionInfo)) : std::nullopt; }
+    void updateSessionInfo(SessionInfo&& info);
 
   private:
     ByteVec receiveBuf;
@@ -62,6 +69,7 @@ class NetworkConnection final : public TCPConnection {
     ProtocolState state;
     ClientHandshake::Intent intent = ClientHandshake::Intent::None;
     std::unique_ptr<PacketHandler> packetHandler;
+    std::unique_ptr<SessionInfo> sessionInfo = nullptr;
 
     std::shared_ptr<spdlog::logger> logger;
     std::atomic<bool> dirty = false; // Indicates if the connection has data to send

@@ -23,6 +23,7 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
+        utils/hash/MD5.cpp
 )
 
 set(HEADERS
@@ -33,6 +34,8 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        utils/hash/MD5.h
+        utils/UUID.h
 )
 
 # Project
