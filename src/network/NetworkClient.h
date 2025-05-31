@@ -38,11 +38,7 @@ class NetworkConnection final : public TCPConnection {
     using TCPConnection::receive;
     using TCPConnection::send;
 
-#ifdef __linux__
     NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<spdlog::logger> logger, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), logger(std::move(logger)), eventLoop(std::move(eventLoop)) { changeState(Handshaking); }
-#else
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<spdlog::logger> logger) : TCPConnection(socketFd, address, port), logger(std::move(logger)) { changeState(Handshaking); }
-#endif
     ~NetworkConnection() override = default;
 
     std::optional<std::unique_ptr<ServerboundPacket>> receivePacket();
@@ -68,10 +64,9 @@ class NetworkConnection final : public TCPConnection {
     std::unique_ptr<PacketHandler> packetHandler;
 
     std::shared_ptr<spdlog::logger> logger;
-#ifdef __linux__
     std::atomic<bool> dirty = false; // Indicates if the connection has data to send
     std::shared_ptr<WorkerThread> eventLoop;
-#endif
+
     int flushReceive();
     int flushSend();
 

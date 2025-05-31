@@ -137,19 +137,11 @@ void stratos::BossThread::start() {
                         if (workers.size() < workerThreads) {
                             auto worker = std::make_shared<WorkerThread>(network, workers.size());
                             worker->start();
-#ifdef __linux__
                             connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger(), worker);
-#else
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger());
-#endif
                             worker->addConnection(connection);
                             workers.push_back(std::move(worker));
                         } else {
-#ifdef __linux__
                             connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger(), workers[connectionCount % workerThreads]);
-#else
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger());
-#endif
                             workers[connectionCount % workerThreads]->addConnection(connection);
                         }
 
@@ -195,49 +187,63 @@ void stratos::WorkerThread::start() {
         thread = std::thread([this] {
             while (running) {
                 processIncomingConnections();
+                processSendNotifications();
 #ifdef _WIN32
-                fd_set readSet, writeSet;
-                FD_ZERO(&readSet);
-                FD_ZERO(&writeSet);
-                SocketFd maxFd = 0;
-
-                for (const auto& conn : connections) {
-                    FD_SET(conn->getFd(), &readSet);
-                    if (conn->hasSendData()) FD_SET(conn->getFd(), &writeSet);
-                    if (conn->getFd() > maxFd) maxFd = conn->getFd();
+                if (connectionPollFds.empty()) {
+                    Sleep(2);
+                    continue;
+                }
+                if (const int result = WSAPoll(connectionPollFds.data(), connectionPollFds.size(), 100); result == SOCKET_ERROR) {
+                    network->getLogger()->error("WSAPoll failed: {}", WSAGetLastError());
+                    continue;
                 }
 
-                timeval timeout{};
-                timeout.tv_sec  = 0;
-                timeout.tv_usec = 2000;
-                select(maxFd + 1, &readSet, &writeSet, nullptr, &timeout);
+                for (size_t i = 0; i < connectionPollFds.size(); ++i) {
+                    auto& [fd, events, revents] = connectionPollFds[i];
+                    auto it = connections.find(fd);
+                    if (it == connections.end()) continue;
+                    auto& conn = it->second;
 
-                for (const auto& conn : connections) {
-                    if (!conn) continue;
-                    if (FD_ISSET(conn->getFd(), &readSet)) {
-                        std::cout << "\nHandling receive for client " << conn->getAddress() << ":" << conn->getPort() << std::endl;
-                        if (conn->handleReceive() == 0) { // non-blocking
-                            // TODO: handle connection close
+                    // Handle socket errors
+                    if (revents & POLLERR || revents & POLLHUP || revents & POLLNVAL) {
+                        network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
+                        conn->close();
+                        connectionPollFds.erase(connectionPollFds.begin() + i);
+                        removeConnection(fd);
+                        --i;
+                        continue;
+                    }
+
+                    // Handle readable events
+                    if (revents & POLLRDNORM) {
+                        if (!conn->handleReceive()) {
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
                             conn->close();
-                            removeConnection(conn);
-                            continue; // Skip further processing for this connection
+                            connectionPollFds.erase(connectionPollFds.begin() + i);
+                            removeConnection(fd);
+                            --i;
+                            continue;
                         }
                     }
-                    if (FD_ISSET(conn->getFd(), &writeSet)) {
-                        conn->flushSend(); // try sending pending buffers
+
+                    // Handle writable events
+                    if (revents & POLLWRNORM) {
+                        conn->flushSend();
+                        if (!conn->hasSendData()) {
+                            events &= ~POLLWRNORM;
+                            bool expected = true;
+                            conn->dirty.compare_exchange_strong(expected, false);
+                        }
                     }
 
                     // Handle server -> client disconnects
                     if (conn->isDisconnected()) {
                         network->getLogger()->info("Client {}:{} disconnected", conn->getAddress(), conn->getPort());
                         conn->close();
-                        removeConnection(conn);
+                        removeConnection(fd);
                     }
                 }
 #elifdef __linux__
-                processSendNotifications();
-
                 constexpr int MAX_EVENTS = 64;
                 epoll_event   events[MAX_EVENTS];
 
@@ -249,16 +255,15 @@ void stratos::WorkerThread::start() {
 
                 for (int i = 0; i < ready; ++i) {
                     int  fd = events[i].data.fd;
-                    auto it = std::ranges::find_if(connections, [fd](const auto& c) { return c->getFd() == fd; });
-
+                    auto it = connections.find(fd);
                     if (it == connections.end()) continue;
-                    auto& conn   = *it;
+                    auto& conn   = it->second;
                     if (events[i].events & EPOLLIN) {
                         if (conn->handleReceive() == 0) {
                             network->getLogger()->info("Connection closed for client {}:{}", conn->getAddress(), conn->getPort());
                             conn->close();
-                            removeConnection(conn);
-                            continue; // Skip further processing for this connection
+                            removeConnection(fd);
+                            continue;
                         }
                     }
 
@@ -282,7 +287,7 @@ void stratos::WorkerThread::start() {
                     if (conn->isDisconnected()) {
                         network->getLogger()->info("Client {}:{} disconnected", conn->getAddress(), conn->getPort());
                         conn->close();
-                        removeConnection(conn);
+                        removeConnection(fd);
                     }
                 }
 #endif
@@ -293,7 +298,7 @@ void stratos::WorkerThread::start() {
 void stratos::WorkerThread::stop() {
     if (running.exchange(false)) {
         // Notify all connections to stop
-        for (const auto& conn : connections) {
+        for (const auto& conn : connections | std::views::values) {
             conn->close();
         }
 
@@ -307,29 +312,27 @@ void stratos::WorkerThread::addConnection(std::shared_ptr<NetworkConnection> con
     inConnectionQueue.enqueue(std::move(connection));
 }
 
-void stratos::WorkerThread::removeConnection(const std::shared_ptr<NetworkConnection>& connection) {
-    if (!connection) return;
-
+void stratos::WorkerThread::removeConnection(const SocketFd connection) {
 #ifdef __linux__
-    epoll_ctl(epollFd, EPOLL_CTL_DEL, connection->getFd(), nullptr);
+    epoll_ctl(epollFd, EPOLL_CTL_DEL, connection, nullptr);
 #endif
 
     std::lock_guard lock(connectionMutex);
-    std::erase(connections, connection);
+    connections.erase(connection);
     connectionCount--;
 }
-#ifdef __linux__
 void stratos::WorkerThread::notifySend(const SocketFd& socketFd) {
     std::cout <<"Notify send for socket " << socketFd << std::endl;
     sendNotifyQueue.enqueue(socketFd);
 }
-#endif
 void stratos::WorkerThread::processIncomingConnections() {
 
     std::lock_guard lock(connectionMutex);
     while (true) {
         if (std::shared_ptr<NetworkConnection> connection; inConnectionQueue.try_dequeue(connection)) {
-#ifdef __linux__
+#ifdef __WIN32
+            connectionPollFds.push_back({connection->getFd(), POLLRDNORM, 0});
+#elifdef __linux__
             epoll_event ev{};
             ev.events  = EPOLLIN | EPOLLET; // Edge-triggered, no out until we have data to send
             ev.data.fd = connection->getFd();
@@ -339,22 +342,33 @@ void stratos::WorkerThread::processIncomingConnections() {
                 epoll_ctl(epollFd, EPOLL_CTL_MOD, connection->getFd(), &ev);
             }
 #endif
-
-            connections.push_back(connection);
+            connections[connection->getFd()] = std::move(connection);
             connectionCount++;
         } else {
             break;
         }
     }
 }
-#ifdef __linux__
+
 void stratos::WorkerThread::processSendNotifications() {
     SocketFd socketFd;
+#ifdef _WIN32
+    std::vector<SocketFd> sockets;
+    while (sendNotifyQueue.try_dequeue(socketFd)) {
+        sockets.push_back(socketFd);
+    }
+    std::lock_guard lock(connectionMutex);
+    for (auto& pfd : connectionPollFds) {
+        if (std::ranges::find(sockets, pfd.fd) != sockets.end()) {
+            pfd.events |= POLLWRNORM;
+        }
+    }
+#elifdef __linux__
     while (sendNotifyQueue.try_dequeue(socketFd)) {
         epoll_event ev{};
         ev.events = EPOLLIN | EPOLLOUT| EPOLLET; // Edge-triggered, no out until we have data to send
         ev.data.fd = socketFd;
         epoll_ctl(epollFd, EPOLL_CTL_MOD, socketFd, &ev);
     }
-}
 #endif
+}

@@ -50,9 +50,7 @@ std::optional<std::unique_ptr<ServerboundPacket>> NetworkConnection::receivePack
 void NetworkConnection::sendPacket(std::unique_ptr<ClientboundPacket>&& packet) {
     if (isDisconnected()) return;
     sendQueue.enqueue(std::move(packet));
-#ifdef __linux__
     if (bool expected = false; dirty.compare_exchange_strong(expected, true)) eventLoop->notifySend(socketFd);
-#endif
 }
 int NetworkConnection::handleReceive() {
     const int received = flushReceive();

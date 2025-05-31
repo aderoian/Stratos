@@ -123,10 +123,8 @@ class WorkerThread final : public NetworkThread {
     void stop() override;
 
     void addConnection(std::shared_ptr<NetworkConnection> connection);
-    void removeConnection(const std::shared_ptr<NetworkConnection>& connection);
-#ifdef __linux__
+    void removeConnection(SocketFd connection);
     void notifySend(const SocketFd& socketFd);
-#endif
 
     [[nodiscard]] int getId() const { return id; }
     [[nodiscard]] int getConnectionCount() const { return connectionCount; }
@@ -136,17 +134,17 @@ class WorkerThread final : public NetworkThread {
     int connectionCount = 0;
 
     std::mutex                                                      connectionMutex;
-    std::vector<std::shared_ptr<NetworkConnection>>                 connections;
+    std::unordered_map<SocketFd, std::shared_ptr<NetworkConnection>> connections;
     moodycamel::ConcurrentQueue<std::shared_ptr<NetworkConnection>> inConnectionQueue;
-#ifdef __linux__
-    int epollFd = -1;
     moodycamel::ConcurrentQueue<SocketFd> sendNotifyQueue;
+#ifdef __WIN32
+    std::vector<WSAPOLLFD> connectionPollFds;
+#elifdef __linux__
+    int epollFd = -1;
 #endif
 
     void processIncomingConnections();
-#ifdef __linux__
     void processSendNotifications();
-#endif
 };
 } // namespace stratos
 
