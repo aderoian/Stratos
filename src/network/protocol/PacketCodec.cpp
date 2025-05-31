@@ -69,7 +69,6 @@ void stratos::PingRequest::decrypt(PacketBuffer& buffer) {
     timestamp = buffer.readLong();
 }
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
-    std::cout << "Handling ClientHandshake packet from " << connection->getAddress() << ":" << connection->getPort() << std::endl;
     switch (packet.intent) {
     case ClientHandshake::Intent::Status:
         connection->changeState(Status);
@@ -87,7 +86,6 @@ bool stratos::HandshakePacketHandler::handle(LegacyServerListPing& packet) {
     return true;
 }
 bool stratos::StatusPacketHandler::handle(StatusRequest& packet) {
-    std::cout << "Handling StatusRequest packet from " << connection->getAddress() << ":" << connection->getPort() << std::endl;
     if (connection->getState() == Status)
         connection->sendPacket(std::make_unique<StatusResponse>(
             R"({"version":{"name":"1.21.5","protocol":770},"players":{"max":20,"online":0,"sample":[]},"description":{"text":"A Minecraft Server"}})"));

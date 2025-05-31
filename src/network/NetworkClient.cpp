@@ -56,12 +56,6 @@ int NetworkConnection::handleReceive() {
     const int received = flushReceive();
     if (received <= 0) return received; // Connection closed or error
 
-    std::cout << "Received " << received << " bytes from client " << address << ":" << port << std::endl;
-    for (int i = 0; i < receiveBuf.size(); ++i) {
-        printf("%02X ", receiveBuf.data()[i]);
-    }
-    std::cout << std::endl;
-
     size_t offset = 0;
     while (!receiveBuf.empty()) {
         if (handleLegacyPing()) {
@@ -87,7 +81,6 @@ int NetworkConnection::handleReceive() {
                     return received;
                 }
 
-                logger->info("Received packet with ID {} from client {}:{}", packetId, address, port);
                 packet->decrypt(packetBuffer);
                 if (!packet->accept(*packetHandler)) {
                     std::unique_ptr<ServerboundPacket> casted{

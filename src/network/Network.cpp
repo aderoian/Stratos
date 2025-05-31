@@ -322,7 +322,6 @@ void stratos::WorkerThread::removeConnection(const SocketFd connection) {
     connectionCount--;
 }
 void stratos::WorkerThread::notifySend(const SocketFd& socketFd) {
-    std::cout <<"Notify send for socket " << socketFd << std::endl;
     sendNotifyQueue.enqueue(socketFd);
 }
 void stratos::WorkerThread::processIncomingConnections() {
