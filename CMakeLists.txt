@@ -24,6 +24,7 @@ set(SOURCES
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
         utils/hash/MD5.cpp
+        utils/crypto/CryptoUtils.cpp
 )
 
 set(HEADERS
@@ -35,6 +36,7 @@ set(HEADERS
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
         utils/hash/MD5.h
+        utils/crypto/CryptoUtils.h
         utils/UUID.h
 )
 
@@ -58,6 +60,27 @@ target_sources(${LOCAL_PROJECT_NAME} PRIVATE src/Stratos.cpp ${SOURCES} ${HEADER
 if (WIN32)
     target_link_libraries(Stratos PRIVATE iphlpapi ws2_32)
 endif ()
+
+# OpenSSL
+if (WIN32)
+    set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
+    set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include")
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/VC/x64/MDd")
+    else()
+        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/VC/x64/MD")
+    endif()
+
+    # Manually set the expected library paths
+    set(OPENSSL_SSL_LIBRARY "${OPENSSL_LIB_DIR}/libssl.lib")
+    set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_LIB_DIR}/libcrypto.lib")
+    message(STATUS "Using OpenSSL from: ${OPENSSL_ROOT_DIR}\n\tInclude: ${OPENSSL_INCLUDE_DIR}\n\tSSL Library: ${OPENSSL_SSL_LIBRARY}\n\tCrypto Library: ${OPENSSL_CRYPTO_LIBRARY}")
+endif ()
+
+set(OPENSSL_USE_STATIC_LIBS TRUE)
+find_package(OpenSSL REQUIRED)
+target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
