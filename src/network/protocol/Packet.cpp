@@ -33,6 +33,16 @@ void stratos::PacketRegistry::setup() {
     registerPacket({Status, Clientbound, StatusResponse::ID}, [] { return std::make_unique<StatusResponse>(); });
     registerPacket({Status, Clientbound, PongResponse::ID}, [] { return std::make_unique<PongResponse>(); });
 
-
-
+    // Login Packets
+    registerPacket({Login, Serverbound, LoginStart::ID}, [] { return std::make_unique<LoginStart>(); });
+    registerPacket({Login, Serverbound, EncryptionResponse::ID}, [] { return std::make_unique<EncryptionResponse>(); });
+    registerPacket({Login, Serverbound, LoginPluginResponse::ID}, [] { return std::make_unique<LoginPluginResponse>(); });
+    registerPacket({Login, Serverbound, LoginAcknowledge::ID}, [] { return std::make_unique<LoginAcknowledge>(); });
+    registerPacket({Login, Serverbound, LoginCookieResponse::ID}, [] { return std::make_unique<LoginCookieResponse>(); });
+    registerPacket({Login, Clientbound, LoginDisconnect::ID}, [] { return std::make_unique<LoginDisconnect>(); });
+    registerPacket({Login, Clientbound, EncryptionRequest::ID}, [] { return std::make_unique<EncryptionRequest>(); });
+    registerPacket({Login, Clientbound, LoginSuccess::ID}, [] { return std::make_unique<LoginSuccess>(); });
+    registerPacket({Login, Clientbound, SetCompression::ID}, [] { return std::make_unique<SetCompression>(); });
+    registerPacket({Login, Clientbound, LoginPluginRequest::ID}, [] { return std::make_unique<LoginPluginRequest>(); });
+    registerPacket({Login, Clientbound, LoginCookieRequest::ID}, [] { return std::make_unique<LoginCookieRequest>(); });
 }

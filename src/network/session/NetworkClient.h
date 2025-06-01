@@ -19,11 +19,12 @@
 
 #ifndef NETWORKCLIENT_H
 #define NETWORKCLIENT_H
+#include "../io/Socket.h"
+#include "../protocol/Packet.h"
+#include "../protocol/PacketCodec.h"
 #include "concurrentqueue.h"
-#include "protocol/Packet.h"
-#include "protocol/PacketCodec.h"
-#include "Socket.h"
 #include "spdlog/spdlog.h"
+#include "utils/crypto/CryptoUtils.h"
 
 #include <memory>
 #include <optional>
@@ -33,12 +34,17 @@ class WorkerThread;
 using SessionId = ClientInfo;
 class NetworkManager;
 
+struct SessionInfo {
+    std::string username;
+    UUID uuid;
+};
+
 class NetworkConnection final : public TCPConnection {
   public:
     using TCPConnection::receive;
     using TCPConnection::send;
 
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, std::shared_ptr<spdlog::logger> logger, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), logger(std::move(logger)), eventLoop(std::move(eventLoop)) { changeState(Handshaking); }
+    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, NetworkManager* network, std::shared_ptr<spdlog::logger> logger, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), network(network), logger(std::move(logger)), eventLoop(std::move(eventLoop)) { changeState(Handshaking); }
     ~NetworkConnection() override = default;
 
     std::optional<std::unique_ptr<ServerboundPacket>> receivePacket();
@@ -46,14 +52,21 @@ class NetworkConnection final : public TCPConnection {
     int                                               handleReceive();
     void changeState(ProtocolState newState);
     bool                                              disconnect();
+    bool                                              disconnect(const std::string& reason);
     bool                                              close() override;
 
+    [[nodiscard]] const NetworkManager* getNetwork() const { return network; }
+    [[nodiscard]] const std::shared_ptr<spdlog::logger>& getLogger() const { return logger; }
     [[nodiscard]] bool hasSendData() const { return sendQueue.size_approx() > 0; }
     [[nodiscard]] bool isDisconnected() const { return disconnected.load(std::memory_order_acquire); }
     [[nodiscard]] ProtocolState getState() const { return state; }
     [[nodiscard]] ClientHandshake::Intent getIntent() const { return intent; }
+    [[nodiscard]] std::optional<std::reference_wrapper<SessionInfo>> getSessionInfo() const { return sessionInfo ? std::make_optional(std::ref(*sessionInfo)) : std::nullopt; }
+    void updateSessionInfo(SessionInfo&& info);
 
   private:
+    NetworkManager* network;
+
     ByteVec receiveBuf;
     moodycamel::ConcurrentQueue<std::unique_ptr<ClientboundPacket>> sendQueue = moodycamel::ConcurrentQueue<std::unique_ptr<ClientboundPacket>>();
     moodycamel::ConcurrentQueue<std::unique_ptr<ServerboundPacket>> receiveQueue = moodycamel::ConcurrentQueue<std::unique_ptr<ServerboundPacket>>();
@@ -62,10 +75,16 @@ class NetworkConnection final : public TCPConnection {
     ProtocolState state;
     ClientHandshake::Intent intent = ClientHandshake::Intent::None;
     std::unique_ptr<PacketHandler> packetHandler;
+    std::unique_ptr<SessionInfo> sessionInfo = nullptr;
 
     std::shared_ptr<spdlog::logger> logger;
     std::atomic<bool> dirty = false; // Indicates if the connection has data to send
     std::shared_ptr<WorkerThread> eventLoop;
+
+    bool encryptionEnabled = false;
+    const EVPKeyPtr* encryptionKey;
+    std::vector<uint8_t> verifyToken; // Used for encryption handshake
+    std::vector<uint8_t> clientSecret;
 
     int flushReceive();
     int flushSend();
@@ -73,6 +92,7 @@ class NetworkConnection final : public TCPConnection {
     bool handleLegacyPing();
 
     friend class WorkerThread;
+    friend class LoginPacketHandler;
 };
 
 class NetworkSession {

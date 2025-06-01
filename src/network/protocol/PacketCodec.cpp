@@ -19,8 +19,11 @@
 
 #include "PacketCodec.h"
 
-#include "network/NetworkClient.h"
+#include "../session/NetworkClient.h"
+#include "network/Network.h"
+#include "network/session/SessionAuth.h"
 #include "PacketSerialization.h"
+#include "utils/UUID.h"
 
 void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
     protocolVersion = buffer.readVarInt();
@@ -28,7 +31,7 @@ void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
     serverPort      = buffer.readUnsignedShort();
 
     // Read the intent
-    intent = buffer.readXEnum<int, Intent>(readVarInt, [](const int& value) -> Intent {
+    intent = buffer.readVarIntEnum<Intent>([](const int& value) -> Intent {
         switch (value) {
         case 0x01:
             return Intent::Status;
@@ -68,6 +71,47 @@ void stratos::StatusRequest::decrypt(PacketBuffer& buffer) {}
 void stratos::PingRequest::decrypt(PacketBuffer& buffer) {
     timestamp = buffer.readLong();
 }
+void stratos::LoginStart::decrypt(PacketBuffer& buffer) {
+    name = buffer.readString(16);
+    uuid = buffer.readUUID();
+}
+void stratos::EncryptionResponse::decrypt(PacketBuffer& buffer) {
+    sharedSecret = buffer.readByteArray(buffer.readVarInt());
+    verifyToken  = buffer.readByteArray(buffer.readVarInt());
+}
+void stratos::LoginPluginResponse::decrypt(PacketBuffer& buffer) {
+    messageId = buffer.readVarInt();
+    data = buffer.readPrefixedOptionalInferredByteArray();
+}
+void stratos::LoginCookieResponse::decrypt(PacketBuffer& buffer) {
+    cookie = buffer.readIdentifier();
+    payload = buffer.readPrefixedOptionalPrefixedByteArray();
+}
+void stratos::LoginDisconnect::encrypt(PacketBuffer& buffer) {
+    buffer.writeString(reason, 32767);
+}
+void stratos::EncryptionRequest::encrypt(PacketBuffer& buffer) {
+    buffer.writeString(serverId, 20);
+    buffer.writePrefixedByteArray(publicKey);
+    buffer.writePrefixedByteArray(verifyToken);
+    buffer.writeBoolean(shouldAuthenticate);
+}
+void stratos::LoginSuccess::encrypt(PacketBuffer& buffer) {
+    buffer.writeUUID(uuid);
+    buffer.writeString(username, 16);
+    buffer.writeLoginProperty(properties);
+}
+void stratos::SetCompression::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(threshold);
+}
+void stratos::LoginPluginRequest::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(messageId);
+    buffer.writeIdentifier(channel);
+    buffer.writeByteArray(data);
+}
+void stratos::LoginCookieRequest::encrypt(PacketBuffer& buffer) {
+    buffer.writeIdentifier(cookie);
+}
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
     case ClientHandshake::Intent::Status:
@@ -96,3 +140,32 @@ bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
         connection->sendPacket(std::make_unique<PongResponse>(packet.timestamp));
     return true;
 }
+bool stratos::LoginPacketHandler::handle(LoginStart& packet) {
+    if (connection->getNetwork()->useEncryption()) {
+        connection->updateSessionInfo({packet.name, packet.uuid});
+        connection->encryptionKey = &connection->getNetwork()->getEncryptionKey();
+        std::vector<uint8_t> token = connection->verifyToken = generateRandomBytes(16);
+        connection->sendPacket(std::make_unique<EncryptionRequest>("stratos", encodeServerPublicKey(connection->encryptionKey), std::move(token), true)); // TODO: Server config
+    } else {
+        connection->updateSessionInfo({packet.name, generateOfflineUUID(packet.name)});
+        connection->sendPacket(std::make_unique<LoginSuccess>(packet.uuid, std::move(packet.name), std::vector<LoginProperty>()));
+    }
+    return true;
+}
+bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
+    if (const std::vector<uint8_t> decryptToken = rsaDecrypt(connection->encryptionKey, packet.verifyToken); decryptToken != connection->verifyToken) {
+        connection->disconnect();
+        return false;
+    }
+    connection->clientSecret = std::move(rsaDecrypt(connection->encryptionKey, packet.sharedSecret));
+    connection->encryptionEnabled = true;
+
+    authenticate(connection, "stratos", connection->clientSecret, *connection->encryptionKey);
+    return true;
+}
+bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) {
+    connection->changeState(Configuration);
+    return true;
+}
+bool stratos::LoginPacketHandler::handle(LoginCookieResponse& packet) { return false; }

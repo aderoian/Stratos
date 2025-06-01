@@ -20,8 +20,9 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 #include "concurrentqueue.h"
+#include "io/Socket.h"
 #include "protocol/PacketCodec.h"
-#include "Socket.h"
+#include "utils/crypto/CryptoUtils.h"
 
 #include <memory>
 #include <shared_mutex>
@@ -55,9 +56,15 @@ class NetworkManager final {
     void stop();
     void tick();
 
-    std::shared_ptr<spdlog::logger>              getLogger() const { return logger; }
-    std::shared_ptr<NetworkSession>              getSession(const SessionId& sessionId);
-    std::vector<std::shared_ptr<NetworkSession>> getSessions();
+    [[nodiscard]] std::shared_ptr<spdlog::logger>              getLogger() const { return logger; }
+    [[nodiscard]] std::shared_ptr<NetworkSession>              getSession(const SessionId& sessionId);
+    [[nodiscard]] std::vector<std::shared_ptr<NetworkSession>> getSessions();
+
+    [[nodiscard]] const std::string& getAddress() const { return socketServer.getAddress(); }
+    [[nodiscard]] int getPort() const { return socketServer.getPort(); }
+
+    [[nodiscard]] bool useEncryption() const { return encryptionEnabled; }
+    [[nodiscard]] const EVPKeyPtr& getEncryptionKey() const { return encryptionKey; }
 
     void createSession(std::shared_ptr<NetworkConnection> connection);
     bool                            removeSession(const SessionId& sessionId);
@@ -72,10 +79,11 @@ class NetworkManager final {
     std::unordered_map<SessionId, std::shared_ptr<NetworkSession>> sessions;
 
     TCPServer socketServer;
-
     std::atomic<bool> running;
-
     std::unique_ptr<BossThread> bossThread;
+
+    bool encryptionEnabled = false;
+    EVPKeyPtr encryptionKey = EVPKeyPtr(nullptr, &EVP_PKEY_free);
 
     void processIncomingConnections();
 
