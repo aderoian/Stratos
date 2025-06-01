@@ -20,7 +20,9 @@
 #include "Network.h"
 
 #include "NetworkClient.h"
+#include "openssl/ssl.h"
 #include "spdlog/logger.h"
+#include "utils/crypto/CryptoUtils.h"
 
 #include <ranges>
 #ifdef __linux__
@@ -30,6 +32,17 @@
 bool stratos::NetworkManager::start() {
     if (running) throw std::runtime_error("Attempted to start NetworkManager while it is already running");
     running = true;
+
+    encryptionEnabled = true; // TODO: settings from server config
+    if (encryptionEnabled) {
+        try {
+            encryptionKey = std::move(generateEncryptionKey());
+            logger->info("Generated encryption key of size {} bytes", encodeServerPublicKey(&encryptionKey).size());
+        } catch (const std::exception& e) {
+            logger->error("Failed to generate encryption key: {}", e.what());
+            return false;
+        }
+    }
 
     try {
         if (socketServer.isValid()) socketServer.listen(100);
@@ -110,7 +123,7 @@ void stratos::NetworkManager::processIncomingConnections() {
             // Create a new session
             logger->info("Creating new network session for client {}:{}", client.ip, client.port);
             const auto session = std::make_shared<NetworkSession>(this, client, std::move(connection));
-            sessions[client] = session;
+            sessions[client]   = session;
         }
     }
 }
@@ -137,11 +150,11 @@ void stratos::BossThread::start() {
                         if (workers.size() < workerThreads) {
                             auto worker = std::make_shared<WorkerThread>(network, workers.size());
                             worker->start();
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger(), worker);
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network, network->getLogger(), worker);
                             worker->addConnection(connection);
                             workers.push_back(std::move(worker));
                         } else {
-                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network->getLogger(), workers[connectionCount % workerThreads]);
+                            connection = std::make_shared<NetworkConnection>(socket, ip, port, network, network->getLogger(), workers[connectionCount % workerThreads]);
                             workers[connectionCount % workerThreads]->addConnection(connection);
                         }
 

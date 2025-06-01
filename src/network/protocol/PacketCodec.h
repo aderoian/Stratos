@@ -27,10 +27,10 @@
 #include <string>
 
 namespace stratos {
+class EncryptionResponse;
 class LoginCookieResponse;
 class LoginAcknowledge;
 class LoginPluginResponse;
-class EncryptionRequest;
 class LoginStart;
 class PingRequest;
 class StatusRequest;
@@ -51,7 +51,7 @@ public:
     virtual bool handle(PingRequest&) { return false; }
 
     virtual bool handle(LoginStart&) { return false; }
-    virtual bool handle(EncryptionRequest&) { return false; }
+    virtual bool handle(EncryptionResponse&) { return false; }
     virtual bool handle(LoginPluginResponse&) { return false; }
     virtual bool handle(LoginAcknowledge&) { return false; }
     virtual bool handle(LoginCookieResponse&) { return false; }
@@ -233,9 +233,10 @@ public:
     std::string serverId; // String(20)
     std::vector<uint8_t> publicKey; // prefixed ByteArray
     std::vector<uint8_t> verifyToken; // prefixed ByteArray
-    EncryptionRequest() : Packet(ID), ClientboundPacket(ID), serverId(""), publicKey(), verifyToken() {}
-    EncryptionRequest(std::string&& serverId, std::vector<uint8_t>&& publicKey, std::vector<uint8_t>&& verifyToken)
-        : Packet(ID), ClientboundPacket(ID), serverId(std::move(serverId)), publicKey(std::move(publicKey)), verifyToken(std::move(verifyToken)) {}
+    bool shouldAuthenticate;
+    EncryptionRequest() : Packet(ID), ClientboundPacket(ID), serverId(""), publicKey(), verifyToken(), shouldAuthenticate(false) {}
+    EncryptionRequest(std::string&& serverId, std::vector<uint8_t>&& publicKey, std::vector<uint8_t>&& verifyToken, bool shouldAuthenticate)
+        : Packet(ID), ClientboundPacket(ID), serverId(std::move(serverId)), publicKey(std::move(publicKey)), verifyToken(std::move(verifyToken)), shouldAuthenticate(shouldAuthenticate) {}
     ~EncryptionRequest() override = default;
     void encrypt(PacketBuffer& buffer) override;
 };
@@ -317,7 +318,7 @@ public:
     using PacketHandler::handle;
     explicit LoginPacketHandler(NetworkConnection* connection) : connection(std::move(connection)) {}
     bool handle(LoginStart& packet) override;
-    bool handle(EncryptionRequest& packet) override;
+    bool handle(EncryptionResponse& packet) override;
     bool handle(LoginPluginResponse& packet) override;
     bool handle(LoginAcknowledge& packet) override;
     bool handle(LoginCookieResponse& packet) override;

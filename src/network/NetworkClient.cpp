@@ -133,6 +133,12 @@ bool NetworkConnection::disconnect() {
     if (bool expected = false; !disconnected.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) return false;
     return true;
 }
+bool NetworkConnection::disconnect(const std::string& reason) {
+    if (bool expected = false; !disconnected.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) return false;
+    if (state == Login)
+        sendPacket(std::make_unique<LoginDisconnect>(reason.data()));
+    return true;
+}
 bool NetworkConnection::close() {
     if (TCPConnection::close()) {
         bool expected = false;
@@ -168,7 +174,23 @@ int NetworkConnection::flushReceive () {
         if (received < 0) break;
 
         totalReceived += received;
-        receiveBuf.insert(receiveBuf.end(), segment.begin(), segment.begin() + received);
+        if (encryptionEnabled) {
+            try {
+                ByteVec decrypted = aesDecryptCFB8(clientSecret, clientSecret, segment);
+                if (decrypted.empty()) {
+                    logger->error("Failed to decrypt received data, disconnecting client {}:{}", address, port);
+                    disconnect("Decryption failed");
+                    return -1; // Decryption failed
+                }
+                receiveBuf.insert(receiveBuf.end(), decrypted.begin(), decrypted.begin() + received);
+            } catch (std::runtime_error & e) {
+                logger->error("Decryption error for client {}:{}: {}", address, port, e.what());
+                disconnect("Decryption error");
+                return -1; // Decryption error
+            }
+        } else {
+            receiveBuf.insert(receiveBuf.end(), segment.begin(), segment.begin() + received);
+        }
         segment.clear();
     }
     return totalReceived > 0 ? totalReceived : -1;
@@ -181,8 +203,16 @@ int NetworkConnection::flushSend() {
         PacketBuffer pkBuf;
         pkBuf.writeVarInt(packet->getId());
         packet->encrypt(pkBuf);
-        writeVarInt(sendBuffer, static_cast<int>(pkBuf.getSize()));
-        sendBuffer.insert(sendBuffer.end(), pkBuf.begin(), pkBuf.end());
+
+        PacketBuffer framedBuf;
+        framedBuf.writeVarInt(static_cast<int>(pkBuf.getSize()));
+        framedBuf.append(pkBuf.getBuffer());
+        if (encryptionEnabled) {
+            ByteVec encrypted = aesEncryptCFB8(clientSecret, clientSecret, framedBuf.getBuffer());
+            sendBuffer.insert(sendBuffer.end(), std::make_move_iterator(encrypted.begin()), std::make_move_iterator(encrypted.end()));
+        } else {
+            sendBuffer.insert(sendBuffer.end(), framedBuf.begin(), framedBuf.end());
+        }
     }
 
     if (sendBuffer.empty()) return 0;

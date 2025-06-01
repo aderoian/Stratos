@@ -19,6 +19,7 @@
 
 #include "PacketCodec.h"
 
+#include "network/Network.h"
 #include "network/NetworkClient.h"
 #include "PacketSerialization.h"
 #include "utils/UUID.h"
@@ -92,6 +93,7 @@ void stratos::EncryptionRequest::encrypt(PacketBuffer& buffer) {
     buffer.writeString(serverId, 20);
     buffer.writePrefixedByteArray(publicKey);
     buffer.writePrefixedByteArray(verifyToken);
+    buffer.writeBoolean(shouldAuthenticate);
 }
 void stratos::LoginSuccess::encrypt(PacketBuffer& buffer) {
     buffer.writeUUID(uuid);
@@ -139,14 +141,29 @@ bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
 }
 bool stratos::LoginPacketHandler::handle(LoginStart& packet) {
     connection->updateSessionInfo({packet.name, generateOfflineUUID(packet.name)});
-    connection->sendPacket(std::make_unique<LoginSuccess>(packet.uuid, std::move(packet.name), std::vector<LoginProperty>()));
+    if (connection->getNetwork()->useEncryption()) {
+        connection->encryptionKey = &connection->getNetwork()->getEncryptionKey();
+        std::vector<uint8_t> token = connection->verifyToken = generateRandomBytes(16);
+        connection->sendPacket(std::make_unique<EncryptionRequest>("", encodeServerPublicKey(connection->encryptionKey), std::move(token), false));
+    } else {
+        connection->sendPacket(std::make_unique<LoginSuccess>(packet.uuid, std::move(packet.name), std::vector<LoginProperty>()));
+    }
     return true;
 }
-bool stratos::LoginPacketHandler::handle(EncryptionRequest& packet) { return false; }
+bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
+    if (const std::vector<uint8_t> decryptToken = rsaDecrypt(connection->encryptionKey, packet.verifyToken); decryptToken != connection->verifyToken) {
+        connection->disconnect();
+        return false;
+    }
+    connection->clientSecret = std::move(rsaDecrypt(connection->encryptionKey, packet.sharedSecret));
+    connection->encryptionEnabled = true;
+    SessionInfo sessionInfo = *connection->getSessionInfo();
+    connection->sendPacket(std::make_unique<LoginSuccess>(sessionInfo.uuid, std::move(sessionInfo.username), std::vector<LoginProperty>()));
+    return true;
+}
 bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }
 bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) {
     connection->changeState(Configuration);
-    std::cout << "Login acknowledged, changing state to Configuration." << std::endl;
     return true;
 }
 bool stratos::LoginPacketHandler::handle(LoginCookieResponse& packet) { return false; }

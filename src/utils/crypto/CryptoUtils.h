@@ -29,11 +29,12 @@
 namespace stratos {
 using EVPKeyPtr = std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)>;
 
-static EVPKeyPtr generateEncryptionKey();
-static std::vector<uint8_t> encodeServerPublicKey(const EVPKeyPtr* key);
-static std::vector<uint8_t> rsaEncrypt(const EVPKeyPtr* key, const std::vector<uint8_t>& payload);
-static std::vector<uint8_t> rsaDecrypt(const EVPKeyPtr* key, const std::vector<uint8_t>& payload);
-static std::vector<uint8_t> aesEncryptCFB8(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, const std::vector<uint8_t>& plaintext);
-static std::vector<uint8_t> aesDecryptCFB8(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, const std::vector<uint8_t>& ciphertext);
+EVPKeyPtr generateEncryptionKey();
+std::vector<uint8_t> encodeServerPublicKey(const EVPKeyPtr* key);
+std::vector<uint8_t> rsaEncrypt(const EVPKeyPtr* key, const std::vector<uint8_t>& payload);
+std::vector<uint8_t> rsaDecrypt(const EVPKeyPtr* key, const std::vector<uint8_t>& payload);
+std::vector<uint8_t> aesEncryptCFB8(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, const std::vector<uint8_t>& plaintext);
+std::vector<uint8_t> aesDecryptCFB8(const std::vector<uint8_t>& key, const std::vector<uint8_t>& iv, const std::vector<uint8_t>& ciphertext);
+std::vector<uint8_t> generateRandomBytes(size_t size);
 } // namespace stratos
 #endif //CRYPTOUTILS_H

@@ -20,6 +20,7 @@
 #include "CryptoUtils.h"
 
 #include <openssl/evp.h>
+#include <openssl/rand.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
 #include <stdexcept>
@@ -137,7 +138,7 @@ std::vector<uint8_t> stratos::aesDecryptCFB8(const std::vector<uint8_t>& key, co
     }
 
     std::vector<uint8_t> plaintext(ciphertext.size());
-    int outlen = 0;
+    int                  outlen = 0;
     if (EVP_DecryptUpdate(ctx, plaintext.data(), &outlen, ciphertext.data(), static_cast<int>(ciphertext.size())) != 1) {
         EVP_CIPHER_CTX_free(ctx);
         throw std::runtime_error("AES decryption failed");
@@ -145,4 +146,10 @@ std::vector<uint8_t> stratos::aesDecryptCFB8(const std::vector<uint8_t>& key, co
 
     EVP_CIPHER_CTX_free(ctx);
     return plaintext;
+}
+std::vector<uint8_t> stratos::generateRandomBytes(const size_t size) {
+    std::vector<uint8_t> randomBytes(size);
+    if (RAND_bytes(randomBytes.data(), static_cast<int>(size)) != 1)
+        throw std::runtime_error("Failed to generate random bytes");
+    return randomBytes;
 }
