@@ -24,8 +24,8 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
-        utils/hash/MD5.cpp
         utils/crypto/CryptoUtils.cpp
+        utils/hash/MD5.cpp
 )
 
 set(HEADERS
@@ -37,8 +37,11 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
-        utils/hash/MD5.h
         utils/crypto/CryptoUtils.h
+        utils/hash/MD5.h
+        utils/io/FileUtils.h
+        utils/MathUtils.h
+        utils/TimeUtils.h
         utils/UUID.h
 )
 
