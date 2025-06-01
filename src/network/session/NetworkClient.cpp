@@ -19,8 +19,8 @@
 
 #include "NetworkClient.h"
 
-#include "Network.h"
-#include "protocol/PacketSerialization.h"
+#include "network/Network.h"
+#include "network/protocol/PacketSerialization.h"
 #include "spdlog/logger.h"
 
 namespace stratos {

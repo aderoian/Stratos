@@ -19,8 +19,9 @@
 
 #include "PacketCodec.h"
 
+#include "../session/NetworkClient.h"
 #include "network/Network.h"
-#include "network/NetworkClient.h"
+#include "network/session/SessionAuth.h"
 #include "PacketSerialization.h"
 #include "utils/UUID.h"
 
@@ -140,12 +141,13 @@ bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
     return true;
 }
 bool stratos::LoginPacketHandler::handle(LoginStart& packet) {
-    connection->updateSessionInfo({packet.name, generateOfflineUUID(packet.name)});
     if (connection->getNetwork()->useEncryption()) {
+        connection->updateSessionInfo({packet.name, packet.uuid});
         connection->encryptionKey = &connection->getNetwork()->getEncryptionKey();
         std::vector<uint8_t> token = connection->verifyToken = generateRandomBytes(16);
-        connection->sendPacket(std::make_unique<EncryptionRequest>("", encodeServerPublicKey(connection->encryptionKey), std::move(token), false));
+        connection->sendPacket(std::make_unique<EncryptionRequest>("stratos", encodeServerPublicKey(connection->encryptionKey), std::move(token), true)); // TODO: Server config
     } else {
+        connection->updateSessionInfo({packet.name, generateOfflineUUID(packet.name)});
         connection->sendPacket(std::make_unique<LoginSuccess>(packet.uuid, std::move(packet.name), std::vector<LoginProperty>()));
     }
     return true;
@@ -157,8 +159,8 @@ bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
     }
     connection->clientSecret = std::move(rsaDecrypt(connection->encryptionKey, packet.sharedSecret));
     connection->encryptionEnabled = true;
-    SessionInfo sessionInfo = *connection->getSessionInfo();
-    connection->sendPacket(std::make_unique<LoginSuccess>(sessionInfo.uuid, std::move(sessionInfo.username), std::vector<LoginProperty>()));
+
+    authenticate(connection, "stratos", connection->clientSecret, *connection->encryptionKey);
     return true;
 }
 bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }

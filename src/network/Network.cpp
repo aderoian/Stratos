@@ -19,8 +19,8 @@
 
 #include "Network.h"
 
-#include "NetworkClient.h"
 #include "openssl/ssl.h"
+#include "session/NetworkClient.h"
 #include "spdlog/logger.h"
 #include "utils/crypto/CryptoUtils.h"
 

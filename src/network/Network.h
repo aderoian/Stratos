@@ -20,8 +20,8 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 #include "concurrentqueue.h"
+#include "io/Socket.h"
 #include "protocol/PacketCodec.h"
-#include "Socket.h"
 #include "utils/crypto/CryptoUtils.h"
 
 #include <memory>
@@ -59,6 +59,9 @@ class NetworkManager final {
     [[nodiscard]] std::shared_ptr<spdlog::logger>              getLogger() const { return logger; }
     [[nodiscard]] std::shared_ptr<NetworkSession>              getSession(const SessionId& sessionId);
     [[nodiscard]] std::vector<std::shared_ptr<NetworkSession>> getSessions();
+
+    [[nodiscard]] const std::string& getAddress() const { return socketServer.getAddress(); }
+    [[nodiscard]] int getPort() const { return socketServer.getPort(); }
 
     [[nodiscard]] bool useEncryption() const { return encryptionEnabled; }
     [[nodiscard]] const EVPKeyPtr& getEncryptionKey() const { return encryptionKey; }

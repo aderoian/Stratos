@@ -34,6 +34,28 @@ inline UUID generateOfflineUUID(const std::string& username) {
     hash[8] = (hash[8] & 0x3F) | 0x80;
     return hash;
 }
+
+inline UUID UUIDFromString(const std::string& uuidStr) {
+    UUID uuid = {};
+    size_t index = 0;
+    for (size_t i = 0; i < uuidStr.size(); ++i) {
+        if (uuidStr[i] == '-') continue; // Skip dashes
+        if (index >= uuid.size()) break; // Prevent overflow
+        uuid[index++] = static_cast<uint8_t>(std::stoi(uuidStr.substr(i, 2), nullptr, 16));
+        ++i; // Skip next character as well
+    }
+    return uuid;
+}
+
+inline std::string UUIDToString(const UUID& uuid, const bool dashes = true) {
+    std::ostringstream oss;
+    for (size_t i = 0; i < uuid.size(); ++i) {
+        if (dashes && (i == 4 || i == 6 || i == 8 || i == 10))
+            oss << '-';
+        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(uuid[i]);
+    }
+    return oss.str();
+}
 }
 
 #endif //UUID_H

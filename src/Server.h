@@ -20,7 +20,6 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
-#include "network/Socket.h"
 #include "spdlog/spdlog.h"
 
 #include <array>

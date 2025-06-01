@@ -19,10 +19,10 @@
 
 #ifndef NETWORKCLIENT_H
 #define NETWORKCLIENT_H
+#include "../io/Socket.h"
+#include "../protocol/Packet.h"
+#include "../protocol/PacketCodec.h"
 #include "concurrentqueue.h"
-#include "protocol/Packet.h"
-#include "protocol/PacketCodec.h"
-#include "Socket.h"
 #include "spdlog/spdlog.h"
 #include "utils/crypto/CryptoUtils.h"
 
@@ -56,6 +56,7 @@ class NetworkConnection final : public TCPConnection {
     bool                                              close() override;
 
     [[nodiscard]] const NetworkManager* getNetwork() const { return network; }
+    [[nodiscard]] const std::shared_ptr<spdlog::logger>& getLogger() const { return logger; }
     [[nodiscard]] bool hasSendData() const { return sendQueue.size_approx() > 0; }
     [[nodiscard]] bool isDisconnected() const { return disconnected.load(std::memory_order_acquire); }
     [[nodiscard]] ProtocolState getState() const { return state; }
