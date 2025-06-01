@@ -18,6 +18,7 @@
  */
 
 #include "network/protocol/PacketSerialization.h"
+#include "utils/io/FileUtils.h"
 
 #include <cassert>
 #include <iostream>
@@ -112,10 +113,49 @@ void networkSerializationTest() {
     assert(stratos::readVarLong(buffer, offset) == -1234567890123456789LL);
 }
 
+void fileUtilsTest() {
+    stratos::Path path("relativeTest");
+    assert(!path.exists());
+    assert(!path.isDirectory());
+    assert(path.mkdir());
+    assert(path.exists());
+    assert(!path.isAbsolute());
+    assert(path.isRelative());
+    assert(!path.isFile());
+
+    stratos::Path file = path.resolve("test.txt");
+    assert(!file.exists());
+    assert(!file.isFile());
+    {
+        std::fstream fs = stratos::open(file, std::ios::out);
+        fs << "Hello, Stratos!";
+        stratos::close(fs);
+    }
+    assert(file.exists());
+    assert(file.isFile());
+    {
+        std::fstream fs = stratos::open(file, std::ios::in);
+        std::string content;
+        std::getline(fs, content);
+        stratos::close(fs);
+        assert(content == "Hello, Stratos!");
+    }
+
+    file.remove();
+    assert(!file.exists());
+    assert(!file.isFile());
+    assert(path.exists() && path.isDirectory());
+    assert(path.rmdir());
+    assert(!path.exists());
+    assert(!path.isDirectory());
+}
+
 int main(const int argc, char **argv) {
     for (int i = 1; i < argc; ++i) {
         if (std::string arg = argv[i]; arg == "--network-serialization") {
             networkSerializationTest();
+        } else if (arg == "--file-utils") {
+            fileUtilsTest();
         }
     }
 

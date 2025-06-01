@@ -1,5 +1,5 @@
 # Global
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.20.0)
 set(CMAKE_CXX_STANDARD 20)
 
 # Project variables
@@ -115,6 +115,7 @@ target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE
 target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/concurrentqueue
+        ${CMAKE_CURRENT_SOURCE_DIR}/vendor/json/include
 )
 target_sources("${LOCAL_PROJECT_NAME}Test" PRIVATE
         ${SOURCES}
@@ -124,7 +125,9 @@ target_sources("${LOCAL_PROJECT_NAME}Test" PRIVATE
 if (WIN32)
     target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE iphlpapi ws2_32)
 endif()
+target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr OpenSSL::SSL OpenSSL::Crypto)
 
 set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
 add_test(NAME NetworkSerialization COMMAND "${LOCAL_PROJECT_NAME}Test" --network-serialization)
+add_test(NAME FileUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --file-utils)
