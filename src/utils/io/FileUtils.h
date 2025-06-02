@@ -23,60 +23,47 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
-
 namespace fs = std::filesystem;
 
 namespace stratos {
-
 class Path {
-  public:
+public:
     explicit Path(const char* path) : path(fs::path(path)) {}
     explicit Path(const std::string& path) : path(fs::path(path)) {}
-    explicit Path(const fs::path& path) : path(path) {}
+    explicit Path(fs::path  path) : path(std::move(path)) {}
     Path(const Path&) = default;
     Path(Path&&)      = default;
 
-    [[nodiscard]] std::string toString() const { return path.string(); }
-    [[nodiscard]] bool        isAbsolute() const { return path.is_absolute(); }
-    [[nodiscard]] bool        isRelative() const { return path.is_relative(); }
-    [[nodiscard]] bool        exists() const { return fs::exists(path); }
-    [[nodiscard]] bool        isDirectory() const { return fs::is_directory(path); }
-    [[nodiscard]] bool        isSymlink() const { return fs::is_symlink(path); }
-    [[nodiscard]] bool        isFile() const { return fs::is_regular_file(path); }
-    [[nodiscard]] std::string getFileName() const { return path.filename().string(); }
-    [[nodiscard]] std::string getFileNameWithoutExtension() const { return path.stem().string(); }
-    [[nodiscard]] std::string getFileNameWithExtension() const { return path.filename().string(); }
-    [[nodiscard]] std::string getFileExtension() const { return path.extension().string(); }
-    [[nodiscard]] std::string getParentDirectory() const { return path.has_parent_path() ? path.parent_path().string() : std::string(); }
-    [[nodiscard]] fs::path    getNativePath() const { return path; }
-    [[nodiscard]] fs::path    getRelativePath(const Path& base) const { return fs::relative(path, base.path); }
-    [[nodiscard]] fs::path    getAbsolutePath() const { return fs::absolute(path); }
-    [[nodiscard]] Path        resolve(const std::string& path) const { return Path(fs::absolute(this->path / path)); }
-    [[nodiscard]] bool        mkdir() const { return fs::create_directory(path); }
-    [[nodiscard]] bool        mkdirs() const { return fs::create_directories(path); }
-    [[nodiscard]] bool        rmdir() const { return fs::remove_all(path); }
-    [[nodiscard]] bool        rmdirs() const { return fs::remove_all(path); }
-    [[nodiscard]] bool        remove() const { return isFile() && fs::remove(path); }
+    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] bool        isAbsolute() const;
+    [[nodiscard]] bool        isRelative() const;
+    [[nodiscard]] bool        exists() const;
+    [[nodiscard]] bool        isDirectory() const;
+    [[nodiscard]] bool        isSymlink() const;
+    [[nodiscard]] bool        isFile() const;
+    [[nodiscard]] std::string getFileName() const;
+    [[nodiscard]] std::string getFileNameWithoutExtension() const;
+    [[nodiscard]] std::string getFileNameWithExtension() const;
+    [[nodiscard]] std::string getFileExtension() const;
+    [[nodiscard]] std::string getParentDirectory() const;
+    [[nodiscard]] fs::path    getNativePath() const;
+    [[nodiscard]] fs::path    getRelativePath(const Path& base) const;
+    [[nodiscard]] fs::path    getAbsolutePath() const;
+    [[nodiscard]] Path        resolve(const std::string& path) const;
+    [[nodiscard]] bool        mkdir() const;
+    [[nodiscard]] bool        mkdirs() const;
+    [[nodiscard]] bool        rmdir() const;
+    [[nodiscard]] bool        rmdirs() const;
+    [[nodiscard]] bool        remove() const;
 
-  private:
+private:
     fs::path path;
 };
 
-inline std::fstream open(const Path& path, const std::ios::openmode mode) {
-    std::fstream file(path.getNativePath(), mode);
-    if (!file.is_open()) {
-        throw fs::filesystem_error("Failed to open file: " + path.toString(), std::error_code());
-    }
-    return file;
-}
-inline std::fstream open(const std::string& path, const std::ios::openmode mode) {
-    return open(Path(path), mode);
-}
-inline std::fstream open(const char* path, const std::ios::openmode mode) {
-    return open(Path(path), mode);
-}
-inline void close(std::fstream& file) { if (file.is_open()) file.close(); }
-
-} // namespace stratos
+std::fstream open(const Path& path, std::ios::openmode mode);
+std::fstream open(const std::string& path, std::ios::openmode mode);
+std::fstream open(const char* path, std::ios::openmode mode);
+void close(std::fstream& file);
+}// namespace stratos
 
 #endif //FILEUTILS_H

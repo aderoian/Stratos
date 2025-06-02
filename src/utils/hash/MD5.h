@@ -27,7 +27,7 @@ uint32_t leftRotate(uint32_t value, uint32_t shift);
 void processBlock(const uint8_t block[64], uint32_t& A, uint32_t& B, uint32_t& C, uint32_t& D);
 }
 namespace stratos {
-std::array<uint8_t, 16> md5(const void* input, size_t length);
+std::array<uint8_t, 16> md5(const void* input, unsigned long length);
 }
 
 #endif //MD5_H
