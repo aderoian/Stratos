@@ -1,6 +1,7 @@
 # Global
 cmake_minimum_required(VERSION 3.20.0)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Project variables
 set(LOCAL_PROJECT_NAME "Stratos")
@@ -24,9 +25,11 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
+        utils/config/Config.cpp
         utils/crypto/CryptoUtils.cpp
         utils/hash/MD5.cpp
         utils/io/FileUtils.cpp
+        utils/StringUtils.cpp
 )
 
 set(HEADERS
@@ -38,11 +41,14 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        utils/config/Config.h
         utils/crypto/CryptoUtils.h
         utils/hash/MD5.h
         utils/io/FileUtils.h
         utils/MathUtils.h
+        utils/StringUtils.h
         utils/TimeUtils.h
+        utils/Types.h
         utils/UUID.h
 )
 
@@ -97,6 +103,7 @@ else ()
         message(FATAL_ERROR "OpenSSL not found. Please install OpenSSL or set the OPENSSL_ROOT_DIR variable.")
     endif ()
 endif ()
+
 # CPR
 set(CPR_USE_SYSTEM_CURL OFF)
 set(CPR_BUILD_TESTS OFF)
@@ -118,7 +125,7 @@ set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY 
 # Testing
 enable_testing()
 
-add_executable("${LOCAL_PROJECT_NAME}Test" test/stratos_test.cpp)
+add_executable("${LOCAL_PROJECT_NAME}Test")
 
 target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -130,6 +137,7 @@ target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${CMAKE_CURRENT_S
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/json/include
 )
 target_sources("${LOCAL_PROJECT_NAME}Test" PRIVATE
+        test/stratos_test.cpp
         ${SOURCES}
         ${HEADERS}
 )
@@ -138,11 +146,18 @@ if (WIN32)
     target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE iphlpapi ws2_32)
     target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_INCLUDE_DIR})
     target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+else ()
+    if (OpenSSL_FOUND)
+        target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_INCLUDE_DIR})
+        target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_LIBRARIES})
+    else ()
+        message(FATAL_ERROR "OpenSSL not found. Please install OpenSSL or set the OPENSSL_ROOT_DIR variable.")
+    endif ()
 endif()
-target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
+target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr)
 
 set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
 add_test(NAME NetworkSerialization COMMAND "${LOCAL_PROJECT_NAME}Test" --network-serialization)
 add_test(NAME FileUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --file-utils)
+add_test(NAME StringUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --string-utils)
