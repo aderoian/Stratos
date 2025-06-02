@@ -41,6 +41,10 @@ bool        Path::mkdirs() const { return fs::create_directories(path); }
 bool        Path::rmdir() const { return fs::remove_all(path); }
 bool        Path::rmdirs() const { return fs::remove_all(path); }
 bool        Path::remove() const { return isFile() && fs::remove(path); }
+Path Path::operator/(const Path& other) const { return Path(path / other.path); }
+Path Path::operator/(const fs::path& other) const { return Path(path / other); }
+Path Path::operator/(const std::string& other) const { return Path(path / other); }
+Path Path::operator/(const char* other) const { return Path(path / other); }
 
 std::fstream open(const Path& path, const std::ios::openmode mode) {
     std::fstream file(path.getNativePath(), mode);

@@ -56,6 +56,11 @@ public:
     [[nodiscard]] bool        rmdirs() const;
     [[nodiscard]] bool        remove() const;
 
+    Path operator/(const Path& other) const;
+    Path operator/(const fs::path& other) const;
+    Path operator/(const std::string& other) const;
+    Path operator/(const char* other) const;
+
 private:
     fs::path path;
 };
