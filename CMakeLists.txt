@@ -26,6 +26,7 @@ set(SOURCES
         network/protocol/PacketCodec.cpp
         utils/crypto/CryptoUtils.cpp
         utils/hash/MD5.cpp
+        utils/io/ByteBuffer.cpp
 )
 
 set(HEADERS
@@ -40,6 +41,7 @@ set(HEADERS
         utils/crypto/CryptoUtils.h
         utils/hash/MD5.h
         utils/io/FileUtils.h
+        utils/io/ByteBuffer.h
         utils/MathUtils.h
         utils/TimeUtils.h
         utils/UUID.h
@@ -134,3 +136,4 @@ set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRE
 
 add_test(NAME NetworkSerialization COMMAND "${LOCAL_PROJECT_NAME}Test" --network-serialization)
 add_test(NAME FileUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --file-utils)
+add_test(NAME ByteBuffer COMMAND "${LOCAL_PROJECT_NAME}Test" --byte-buffer)
