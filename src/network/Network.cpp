@@ -256,6 +256,7 @@ void stratos::WorkerThread::start() {
                     if (conn->isDisconnected()) {
                         network->getLogger()->info("Client {}:{} disconnected", conn->getAddress(), conn->getPort());
                         conn->close();
+                        connectionPollFds.erase(connectionPollFds.begin() + i);
                         removeConnection(fd);
                     }
                 }
