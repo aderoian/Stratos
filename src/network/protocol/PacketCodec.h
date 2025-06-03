@@ -26,6 +26,9 @@
 #include <optional>
 #include <string>
 
+#define PROTOCOL_VERSION 770
+#define PROTOCOL_VERSION_STRING "1.21.5"
+
 namespace stratos {
 class EncryptionResponse;
 class LoginCookieResponse;

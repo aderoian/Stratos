@@ -21,11 +21,13 @@
 #define SERVER_H_
 
 #include "spdlog/spdlog.h"
+#include "utils/io/FileUtils.h"
 
 #include <array>
 #include <atomic>
 
 namespace stratos {
+class PropertiesConfig;
 class NetworkManager;
 
 class Server final {
@@ -35,7 +37,7 @@ public:
     static constexpr float TARGET_SECONDS_PER_TICK = 1.0f / TARGET_TICKS_PER_SECOND;
     static constexpr float TARGET_MILLIS_PER_TICK = TARGET_SECONDS_PER_TICK * 1000.0f;
 
-    explicit Server(const std::shared_ptr<spdlog::logger>& logger);
+    Server(const std::shared_ptr<spdlog::logger>& logger, Path root);
     ~Server();
 
     [[nodiscard]] std::shared_ptr<spdlog::logger> getLogger() const;
@@ -47,6 +49,17 @@ public:
     [[nodiscard]] float getAverageTPS() const;
     [[nodiscard]] float getAverageLoad() const;
 
+    [[nodiscard]] const Path& getServerDirectory() const;
+    [[nodiscard]] const std::unique_ptr<PropertiesConfig>& getServerProperties() const;
+    [[nodiscard]] std::string getAddress() const;
+    [[nodiscard]] int getPort() const;
+    [[nodiscard]] std::string getName() const;
+    [[nodiscard]] std::string getMotd() const;
+    [[nodiscard]] bool isOnlineMode() const;
+
+    [[nodiscard]] int getMaxPlayers() const;
+    [[nodiscard]] int getOnlinePlayers() const;
+
     void start();
     void shutdown();
     void tickProcessor();
@@ -55,6 +68,9 @@ public:
 private:
     static std::unique_ptr<Server> _instance;
     std::shared_ptr<spdlog::logger> logger;
+
+    Path root;
+    std::unique_ptr<PropertiesConfig> serverConfig;
 
     std::unique_ptr<NetworkManager> network;
 
@@ -69,7 +85,13 @@ private:
     std::array<float, 20> averageUse;
 
     std::string                address;
-    int                        port;
+    int port;
+    std::string name;
+    std::string motd;
+    bool onlineMode;
+
+    int maxPlayers;
+    int onlinePlayers = 0;
 };
 
 extern std::unique_ptr<Server> server;

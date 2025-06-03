@@ -22,10 +22,11 @@
 #include <cstring>
 #include <vector>
 
-uint32_t md5internal::leftRotate(const uint32_t value, const uint32_t shift) {
+namespace md5internal {
+uint32_t leftRotate(const uint32_t value, const uint32_t shift) {
     return (value << shift) | (value >> (32 - shift));
 }
-void md5internal::processBlock(const uint8_t block[64], uint32_t& A, uint32_t& B, uint32_t& C, uint32_t& D) {
+void processBlock(const uint8_t block[64], uint32_t& A, uint32_t& B, uint32_t& C, uint32_t& D) {
     uint32_t a = A, b = B, c = C, d = D;
 
     uint32_t M[16];
@@ -69,8 +70,10 @@ void md5internal::processBlock(const uint8_t block[64], uint32_t& A, uint32_t& B
     C += c;
     D += d;
 }
+}
 
-std::array<uint8_t, 16> stratos::md5(const void* input, const size_t length) {
+namespace stratos {
+std::array<uint8_t, 16> md5(const void* input, const unsigned long length) {
     using namespace md5internal;
     const auto           data      = static_cast<const uint8_t*>(input);
     const uint64_t       totalBits = length * 8;
@@ -89,7 +92,7 @@ std::array<uint8_t, 16> stratos::md5(const void* input, const size_t length) {
     for (size_t i = 0; i < paddedLength; i += 64)
         processBlock(buffer.data() + i, A, B, C, D);
 
-    std::array<uint8_t, 16> result;
+    std::array<uint8_t, 16> result{};
     for (int i = 0; i < 4; ++i) {
         result[i]      = (A >> (i * 8)) & 0xFF;
         result[i + 4]  = (B >> (i * 8)) & 0xFF;
@@ -98,4 +101,5 @@ std::array<uint8_t, 16> stratos::md5(const void* input, const size_t length) {
     }
 
     return result;
+}
 }

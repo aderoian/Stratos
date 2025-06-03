@@ -18,7 +18,9 @@
  */
 
 #include "network/protocol/PacketSerialization.h"
+#include "utils/config/Config.h"
 #include "utils/io/FileUtils.h"
+#include "utils/StringUtils.h"
 #include "utils/io/ByteBuffer.h"
 
 #include <cassert>
@@ -116,6 +118,10 @@ void networkSerializationTest() {
 
 void fileUtilsTest() {
     stratos::Path path("relativeTest");
+    if (path.exists()) {
+        assert(path.isDirectory());
+        assert(path.rmdir());
+    }
     assert(!path.exists());
     assert(!path.isDirectory());
     assert(path.mkdir());
@@ -149,6 +155,89 @@ void fileUtilsTest() {
     assert(path.rmdir());
     assert(!path.exists());
     assert(!path.isDirectory());
+
+    stratos::Path configDir("config");
+    if (configDir.exists()) {
+        assert(configDir.isDirectory());
+        assert(configDir.rmdir());
+    }
+    assert(!configDir.exists());
+    assert(!configDir.isDirectory());
+    assert(configDir.mkdir());
+    assert(configDir.exists());
+    assert(configDir.isDirectory());
+
+    stratos::Path defaultFile = configDir.resolve("testDefault.properties");
+    assert(!defaultFile.exists());
+    assert(!defaultFile.isFile());
+    {
+        stratos::PropertiesConfig config(defaultFile, "key1=value1\nkey2=value2");
+        config.close();
+    }
+    assert(defaultFile.exists());
+    assert(defaultFile.isFile());
+
+    {
+        stratos::PropertiesConfig config(defaultFile);
+        auto prop1 = config.getProperty("key1");
+        assert(prop1.has_value() && prop1->get().asString() == "value1");
+        auto prop2 = config.getProperty("key2");
+        assert(prop2.has_value() && prop2->get().asString() == "value2");
+
+        config.writeProperty({"key3", "value3"});
+        config.close();
+    }
+
+    {
+        stratos::PropertiesConfig config(defaultFile);
+        auto prop3 = config.getProperty("key3");
+        assert(prop3.has_value() && prop3->get().asString() == "value3");
+        config.close();
+    }
+
+    stratos::Path testUnder = configDir.resolve("testUnder.properties");
+    {
+        stratos::PropertiesConfig config(testUnder, "key1=value1\nkey2=value2");
+        config.removeProperty("key2");
+        config.close();
+    }
+
+    {
+        stratos::PropertiesConfig config(testUnder);
+        auto prop1 = config.getProperty("key1");
+        assert(prop1.has_value() && prop1->get().asString() == "value1");
+        auto prop2 = config.getProperty("key2");
+        assert(!prop2.has_value());
+    }
+}
+
+void stringUtilsTest() {
+    std::string trim1 = "   Hello, Stratos!   ";
+    std::string trimmed1 = stratos::trim(trim1);
+    assert(trimmed1 == "Hello, Stratos!");
+    std::string trim2 = "\t\n\r  \tStratos is great!\n\r\t  ";
+    std::string trimmed2 = stratos::trim(trim2);
+    assert(trimmed2 == "Stratos is great!");
+    std::string lower = "Hello, Stratos!";
+    std::string lowercased = stratos::toLower(lower);
+    assert(lowercased == "hello, stratos!");
+    std::string upper = "Hello, Stratos!";
+    std::string uppercased = stratos::toUpper(upper);
+    assert(uppercased == "HELLO, STRATOS!");
+    std::string replaceAllStr = "Hello, Stratos! Hello, Stratos!";
+    std::string replacedAll = stratos::replaceAll(replaceAllStr, "Stratos", "World");
+    assert(replacedAll == "Hello, World! Hello, World!");
+    std::string replaceFirstStr = "Hello, Stratos! Hello, Stratos!";
+    std::string replacedFirst = stratos::replaceFirst(replaceFirstStr, "Stratos", "World");
+    assert(replacedFirst == "Hello, World! Hello, Stratos!");
+    std::vector<std::string> elements = {"Hello", "Stratos", "World"};
+    std::string joined = stratos::join(", ", elements);
+    assert(joined == "Hello, Stratos, World");
+    std::string splitStr = "Hello,Stratos,World";
+    std::vector<std::string> splitByComma = stratos::split(splitStr, ',');
+    assert(splitByComma.size() == 3 && splitByComma[0] == "Hello" && splitByComma[1] == "Stratos" && splitByComma[2] == "World");
+    std::vector<std::string> splitBySpace = stratos::split("Hello Stratos World", " ");
+    assert(splitBySpace.size() == 3 && splitBySpace[0] == "Hello" && splitBySpace[1] == "Stratos" && splitBySpace[2] == "World");
 }
 
 void testReadBoolean() {
@@ -513,6 +602,8 @@ int main(const int argc, char **argv) {
             networkSerializationTest();
         } else if (arg == "--file-utils") {
             fileUtilsTest();
+        } else if (arg == "--string-utils") {
+            stringUtilsTest();
         } else if (arg == "--byte-buffer") {
             bufferTest();
         }

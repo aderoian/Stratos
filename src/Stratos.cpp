@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 
     logger->info("Logger initialized.");
 
-    stratos::server = std::make_unique<stratos::Server>(logger);
+    stratos::server = std::make_unique<stratos::Server>(logger, stratos::Path("./"));
     stratos::server->start();
 
     return 0;

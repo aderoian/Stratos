@@ -87,6 +87,9 @@ void stratos::NetworkManager::tick() {
         sessions.erase(sessionId);
     }
 }
+stratos::Server*                         stratos::NetworkManager::getServer() const {
+    return server;
+}
 std::shared_ptr<stratos::NetworkSession> stratos::NetworkManager::getSession(const SessionId& sessionId) {
     if (const auto it = sessions.find(sessionId); it != sessions.end()) return it->second;
     return nullptr;
@@ -253,6 +256,7 @@ void stratos::WorkerThread::start() {
                     if (conn->isDisconnected()) {
                         network->getLogger()->info("Client {}:{} disconnected", conn->getAddress(), conn->getPort());
                         conn->close();
+                        connectionPollFds.erase(connectionPollFds.begin() + i);
                         removeConnection(fd);
                     }
                 }

@@ -24,9 +24,12 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
+        utils/config/Config.cpp
         utils/crypto/CryptoUtils.cpp
         utils/hash/MD5.cpp
         utils/io/ByteBuffer.cpp
+        utils/io/FileUtils.cpp
+        utils/StringUtils.cpp
 )
 
 set(HEADERS
@@ -38,12 +41,15 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        utils/config/Config.h
         utils/crypto/CryptoUtils.h
         utils/hash/MD5.h
         utils/io/FileUtils.h
         utils/io/ByteBuffer.h
         utils/MathUtils.h
+        utils/StringUtils.h
         utils/TimeUtils.h
+        utils/Types.h
         utils/UUID.h
 )
 
@@ -74,21 +80,29 @@ if (WIN32)
     set(OPENSSL_ROOT_DIR "C:/Program Files/OpenSSL-Win64")
     set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/VC/x64/MDd")
+        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/x64/MDd")
     else()
-        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/VC/x64/MD")
+        set(OPENSSL_LIB_DIR "${OPENSSL_ROOT_DIR}/lib/VC/x64/MD")
     endif()
 
     # Manually set the expected library paths
     set(OPENSSL_SSL_LIBRARY "${OPENSSL_LIB_DIR}/libssl.lib")
     set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_LIB_DIR}/libcrypto.lib")
     message(STATUS "Using OpenSSL from: ${OPENSSL_ROOT_DIR}\n\tInclude: ${OPENSSL_INCLUDE_DIR}\n\tSSL Library: ${OPENSSL_SSL_LIBRARY}\n\tCrypto Library: ${OPENSSL_CRYPTO_LIBRARY}")
-endif ()
 
-set(OPENSSL_USE_STATIC_LIBS TRUE)
-find_package(OpenSSL REQUIRED)
-target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+    target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+else ()
+    find_package(OpenSSL REQUIRED)
+    if (OpenSSL_FOUND)
+        message(STATUS "OpenSSL found: ${OPENSSL_INCLUDE_DIR} ${OpenSSL_LIBRARIES}")
+        target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
+        target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
+    else ()
+        message(FATAL_ERROR "OpenSSL not found. Please install OpenSSL or set the OPENSSL_ROOT_DIR variable.")
+    endif ()
+endif ()
 
 # CPR
 set(CPR_USE_SYSTEM_CURL OFF)
@@ -111,7 +125,7 @@ set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY 
 # Testing
 enable_testing()
 
-add_executable("${LOCAL_PROJECT_NAME}Test" test/stratos_test.cpp)
+add_executable("${LOCAL_PROJECT_NAME}Test")
 
 target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -123,17 +137,28 @@ target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${CMAKE_CURRENT_S
         ${CMAKE_CURRENT_SOURCE_DIR}/vendor/json/include
 )
 target_sources("${LOCAL_PROJECT_NAME}Test" PRIVATE
+        test/stratos_test.cpp
         ${SOURCES}
         ${HEADERS}
 )
 
 if (WIN32)
     target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE iphlpapi ws2_32)
+    target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_INCLUDE_DIR})
+    target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
+else ()
+    if (OpenSSL_FOUND)
+        target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_INCLUDE_DIR})
+        target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE ${OPENSSL_LIBRARIES})
+    else ()
+        message(FATAL_ERROR "OpenSSL not found. Please install OpenSSL or set the OPENSSL_ROOT_DIR variable.")
+    endif ()
 endif()
-target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr)
 
 set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
 add_test(NAME NetworkSerialization COMMAND "${LOCAL_PROJECT_NAME}Test" --network-serialization)
 add_test(NAME FileUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --file-utils)
+add_test(NAME StringUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --string-utils)
 add_test(NAME ByteBuffer COMMAND "${LOCAL_PROJECT_NAME}Test" --byte-buffer)

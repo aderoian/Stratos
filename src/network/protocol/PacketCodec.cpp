@@ -23,6 +23,8 @@
 #include "network/Network.h"
 #include "network/session/SessionAuth.h"
 #include "PacketSerialization.h"
+#include "Server.h"
+#include "utils/config/Config.h"
 #include "utils/UUID.h"
 
 void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
@@ -125,14 +127,16 @@ bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     return true;
 }
 bool stratos::HandshakePacketHandler::handle(LegacyServerListPing& packet) {
-    connection->sendPacket(std::make_unique<LegacyServerListPong>(47, "1.21.5", "A Minecraft Server", 0, 20)); // TODO: Replace with actual server info
+    connection->sendPacket(std::make_unique<LegacyServerListPong>(47, PROTOCOL_VERSION_STRING, server->getMotd(), server->getOnlinePlayers(), server->getServerProperties()->getProperty("max-players").value().get().asInt()));
     connection->disconnect();
     return true;
 }
 bool stratos::StatusPacketHandler::handle(StatusRequest& packet) {
-    if (connection->getState() == Status)
+    if (connection->getState() == Status) {
+        constexpr auto STATUS_RESPONSE_FORMAT = R"({{"version":{{"name":"{}","protocol":{}}},"players":{{"max":{},"online":{},"sample":[]}},"description":{{"text":"{}"}}}})";
         connection->sendPacket(std::make_unique<StatusResponse>(
-            R"({"version":{"name":"1.21.5","protocol":770},"players":{"max":20,"online":0,"sample":[]},"description":{"text":"A Minecraft Server"}})"));
+            std::format(STATUS_RESPONSE_FORMAT, std::string(PROTOCOL_VERSION_STRING), PROTOCOL_VERSION, server->getMaxPlayers(), server->getOnlinePlayers(), server->getMotd())));
+    }
     return true;
 }
 bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
@@ -145,7 +149,7 @@ bool stratos::LoginPacketHandler::handle(LoginStart& packet) {
         connection->updateSessionInfo({packet.name, packet.uuid});
         connection->encryptionKey = &connection->getNetwork()->getEncryptionKey();
         std::vector<uint8_t> token = connection->verifyToken = generateRandomBytes(16);
-        connection->sendPacket(std::make_unique<EncryptionRequest>("stratos", encodeServerPublicKey(connection->encryptionKey), std::move(token), true)); // TODO: Server config
+        connection->sendPacket(std::make_unique<EncryptionRequest>(server->getName(), encodeServerPublicKey(connection->encryptionKey), std::move(token), server->isOnlineMode()));
     } else {
         connection->updateSessionInfo({packet.name, generateOfflineUUID(packet.name)});
         connection->sendPacket(std::make_unique<LoginSuccess>(packet.uuid, std::move(packet.name), std::vector<LoginProperty>()));
@@ -160,7 +164,13 @@ bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
     connection->clientSecret = std::move(rsaDecrypt(connection->encryptionKey, packet.sharedSecret));
     connection->encryptionEnabled = true;
 
-    authenticate(connection, "stratos", connection->clientSecret, *connection->encryptionKey);
+    if (server->isOnlineMode()) {
+        authenticate(connection, server->getName(), connection->clientSecret, *connection->encryptionKey);
+    } else {
+        std::string username = connection->getSessionInfo()->get().username;
+        connection->updateSessionInfo({username, generateOfflineUUID(username)});
+        connection->sendPacket(std::make_unique<LoginSuccess>(connection->getSessionInfo()->get().uuid, std::move(username), std::vector<LoginProperty>()));
+    }
     return true;
 }
 bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }

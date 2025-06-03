@@ -20,20 +20,74 @@
 #include "Server.h"
 
 #include "network/Network.h"
+#include "utils/config/Config.h"
 #include "utils/MathUtils.h"
 #include "utils/TimeUtils.h"
+
+#define DEFAULT_SERVER_PROPERTIES R"(# Basic server settings
+server-name=
+motd=A Minecraft Server
+max-players=20
+online-mode=true
+pvp=true
+difficulty=1
+gamemode=0
+hardcore=false
+allow-nether=true
+enable-command-block=false
+spawn-npcs=true
+spawn-animals=true
+spawn-monsters=true
+generate-structures=true
+
+# Networking
+server-port=25565
+server-ip=
+enable-query=false
+enable-rcon=false
+
+# World settings
+level-name=world
+level-seed=
+level-type=default
+view-distance=10
+simulation-distance=10
+max-build-height=256
+
+# Performance tuning
+max-tick-time=60000
+tick-distance=10
+
+# Logging
+debug=false)"
 
 namespace stratos {
 
 std::unique_ptr<Server> server = nullptr;
 
-Server::Server(const std::shared_ptr<spdlog::logger>& logger) : logger(logger) {
+Server::Server(const std::shared_ptr<spdlog::logger>& logger, Path path) : logger(logger), root(std::move(path)) {
     averageTPS.fill(20.0f);
     averageUse.fill(1.0f);
 
-    // TODO: Load server settings from config file
-    address = "0.0.0.0";
-    port    = 25566;
+    try {
+        serverConfig = std::make_unique<PropertiesConfig>(root / "server.properties", DEFAULT_SERVER_PROPERTIES);
+        logger->info("Loaded server.properties");
+    } catch (const std::exception& e) {
+        logger->error("Failed to load server configuration: {}", e.what());
+        throw;
+    }
+
+    try {
+        const std::optional<PropertiesConfig::Property> ip = serverConfig->getProperty("server-ip");
+        address = ip && !ip->value.empty() ? std::move(ip->asString()) : "0.0.0.0";
+        port = serverConfig->getProperty("server-port").value().get().asInt();
+        name = serverConfig->getProperty("server-name").value().get().asString();
+        motd = serverConfig->getProperty("motd").value().get().asString();
+        onlineMode = serverConfig->getProperty("online-mode").value().get().asBool();
+        maxPlayers = serverConfig->getProperty("max-players").value().get().asInt();
+    } catch (const std::bad_optional_access& e) {
+        throw std::runtime_error("Missing required properties in 'server.properties'");
+    }
 
     try {
         logger->info("Starting network...");
@@ -83,7 +137,15 @@ float Server::getAverageLoad() const {
 
     return utils::round((total / averageUse.size()) * 100.0f, 2);
 }
-
+const Path& Server::getServerDirectory() const { return root; }
+const std::unique_ptr<PropertiesConfig>& Server::getServerProperties() const { return serverConfig; }
+std::string Server::getAddress() const { return address; }
+int Server::getPort() const { return port; }
+std::string Server::getName() const { return name; }
+std::string Server::getMotd() const { return motd; }
+bool Server::isOnlineMode() const { return onlineMode; }
+int Server::getMaxPlayers() const { return maxPlayers; }
+int Server::getOnlinePlayers() const { return onlinePlayers; }
 void Server::start() {
     logger->info("Starting server...");
     running = true;
