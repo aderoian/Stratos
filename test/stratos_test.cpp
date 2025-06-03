@@ -401,10 +401,10 @@ void testReadDouble() {
 void testReadString() {
     std::cout << "Testing readString()..." << std::endl;
 
-    // Test data: length (2 bytes big-endian) + UTF-8 string "Hello"
+    // Test data: length (VarInt) + UTF-8 string "Hello"
     // Length = 5, then "Hello" in UTF-8
     ByteVec data = {
-        0x00, 0x05,  // Length: 5
+        0x05,  // Length: 5
         'H', 'e', 'l', 'l', 'o'
     };
     stratos::ByteBuffer buffer(data);
