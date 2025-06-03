@@ -46,10 +46,10 @@ void Config::close() {
     if (configFile.is_open())
         configFile.close();
 }
-int PropertiesConfig::Property::asInt() const { return std::stoi(key); }
-long PropertiesConfig::Property::asLong() const { return std::stol(key); }
-float PropertiesConfig::Property::asFloat() const { return std::stof(key); }
-double PropertiesConfig::Property::asDouble() const { return std::stod(key); }
+int PropertiesConfig::Property::asInt() const { return std::stoi(value); }
+long PropertiesConfig::Property::asLong() const { return std::stol(value); }
+float PropertiesConfig::Property::asFloat() const { return std::stof(value); }
+double PropertiesConfig::Property::asDouble() const { return std::stod(value); }
 bool PropertiesConfig::Property::asBool() const { return value == "true" || value == "1"; }
 std::string PropertiesConfig::Property::asString() const { return value; }
 bool PropertiesConfig::Property::operator==(const Property& other) const { return key == other.key && value == other.value; }
