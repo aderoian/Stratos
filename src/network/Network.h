@@ -56,6 +56,7 @@ class NetworkManager final {
     void stop();
     void tick();
 
+    [[nodiscard]] Server* getServer() const;
     [[nodiscard]] std::shared_ptr<spdlog::logger>              getLogger() const { return logger; }
     [[nodiscard]] std::shared_ptr<NetworkSession>              getSession(const SessionId& sessionId);
     [[nodiscard]] std::vector<std::shared_ptr<NetworkSession>> getSessions();
