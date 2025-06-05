@@ -17,6 +17,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 # Source files
 set(SOURCES
         Server.cpp
+        nbt/CompoundTag.cpp
+        nbt/ListTag.cpp
+        nbt/NBTValue.cpp
+        nbt/Tag.cpp
         network/Network.cpp
         network/session/NetworkClient.cpp
         network/session/SessionAuth.cpp
@@ -34,6 +38,13 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        nbt/ArrayTag.h
+        nbt/CompoundTag.h
+        nbt/ListTag.h
+        nbt/NBTValue.h
+        nbt/PrimitiveTag.h
+        nbt/StringTag.h
+        nbt/Tag.h
         network/Network.h
         network/session/NetworkClient.h
         network/session/SessionAuth.h
