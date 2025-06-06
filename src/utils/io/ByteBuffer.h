@@ -47,19 +47,6 @@ class BufferOverflowException : public std::logic_error {
 };
 
 class ByteBuffer {
-  private:
-    size_t offset;
-    std::vector<byte> buffer;
-
-    /**
-     * @brief Checks if the buffer is readable.
-     */
-    void checkRead(unsigned long long size) const {
-        if (offset + size > buffer.size()) {
-            throw BufferUnderflowException("Buffer underflow: not enough data to read");
-        }
-    }
-    
   public:
     ByteBuffer() : offset(0) {}
     explicit ByteBuffer(ByteVec data) : offset(0), buffer(std::move(data)) {}
@@ -79,7 +66,23 @@ class ByteBuffer {
     std::vector<uint64_t> readBitSet();
     std::vector<bool>     readFixedBitSet(size_t length);
     ByteVec               readByteArray(size_t length);
-    
+
+    void writeBoolean(bool value);
+    void writeByte(int8_t value);
+    void writeUnsignedByte(uint8_t value);
+    void writeShort(short value);
+    void writeUnsignedShort(uint16_t value);
+    void writeInt(int value);
+    void writeLong(int64_t value);
+    void writeFloat(float value);
+    void writeDouble(double value);
+    void writeString(const std::string& value, int maxChars);
+    void writeVarInt(int value);
+    void writeVarLong(int64_t value);
+    void writeBitSet(const std::vector<uint64_t>& longs);
+    void writeFixedBitSet(const std::vector<bool>& bits, size_t length);
+    void writeByteArray(const ByteVec& values);
+
     /**
      * @brief Clears the buffer & resets the offset.
      */
@@ -94,6 +97,19 @@ class ByteBuffer {
     void append(const ByteVec&& data) { buffer.insert(buffer.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end())); }
     auto begin() { return buffer.begin(); }
     auto end() { return buffer.end(); }
+
+  private:
+    size_t offset;
+    std::vector<byte> buffer;
+
+    /**
+     * @brief Checks if the buffer is readable.
+     */
+    void checkRead(const uint64_t size) const {
+        if (offset + size > buffer.size()) {
+            throw BufferUnderflowException("Buffer underflow: not enough data to read");
+        }
+    }
 };
 
 } // namespace stratos

@@ -19,6 +19,8 @@
 
 #include "ByteBuffer.h"
 
+#include <cstring>
+
 int constexpr SEGMENT_BITS = 0x7F;
 int constexpr CONTINUE_BIT = 0x80;
 
@@ -199,4 +201,88 @@ ByteVec stratos::ByteBuffer::readByteArray(size_t length) {
         result.push_back(readByte());
     }
     return result;
+}
+void stratos::ByteBuffer::writeBoolean(const bool value) {
+    buffer.push_back(static_cast<unsigned char>(value ? 1 : 0));
+}
+void stratos::ByteBuffer::writeByte(const int8_t value) {
+    buffer.push_back(static_cast<unsigned char>(value));
+}
+void stratos::ByteBuffer::writeUnsignedByte(const uint8_t value) {
+    buffer.push_back(value);
+}
+void stratos::ByteBuffer::writeShort(const short value) {
+    buffer.push_back(static_cast<unsigned char>(value >> 8 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(value & 0xFF));
+}
+void stratos::ByteBuffer::writeUnsignedShort(const uint16_t value) {
+    buffer.push_back(static_cast<unsigned char>(value >> 8 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(value & 0xFF));
+}
+void stratos::ByteBuffer::writeInt(const int value) {
+    buffer.push_back(static_cast<unsigned char>(value >> 24 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(value >> 16 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(value >> 8 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(value & 0xFF));
+}
+void stratos::ByteBuffer::writeLong(const int64_t value) {
+    for (int i = 7; i >= 0; --i) buffer.push_back(static_cast<unsigned char>(value >> (i * 8) & 0xFF));
+}
+void stratos::ByteBuffer::writeFloat(const float value) {
+    uint32_t bits;
+    std::memcpy(&bits, &value, sizeof(float));
+    buffer.push_back(static_cast<unsigned char>(bits >> 24 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(bits >> 16 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(bits >> 8 & 0xFF));
+    buffer.push_back(static_cast<unsigned char>(bits & 0xFF));
+}
+void stratos::ByteBuffer::writeDouble(const double value) {
+    uint64_t bits;
+    std::memcpy(&bits, &value, sizeof(double));
+    for (int i = 7; i >= 0; --i) buffer.push_back(static_cast<unsigned char>(bits >> (i * 8) & 0xFF));
+}
+void stratos::ByteBuffer::writeString(const std::string& value, const int maxChars) {
+    if (const int utf16Units = countCodeUnits(value); utf16Units > maxChars) throw BufferOverflowException("String: exceeds character limit");
+    if (value.size() > maxChars * 3) throw BufferOverflowException("String: exceeds UTF-8 byte size limit");
+    const auto length = static_cast<int32_t>(value.size());
+    writeVarInt(length);
+    buffer.insert(buffer.end(), value.begin(), value.end());
+}
+void stratos::ByteBuffer::writeVarInt(int value) {
+    while (true) {
+        if ((value & ~SEGMENT_BITS) == 0) {
+            writeByte(static_cast<uint8_t>(value));
+            return;
+        }
+        writeByte(static_cast<uint8_t>((value & SEGMENT_BITS) | CONTINUE_BIT));
+        value = static_cast<uint32_t>(value) >> 7;
+    }
+}
+void stratos::ByteBuffer::writeVarLong(int64_t value) {
+    while (true) {
+        if ((value & ~static_cast<int64_t>(SEGMENT_BITS)) == 0) {
+            writeByte(static_cast<uint8_t>(value));
+            return;
+        }
+        writeByte(static_cast<uint8_t>((value & SEGMENT_BITS) | CONTINUE_BIT));
+        value = static_cast<uint64_t>(value) >> 7;
+    }
+}
+void stratos::ByteBuffer::writeBitSet(const std::vector<uint64_t>& longs) {
+    const int length = static_cast<int>(longs.size());
+    writeVarInt(length);
+    for (const uint64_t value : longs)
+        for (int i = 7; i >= 0; --i) buffer.push_back(value >> (i * 8) & 0xFF);
+}
+void stratos::ByteBuffer::writeFixedBitSet(const std::vector<bool>& bits, const size_t length) {
+    const size_t byteLength = (length + 7) / 8;
+    for (size_t byteIndex = 0; byteIndex < byteLength; ++byteIndex) {
+        uint8_t byte = 0;
+        for (int bit = 0; bit < 8; ++bit)
+            if (const size_t bitIndex = byteIndex * 8 + bit; bitIndex < bits.size() && bits[bitIndex]) byte |= 1 << bit;
+        buffer.push_back(byte);
+    }
+}
+void stratos::ByteBuffer::writeByteArray(const ByteVec& values) {
+    for (const auto& value : values) buffer.push_back(value);
 }
