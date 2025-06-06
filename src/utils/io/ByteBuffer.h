@@ -50,6 +50,7 @@ class ByteBuffer {
   public:
     ByteBuffer() : offset(0) {}
     explicit ByteBuffer(ByteVec data) : offset(0), buffer(std::move(data)) {}
+    explicit ByteBuffer(ByteVec&& data) : offset(0), buffer(std::move(data)) {}
     
     bool                  readBoolean();
     int8_t                readByte();
@@ -97,6 +98,17 @@ class ByteBuffer {
     void append(const ByteVec&& data) { buffer.insert(buffer.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end())); }
     auto begin() { return buffer.begin(); }
     auto end() { return buffer.end(); }
+    ByteVec& data() { return buffer; }
+    [[nodiscard]] ByteVec data() const { return buffer; }
+    [[nodiscard]] auto cbegin() const { return buffer.cbegin(); }
+    [[nodiscard]] auto cend() const { return buffer.cend(); }
+    [[nodiscard]] size_t size() const { return buffer.size(); }
+    [[nodiscard]] bool empty() const { return buffer.empty(); }
+    [[nodiscard]] size_t getOffset() const { return offset; }
+    void setOffset(size_t newOffset);
+
+    uint8_t operator[] (size_t index) const;
+    uint8_t& operator[] (size_t index);
 
   private:
     size_t offset;

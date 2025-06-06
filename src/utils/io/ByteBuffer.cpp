@@ -286,3 +286,21 @@ void stratos::ByteBuffer::writeFixedBitSet(const std::vector<bool>& bits, const 
 void stratos::ByteBuffer::writeByteArray(const ByteVec& values) {
     for (const auto& value : values) buffer.push_back(value);
 }
+void    stratos::ByteBuffer::setOffset(const size_t newOffset) {
+    if (newOffset > buffer.size()) {
+        throw BufferOverflowException("Offset exceeds buffer size");
+    }
+    offset = newOffset;
+}
+uint8_t stratos::ByteBuffer::operator[](const size_t index) const {
+    if (index >= buffer.size()) {
+        throw BufferUnderflowException("Index out of bounds for buffer access");
+    }
+    return buffer[index];
+}
+uint8_t& stratos::ByteBuffer::operator[](const size_t index) {
+    if (index >= buffer.size()) {
+        throw BufferUnderflowException("Index out of bounds for buffer access");
+    }
+    return buffer[index];
+}
