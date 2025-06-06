@@ -23,7 +23,7 @@
 
 namespace stratos {
 class StringTag final : CRTPTag<StringTag> {
-public:
+  public:
     static constexpr auto type = TagType::String;
 
     StringTag() {}
@@ -31,20 +31,29 @@ public:
     explicit StringTag(std::string&& str) noexcept : value(std::move(str)) {}
     explicit StringTag(const char* str) : value(str) {}
 
-    explicit operator std::string&() { return value; }
-    explicit operator const std::string&() const { return value; }
+    explicit           operator std::string&() { return value; }
+    explicit           operator const std::string&() const { return value; }
     const std::string& get() const { return value; }
 
-    StringTag& operator=(const std::string& str) { value = str; return *this; }
-    StringTag& operator=(std::string&& str) { value = std::move(str); return *this; }
-    StringTag& operator=(const char* str) { value = str; return *this; }
+    StringTag& operator=(const std::string& str) {
+        value = str;
+        return *this;
+    }
+    StringTag& operator=(std::string&& str) {
+        value = std::move(str);
+        return *this;
+    }
+    StringTag& operator=(const char* str) {
+        value = str;
+        return *this;
+    }
     void set(const std::string& str) { value = str; }
     void set(std::string&& str) { value = std::move(str); }
 
-    void read(ByteBuffer& buffer) override;
-    void write(ByteBuffer& buffer) const override;
+    void read(NBTBuffer& buffer) override;
+    void write(NBTBuffer& buffer) const override;
 
-private:
+  private:
     std::string value;
 };
 

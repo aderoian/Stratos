@@ -19,6 +19,7 @@
 
 #include "ListTag.h"
 
+#include "io/NBTBuffer.h"
 #include "NBTValue.h"
 #include "PrimitiveTag.h"
 #include "StringTag.h"
@@ -69,6 +70,30 @@ void ListTag::push_back(TagValueInitializer&& val) {
 void ListTag::reset(const TagType type) {
     clear();
     tagType = type;
+}
+void ListTag::read(NBTBuffer& buffer) {
+    clear();
+    tagType = static_cast<TagType>(buffer.readByte());
+    if (tagType == TagType::End) return;
+    int length = buffer.readInt();
+    while (length--) {
+        auto tag = Tag::create(static_cast<TagType>(buffer.readByte()));
+        tag->read(buffer);
+        push_back(TagValueInitializer(std::move(tag)));
+    }
+}
+void ListTag::write(NBTBuffer& buffer) const {
+    if (tags.empty()) {
+        buffer.writeByte(0);
+        buffer.writeInt(0);
+    } else {
+        buffer.writeByte(static_cast<uint8_t>(tagType));
+        buffer.writeInt(static_cast<int>(tags.size()));
+        for (const auto& tag : tags) {
+            buffer.writeByte(static_cast<uint8_t>(tag.getType()));
+            tag.get().write(buffer);
+        }
+    }
 }
 
 } // namespace stratos

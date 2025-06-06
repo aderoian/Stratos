@@ -19,7 +19,9 @@
 
 #ifndef PRIMITIVETAG_H
 #define PRIMITIVETAG_H
+#include "io/NBTBuffer.h"
 #include "Tag.h"
+
 #include <type_traits>
 
 namespace stratos {
@@ -34,7 +36,7 @@ template<> struct getPrimitiveType<double>  : std::integral_constant<TagType, Ta
 }
 
 template<class T>
-class PrimitiveTag final : CRTPTag<PrimitiveTag<T>> {
+class PrimitiveTag final : public CRTPTag<PrimitiveTag<T>> {
 public:
     typedef T ValueType; // The type of the value stored in this tag
 
@@ -49,8 +51,8 @@ public:
     PrimitiveTag& operator=(T val) { value = val; return *this; }
     void set(T val) { value = val; }
 
-    void read(ByteBuffer& buffer) override;
-    void write(ByteBuffer& buffer) const override;
+    void read(NBTBuffer& buffer) override;
+    void write(NBTBuffer& buffer) const override;
 private:
     T value;
 };
@@ -66,12 +68,40 @@ typedef PrimitiveTag<float> FloatTag;
 typedef PrimitiveTag<double> DoubleTag;
 
 template <class T>
-void PrimitiveTag<T>::read(ByteBuffer& buffer) {
-    // TODO: we need overload methods
+void PrimitiveTag<T>::read(NBTBuffer& buffer) {
+    if constexpr (std::is_same_v<T, int8_t>) {\
+        value = buffer.readByte();
+    } else if constexpr (std::is_same_v<T, int16_t>) {
+        value = buffer.readShort();
+    } else if constexpr (std::is_same_v<T, int32_t>) {
+        value = buffer.readInt();
+    } else if constexpr (std::is_same_v<T, int64_t>) {
+        value = buffer.readLong();
+    } else if constexpr (std::is_same_v<T, float>) {
+        value = buffer.readFloat();
+    } else if constexpr (std::is_same_v<T, double>) {
+        value = buffer.readDouble();
+    } else {
+        static_assert(std::is_same_v<T, void>, "Unsupported primitive type for NBT");
+    }
 }
 template <class T>
-void PrimitiveTag<T>::write(ByteBuffer& buffer) const {
-    // TODO: we need overload methods
+void PrimitiveTag<T>::write(NBTBuffer& buffer) const {
+    if constexpr (std::is_same_v<T, int8_t>) {
+        buffer.writeByte(value);
+    } else if constexpr (std::is_same_v<T, int16_t>) {
+        buffer.writeShort(value);
+    } else if constexpr (std::is_same_v<T, int32_t>) {
+        buffer.writeInt(value);
+    } else if constexpr (std::is_same_v<T, int64_t>) {
+        buffer.writeLong(value);
+    } else if constexpr (std::is_same_v<T, float>) {
+        buffer.writeFloat(value);
+    } else if constexpr (std::is_same_v<T, double>) {
+        buffer.writeDouble(value);
+    } else {
+        static_assert(std::is_same_v<T, void>, "Unsupported primitive type for NBT");
+    }
 }
 } // namespace stratos
 

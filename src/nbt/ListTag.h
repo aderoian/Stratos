@@ -80,8 +80,8 @@ public:
 
     TagType getListType() const { return tagType; }
 
-    void read(ByteBuffer& buffer) override;
-    void write(ByteBuffer& buffer) const override;
+    void read(NBTBuffer& buffer) override;
+    void write(NBTBuffer& buffer) const override;
 
     friend bool operator==(const ListTag& lhs, const ListTag& rhs);
     friend bool operator!=(const ListTag& lhs, const ListTag& rhs);

@@ -18,6 +18,8 @@
  */
 
 #import "CompoundTag.h"
+
+#include "io/NBTBuffer.h"
 #import "NBTValue.h"
 
 namespace stratos {
@@ -41,9 +43,23 @@ std::pair<CompoundTag::iterator, bool> CompoundTag::put(const std::string& key, 
 std::pair<CompoundTag::iterator, bool> CompoundTag::insert(const std::string& key, TagValueInitializer&& val) { return tags.emplace(key, std::move(val)); }
 bool CompoundTag::erase(const std::string& key) { return tags.erase(key) != 0;}
 bool CompoundTag::hasKey(const std::string& key) const { return tags.contains(key); }
-bool CompoundTag::hasKey(const std::string& key, const TagType type) const {
+bool                                   CompoundTag::hasKey(const std::string& key, const TagType type) const {
     const auto it = tags.find(key);
     return it != tags.end() && it->second.get().getType() == type;
+}
+void CompoundTag::read(NBTBuffer& buffer) {
+    clear();
+    while (true) {
+        auto [name, tag] = buffer.readTag();
+        if (tag == nullptr || tag->getType() == TagType::End) break; // End tag indicates no further tags
+        tags.emplace(std::move(name), std::move(tag));
+    }
+}
+void CompoundTag::write(NBTBuffer& buffer) const {
+    for (const auto& [name, value] : tags) {
+        buffer.writeTagName(name);
+        value.get().write(buffer);
+    }
 }
 
 } // namespace stratos

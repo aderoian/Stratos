@@ -58,8 +58,8 @@ public:
     constantIterator cbegin() const { return tags.cbegin(); }
     constantIterator cend() const   { return tags.cend(); }
 
-    void read(ByteBuffer& buffer) override;
-    void write(ByteBuffer& buffer) const override;
+    void read(NBTBuffer& buffer) override;
+    void write(NBTBuffer& buffer) const override;
 
     friend bool operator==(const CompoundTag& lhs, const CompoundTag& rhs) { return lhs.tags == rhs.tags; }
     friend bool operator!=(const CompoundTag& lhs, const CompoundTag& rhs) { return !(lhs == rhs); }

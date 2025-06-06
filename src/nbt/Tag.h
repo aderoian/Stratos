@@ -23,7 +23,9 @@
 #include <memory>
 
 namespace stratos {
-class ByteBuffer;
+class NBTBuffer;
+}
+namespace stratos {
 
 enum class TagType : std::int8_t {
     End = 0,
@@ -67,8 +69,8 @@ public:
 
     virtual Tag& assign(Tag&& rhs) = 0;
 
-    virtual void read(ByteBuffer& buffer) = 0;
-    virtual void write(ByteBuffer& buffer) const = 0;
+    virtual void read(NBTBuffer& buffer) = 0;
+    virtual void write(NBTBuffer& buffer) const = 0;
 
     static std::unique_ptr<Tag> create(TagType type);
 

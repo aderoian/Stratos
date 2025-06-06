@@ -17,9 +17,11 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 # Source files
 set(SOURCES
         Server.cpp
+        nbt/io/NBTBuffer.cpp
         nbt/CompoundTag.cpp
         nbt/ListTag.cpp
         nbt/NBTValue.cpp
+        nbt/StringTag.cpp
         nbt/Tag.cpp
         network/Network.cpp
         network/session/NetworkClient.cpp
@@ -38,6 +40,7 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        nbt/io/NBTBuffer.h
         nbt/ArrayTag.h
         nbt/CompoundTag.h
         nbt/ListTag.h
