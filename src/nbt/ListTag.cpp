@@ -96,4 +96,10 @@ void ListTag::write(NBTBuffer& buffer) const {
     }
 }
 
+bool operator==(const ListTag& lhs, const ListTag& rhs) {
+    return lhs.tagType == rhs.tagType && lhs.tags == rhs.tags;
+}
+bool operator!=(const ListTag& lhs, const ListTag& rhs) {
+    return !(lhs == rhs);
+}
 } // namespace stratos

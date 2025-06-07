@@ -17,10 +17,10 @@
  *
  */
 
-#import "CompoundTag.h"
+#include "CompoundTag.h"
 
 #include "io/NBTBuffer.h"
-#import "Value.h"
+#include "Value.h"
 
 namespace stratos {
 
@@ -61,5 +61,10 @@ void CompoundTag::write(NBTBuffer& buffer) const {
         value.get().write(buffer);
     }
 }
-
+bool operator==(const CompoundTag& lhs, const CompoundTag& rhs) {
+    return lhs.tags == rhs.tags;
+}
+bool operator!=(const CompoundTag& lhs, const CompoundTag& rhs) {
+    return !(lhs == rhs);
+}
 } // namespace stratos

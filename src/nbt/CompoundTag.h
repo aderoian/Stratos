@@ -20,6 +20,7 @@
 #ifndef COMPOUNDTAG_H
 #define COMPOUNDTAG_H
 #include "Tag.h"
+#include "Value.h"
 
 #include <map>
 
@@ -31,6 +32,8 @@ class CompoundTag final : public CRTPTag<CompoundTag> {
 public:
     typedef TagMap::iterator Iterator;
     typedef TagMap::const_iterator ConstantIterator;
+
+    static constexpr auto type = TagType::Compound;
 
     CompoundTag() = default;
     CompoundTag(std::initializer_list<std::pair<std::string, TagValueInitializer>> init);
@@ -61,8 +64,8 @@ public:
     void read(NBTBuffer& buffer) override;
     void write(NBTBuffer& buffer) const override;
 
-    friend bool operator==(const CompoundTag& lhs, const CompoundTag& rhs) { return lhs.tags == rhs.tags; }
-    friend bool operator!=(const CompoundTag& lhs, const CompoundTag& rhs) { return !(lhs == rhs); }
+    friend bool operator==(const CompoundTag& lhs, const CompoundTag& rhs);
+    friend bool operator!=(const CompoundTag& lhs, const CompoundTag& rhs);
 
 private:
     TagMap tags;
@@ -70,7 +73,7 @@ private:
 
 template<class T, class... Args>
 std::pair<CompoundTag::Iterator, bool> CompoundTag::emplace(const std::string& key, Args&&... args) {
-    return put(key, TagValue(make_unique<T>(std::forward<Args>(args)...)));
+    return put(key, TagValueInitializer(nbtinternal::makeUnique<T>(std::forward<Args>(args)...)));
 }
 }
 

@@ -62,9 +62,6 @@ std::unique_ptr<Tag> Tag::create(const TagType type) {
         throw std::invalid_argument("Invalid tag type");
     }
 }
-bool Tag::equals(const Tag& other) const {
-
-}
 bool                 operator==(const Tag& lhs, const Tag& rhs) { return typeid(lhs) == typeid(rhs) && lhs.equals(rhs); }
 bool                 operator!=(const Tag& lhs, const Tag& rhs) { return !(lhs == rhs); }
 } // namespace stratos

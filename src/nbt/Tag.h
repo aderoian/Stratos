@@ -95,7 +95,7 @@ const T& Tag::as() const {
 template <class Sub>
 class CRTPTag : public Tag {
 public:
-    ~CRTPTag() noexcept override = 0; // Ensure CRTPTag is abstract
+    ~CRTPTag() noexcept override = default; // Ensure CRTPTag is abstract
     [[nodiscard]] TagType getType() const noexcept final { return Sub::type; }
 
     [[nodiscard]] std::unique_ptr<Tag> clone() const& final { return nbtinternal::makeUnique<Sub>(SubThis()); }
@@ -109,10 +109,6 @@ private:
     Sub& SubThis() { return static_cast<Sub&>(*this); }
     const Sub& SubThis() const { return static_cast<const Sub&>(*this); }
 };
-
-template<class Sub>
-CRTPTag<Sub>::~CRTPTag() noexcept override = default;
-
 }
 
 #endif //TAG_H
