@@ -33,6 +33,7 @@ class StringTag;
 
 class NBTBuffer : public ByteBuffer {
   public:
+    NBTBuffer() = default;
     explicit NBTBuffer(const ByteVec& buffer) {
         this->buffer = buffer;
         offset       = 0;

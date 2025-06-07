@@ -21,13 +21,16 @@
 #define COMPRESSIONUTILS_H
 
 namespace stratos {
+using ByteVec = std::vector<uint8_t>;
 class ByteBuffer;
 
 // Binary compression
 bool isGzip(const ByteBuffer& buffer);
 bool isZlib(const ByteBuffer& buffer);
 ByteBuffer decompress(const ByteBuffer& buffer);
+ByteVec decompress(const ByteVec& buffer);
 ByteBuffer compress(const ByteBuffer& buffer, bool gzip = false);
+ByteVec compress(const ByteVec& buffer, bool gzip = false);
 
 } // namespace stratos
 

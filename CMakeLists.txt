@@ -20,6 +20,7 @@ set(SOURCES
         nbt/io/NBTBuffer.cpp
         nbt/CompoundTag.cpp
         nbt/ListTag.cpp
+        nbt/NBT.cpp
         nbt/Value.cpp
         nbt/StringTag.cpp
         nbt/Tag.cpp
@@ -45,6 +46,7 @@ set(HEADERS
         nbt/ArrayTag.h
         nbt/CompoundTag.h
         nbt/ListTag.h
+        nbt/NBT.h
         nbt/Value.h
         nbt/PrimitiveTag.h
         nbt/StringTag.h

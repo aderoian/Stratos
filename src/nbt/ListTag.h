@@ -112,7 +112,7 @@ void ListTag::init(std::initializer_list<Arg> init) {
     tagType = T::type;
     tags.reserve(init.size());
     for(const Arg& arg: init)
-        tags.emplace_back(nbtinternal::makeUnique<T>(arg));
+        tags.emplace_back(internal::makeUnique<T>(arg));
 }
 } // namespace stratos::nbt
 
