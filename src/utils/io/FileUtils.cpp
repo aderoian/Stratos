@@ -59,5 +59,28 @@ std::fstream open(const std::string& path, const std::ios::openmode mode) {
 std::fstream open(const char* path, const std::ios::openmode mode) {
     return open(Path(path), mode);
 }
-void close(std::fstream& file) { if (file.is_open()) file.close(); }
+void close(std::fstream& file) {
+    if (file.is_open()) file.close();
 }
+ByteVec readAllBytes(const Path& path) {
+    std::ifstream file(path.getNativePath(), std::ios::binary | std::ios::ate);
+    if (!file) throw std::runtime_error("Failed to open file: " + path.toString());
+
+    const std::streamsize size = file.tellg();
+    if (size < 0) throw std::runtime_error("Failed to determine file size");
+
+    ByteVec buffer(static_cast<size_t>(size));
+    file.seekg(0);
+    file.read(reinterpret_cast<char*>(buffer.data()), size);
+    if (!file) throw std::runtime_error("Failed to read entire file");
+
+    return buffer;
+}
+void writeAllBytes(const Path& path, const ByteVec& data) {
+    std::ofstream file(path.getNativePath(), std::ios::binary | std::ios::trunc);
+    if (!file) throw std::runtime_error("Failed to open file for writing: " + path.toString());
+
+    file.write(reinterpret_cast<const char*>(data.data()), data.size());
+    if (!file) throw std::runtime_error("Failed to write to file: " + path.toString());
+}
+} // namespace stratos

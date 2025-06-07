@@ -19,7 +19,8 @@
 
 #ifndef FILEUTILS_H
 #define FILEUTILS_H
-#include <exception>
+#include "ByteBuffer.h"
+
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -69,6 +70,9 @@ std::fstream open(const Path& path, std::ios::openmode mode);
 std::fstream open(const std::string& path, std::ios::openmode mode);
 std::fstream open(const char* path, std::ios::openmode mode);
 void close(std::fstream& file);
+
+ByteVec readAllBytes(const Path& path);
+void writeAllBytes(const Path& path, const ByteVec& data);
 }// namespace stratos
 
 #endif //FILEUTILS_H
