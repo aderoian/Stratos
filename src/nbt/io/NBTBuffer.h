@@ -19,6 +19,7 @@
 
 #ifndef NBTBUFFER_H
 #define NBTBUFFER_H
+#include "nbt/Tag.h"
 #include "utils/io/ByteBuffer.h"
 
 #include <memory>
@@ -31,15 +32,33 @@ class ListTag;
 class StringTag;
 
 class NBTBuffer : public ByteBuffer {
-public:
+  public:
+    explicit NBTBuffer(const ByteVec& buffer) {
+        this->buffer = buffer;
+        offset       = 0;
+    }
+    explicit NBTBuffer(ByteVec&& buffer) : ByteBuffer(std::move(buffer)) {}
+
     std::string readTagName();
     std::pair<std::string, std::unique_ptr<Tag>> readTag();
+    template <typename T> std::pair<std::string, std::unique_ptr<T>> readTag();
     std::string readModifiedUTF8String();
     void writeTagName(const std::string& tagName);
     void writeTag(const std::string& name, const std::unique_ptr<Tag>& tag);
     void writeModifiedUTF8String(const std::string& str);
 };
 
+template <typename T> std::pair<std::string, std::unique_ptr<T>> NBTBuffer::readTag() {
+    static_assert(std::is_base_of_v<Tag, T>, "T must be derived from Tag");
+    auto const type = static_cast<TagType>(readByte());
+    if (type != T::type)
+        throw std::runtime_error("NBTBuffer::readTag: invalid tag type");
+
+    std::string name = readModifiedUTF8String();
+    auto tag = nbtinternal::makeUnique<T>();
+    tag->read(*this);
+    return {std::move(name), std::unique_ptr<T>(tag.release())};
+}
 } // stratos
 
 #endif //NBTBUFFER_H
