@@ -49,7 +49,7 @@ class BufferOverflowException : public std::logic_error {
 class ByteBuffer {
   public:
     ByteBuffer() : offset(0) {}
-    explicit ByteBuffer(ByteVec data) : offset(0), buffer(std::move(data)) {}
+    explicit ByteBuffer(const ByteVec& data) : offset(0), buffer(data) {}
     explicit ByteBuffer(ByteVec&& data) : offset(0), buffer(std::move(data)) {}
     
     bool                  readBoolean();
@@ -110,7 +110,7 @@ class ByteBuffer {
     uint8_t operator[] (size_t index) const;
     uint8_t& operator[] (size_t index);
 
-  private:
+  protected:
     size_t offset;
     std::vector<byte> buffer;
 
