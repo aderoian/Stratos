@@ -18,6 +18,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(SOURCES
         Server.cpp
         nbt/io/NBTBuffer.cpp
+        nbt/io/NBTCompression.cpp
         nbt/CompoundTag.cpp
         nbt/ListTag.cpp
         nbt/NBTValue.cpp
@@ -41,6 +42,7 @@ set(SOURCES
 set(HEADERS
         Server.h
         nbt/io/NBTBuffer.h
+        nbt/io/NBTCompression.h
         nbt/ArrayTag.h
         nbt/CompoundTag.h
         nbt/ListTag.h
@@ -133,6 +135,13 @@ set(BUILD_SHARED_LIBS OFF)
 set(CURL_STATICLIB ON)
 add_subdirectory(vendor/cpr)
 target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE cpr::cpr)
+
+# Zlib
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static zlib")
+add_subdirectory(vendor/zlib)
+target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE zlibstatic)
+target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE vendor/zlib)
+
 
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
