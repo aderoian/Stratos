@@ -616,6 +616,8 @@ void bufferTest() {
     }
 }
 
+namespace nbt = stratos::nbt;
+
 void nbtTest() {
     std::cout << "Running NBT tests" << std::endl;
     stratos::Path nbtPath("nbt_test");
@@ -626,13 +628,13 @@ void nbtTest() {
     {
         std::cout << "Testing hello_world.nbt";
         stratos::Path testFile = nbtPath.resolve("hello_world.nbt");
-        stratos::NBTBuffer buffer(stratos::readAllBytes(testFile));
-        auto [name, tag] = buffer.readTag<stratos::CompoundTag>();
+        nbt::NBTBuffer buffer(stratos::readAllBytes(testFile));
+        auto [name, tag] = buffer.readTag<nbt::CompoundTag>();
 
         assert(name == "hello world");
         assert(tag->hasKey("name"));
-        assert((*tag)["name"].getType() == stratos::TagType::String);
-        assert((*tag)["name"].as<stratos::StringTag>().get() == "Bananrama");
+        assert((*tag)["name"].getType() == nbt::TagType::String);
+        assert((*tag)["name"].as<nbt::StringTag>().get() == "Bananrama");
     }
     {
         std::cout << "Testing bigtest.nbt";
@@ -642,8 +644,8 @@ void nbtTest() {
         std::cout << "File size: " << size << "\n";
         std::cout << "Buffer size " << stratos::readAllBytes(testFile).size() << "\n";
         stratos::ByteBuffer bytes(stratos::readAllBytes(testFile));
-        stratos::NBTBuffer buffer((stratos::decompress(bytes).data()));
-        auto [name, tag] = buffer.readTag<stratos::CompoundTag>();
+        nbt::NBTBuffer buffer((stratos::decompress(bytes).data()));
+        auto [name, tag] = buffer.readTag<nbt::CompoundTag>();
 
         assert(name == "Level");
         assert(tag->size() == 11);
@@ -659,77 +661,77 @@ void nbtTest() {
         assert(tag->hasKey("byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"));
         assert(tag->hasKey("shortTest"));
 
-        auto nested = (*tag)["nested compound test"].as<stratos::CompoundTag>();
+        auto nested = (*tag)["nested compound test"].as<nbt::CompoundTag>();
         assert(nested.hasKey("egg"));
         assert(nested.hasKey("ham"));
-        assert(nested["egg"].getType() == stratos::TagType::Compound);
-        assert(nested["ham"].getType() == stratos::TagType::Compound);
-        auto egg = nested["egg"].as<stratos::CompoundTag>();
-        auto ham = nested["ham"].as<stratos::CompoundTag>();
+        assert(nested["egg"].getType() == nbt::TagType::Compound);
+        assert(nested["ham"].getType() == nbt::TagType::Compound);
+        auto egg = nested["egg"].as<nbt::CompoundTag>();
+        auto ham = nested["ham"].as<nbt::CompoundTag>();
         assert(egg.hasKey("name"));
         assert(egg.hasKey("value"));
         assert(ham.hasKey("name"));
         assert(ham.hasKey("value"));
-        assert(egg["name"].getType() == stratos::TagType::String);
-        assert(egg["value"].getType() == stratos::TagType::Float);
-        assert(egg["name"].as<stratos::StringTag>().get() == "Eggbert");
-        assert(egg["value"].as<stratos::FloatTag>().get() == 0.5f);
-        assert(ham["name"].getType() == stratos::TagType::String);
-        assert(ham["value"].getType() == stratos::TagType::Float);
-        assert(ham["name"].as<stratos::StringTag>().get() == "Hampus");
-        assert(ham["value"].as<stratos::FloatTag>().get() == 0.75f);
+        assert(egg["name"].getType() == nbt::TagType::String);
+        assert(egg["value"].getType() == nbt::TagType::Float);
+        assert(egg["name"].as<nbt::StringTag>().get() == "Eggbert");
+        assert(egg["value"].as<nbt::FloatTag>().get() == 0.5f);
+        assert(ham["name"].getType() == nbt::TagType::String);
+        assert(ham["value"].getType() == nbt::TagType::Float);
+        assert(ham["name"].as<nbt::StringTag>().get() == "Hampus");
+        assert(ham["value"].as<nbt::FloatTag>().get() == 0.75f);
 
-        assert((*tag)["intTest"].getType() == stratos::TagType::Int);
-        assert((*tag)["intTest"].as<stratos::IntTag>().get() == 2147483647);
-        assert((*tag)["byteTest"].getType() == stratos::TagType::Byte);
-        assert((*tag)["byteTest"].as<stratos::ByteTag>().get() == 127);
-        assert((*tag)["stringTest"].getType() == stratos::TagType::String);
-        assert((*tag)["stringTest"].as<stratos::StringTag>().get() == "HELLO WORLD THIS IS A TEST STRING ÅÄÖ!");
+        assert((*tag)["intTest"].getType() == nbt::TagType::Int);
+        assert((*tag)["intTest"].as<nbt::IntTag>().get() == 2147483647);
+        assert((*tag)["byteTest"].getType() == nbt::TagType::Byte);
+        assert((*tag)["byteTest"].as<nbt::ByteTag>().get() == 127);
+        assert((*tag)["stringTest"].getType() == nbt::TagType::String);
+        assert((*tag)["stringTest"].as<nbt::StringTag>().get() == "HELLO WORLD THIS IS A TEST STRING ÅÄÖ!");
 
-        auto listTag = (*tag)["listTest (long)"].as<stratos::ListTag>();
-        assert(listTag.getListType() == stratos::TagType::Long);
+        auto listTag = (*tag)["listTest (long)"].as<nbt::ListTag>();
+        assert(listTag.getListType() == nbt::TagType::Long);
         assert(listTag.size() == 5);
-        assert(listTag[0].as<stratos::LongTag>().get() == 11LL);
-        assert(listTag[1].as<stratos::LongTag>().get() == 12LL);
-        assert(listTag.at(2).as<stratos::LongTag>().get() == 13LL);
-        assert(listTag[3].as<stratos::LongTag>().get() == 14LL);
-        assert(listTag[4].as<stratos::LongTag>().get() == 15LL);
+        assert(listTag[0].as<nbt::LongTag>().get() == 11LL);
+        assert(listTag[1].as<nbt::LongTag>().get() == 12LL);
+        assert(listTag.at(2).as<nbt::LongTag>().get() == 13LL);
+        assert(listTag[3].as<nbt::LongTag>().get() == 14LL);
+        assert(listTag[4].as<nbt::LongTag>().get() == 15LL);
 
-        assert((*tag)["doubleTest"].getType() == stratos::TagType::Double);
-        assert((*tag)["doubleTest"].as<stratos::DoubleTag>().get() == 0.49312871321823148);
-        assert((*tag)["floatTest"].getType() == stratos::TagType::Float);
-        assert((*tag)["floatTest"].as<stratos::FloatTag>().get() == 0.49823147058486938f);
-        assert((*tag)["longTest"].getType() == stratos::TagType::Long);
-        assert((*tag)["longTest"].as<stratos::LongTag>().get() == 9223372036854775807LL);
+        assert((*tag)["doubleTest"].getType() == nbt::TagType::Double);
+        assert((*tag)["doubleTest"].as<nbt::DoubleTag>().get() == 0.49312871321823148);
+        assert((*tag)["floatTest"].getType() == nbt::TagType::Float);
+        assert((*tag)["floatTest"].as<nbt::FloatTag>().get() == 0.49823147058486938f);
+        assert((*tag)["longTest"].getType() == nbt::TagType::Long);
+        assert((*tag)["longTest"].as<nbt::LongTag>().get() == 9223372036854775807LL);
 
-        auto compoundList = (*tag)["listTest (compound)"].as<stratos::ListTag>();
-        assert(compoundList.getListType() == stratos::TagType::Compound);
+        auto compoundList = (*tag)["listTest (compound)"].as<nbt::ListTag>();
+        assert(compoundList.getListType() == nbt::TagType::Compound);
         assert(compoundList.size() == 2);
-        auto first = compoundList[0].as<stratos::CompoundTag>();
-        auto second = compoundList[1].as<stratos::CompoundTag>();
+        auto first = compoundList[0].as<nbt::CompoundTag>();
+        auto second = compoundList[1].as<nbt::CompoundTag>();
         assert(first.hasKey("created-on"));
         assert(second.hasKey("created-on"));
         assert(first.hasKey("name"));
         assert(second.hasKey("name"));
-        assert(first["created-on"].getType() == stratos::TagType::Long);
-        assert(first["name"].getType() == stratos::TagType::String);
-        assert(second["created-on"].getType() == stratos::TagType::Long);
-        assert(second["name"].getType() == stratos::TagType::String);
+        assert(first["created-on"].getType() == nbt::TagType::Long);
+        assert(first["name"].getType() == nbt::TagType::String);
+        assert(second["created-on"].getType() == nbt::TagType::Long);
+        assert(second["name"].getType() == nbt::TagType::String);
 
-        assert(first["created-on"].as<stratos::LongTag>().get() == 1264099775885LL);
-        assert(first["name"].as<stratos::StringTag>().get() == "Compound tag #0");
-        assert(second["created-on"].as<stratos::LongTag>().get() == 1264099775885LL);
-        assert(second["name"].as<stratos::StringTag>().get() == "Compound tag #1");
+        assert(first["created-on"].as<nbt::LongTag>().get() == 1264099775885LL);
+        assert(first["name"].as<nbt::StringTag>().get() == "Compound tag #0");
+        assert(second["created-on"].as<nbt::LongTag>().get() == 1264099775885LL);
+        assert(second["name"].as<nbt::StringTag>().get() == "Compound tag #1");
 
-        assert((*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].getType() == stratos::TagType::ByteArray);
-        assert((*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].as<stratos::ByteArrayTag>().size() == 1000);
-        auto byteArray = (*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].as<stratos::ByteArrayTag>();
+        assert((*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].getType() == nbt::TagType::ByteArray);
+        assert((*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].as<nbt::ByteArrayTag>().size() == 1000);
+        auto byteArray = (*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].as<nbt::ByteArrayTag>();
         for (int i = 0; i < 1000; i++) {
             byteArray[i] == (i*i*255+i*7)%100;
         }
 
-        assert((*tag)["shortTest"].getType() == stratos::TagType::Short);
-        assert((*tag)["shortTest"].as<stratos::ShortTag>().get() == 32767);
+        assert((*tag)["shortTest"].getType() == nbt::TagType::Short);
+        assert((*tag)["shortTest"].as<nbt::ShortTag>().get() == 32767);
     }
 }
 

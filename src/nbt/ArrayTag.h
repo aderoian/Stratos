@@ -24,13 +24,13 @@
 
 #include <vector>
 
-namespace stratos {
-namespace nbtinternal {
+namespace stratos::nbt {
+namespace internal {
 template<class T> struct getArrayType { static_assert(sizeof(T) != sizeof(T), "Invalid type parameter for tag_array, can only use byte or int"); };
 template<> struct getArrayType<int8_t>  : std::integral_constant<TagType, TagType::ByteArray> {};
 template<> struct getArrayType<int32_t> : std::integral_constant<TagType, TagType::IntArray> {};
 template<> struct getArrayType<int64_t> : std::integral_constant<TagType, TagType::LongArray> {};
-} // namespace nbtinternal
+} // namespace stratos::nbt::internal
 
 template <class T> class ArrayTag final : public CRTPTag<ArrayTag<T>> {
   public:
@@ -38,7 +38,7 @@ template <class T> class ArrayTag final : public CRTPTag<ArrayTag<T>> {
     typedef typename std::vector<T>::const_iterator constIterator;
 
     typedef T                ValueType;
-    static constexpr TagType type = nbtinternal::getArrayType<T>::value;
+    static constexpr TagType type = internal::getArrayType<T>::value;
 
     ArrayTag() = default;
     ArrayTag(std::initializer_list<T> init) : data(init) {}
@@ -130,6 +130,6 @@ template<class T> bool operator!=(const ArrayTag<T>& lhs, const ArrayTag<T>& rhs
 typedef ArrayTag<int8_t> ByteArrayTag;
 typedef ArrayTag<int32_t> IntArrayTag;
 typedef ArrayTag<int64_t> LongArrayTag;
-} // namespace stratos
+} // namespace stratos::nbt
 
 #endif //ARRAYTAG_H

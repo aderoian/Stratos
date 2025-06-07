@@ -20,9 +20,12 @@
 #include "StringTag.h"
 
 #include "io/NBTBuffer.h"
-void stratos::StringTag::read(NBTBuffer& buffer) {
+
+namespace stratos::nbt {
+void StringTag::read(NBTBuffer& buffer) {
     value = buffer.readModifiedUTF8String();
 }
-void stratos::StringTag::write(NBTBuffer& buffer) const {
+void StringTag::write(NBTBuffer& buffer) const {
     buffer.writeModifiedUTF8String(value);
 }
+} // namespace stratos::nbt

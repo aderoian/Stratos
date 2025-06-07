@@ -25,7 +25,7 @@
 
 #include <vector>
 
-namespace stratos {
+namespace stratos::nbt {
 class TagValue;
 class TagValueInitializer;
 class ListTag final : public CRTPTag<ListTag> {
@@ -114,6 +114,6 @@ void ListTag::init(std::initializer_list<Arg> init) {
     for(const Arg& arg: init)
         tags.emplace_back(nbtinternal::makeUnique<T>(arg));
 }
-} // namespace stratos
+} // namespace stratos::nbt
 
 #endif //LISTTAG_H

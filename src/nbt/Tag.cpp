@@ -25,7 +25,7 @@
 #include "PrimitiveTag.h"
 #include "StringTag.h"
 
-namespace stratos {
+namespace stratos::nbt {
 bool isValidType(const int type, const bool allowEnd) {
     return (allowEnd ? 0 : 1) <= type && type <= 12;
 }
@@ -35,29 +35,29 @@ std::unique_ptr<Tag> Tag::clone() && {
 std::unique_ptr<Tag> Tag::create(const TagType type) {
     switch (type) {
     case TagType::Byte:
-        return nbtinternal::makeUnique<ByteTag>();
+        return internal::makeUnique<ByteTag>();
     case TagType::Short:
-        return nbtinternal::makeUnique<ShortTag>();
+        return internal::makeUnique<ShortTag>();
     case TagType::Int:
-        return nbtinternal::makeUnique<IntTag>();
+        return internal::makeUnique<IntTag>();
     case TagType::Long:
-        return nbtinternal::makeUnique<LongTag>();
+        return internal::makeUnique<LongTag>();
     case TagType::Float:
-        return nbtinternal::makeUnique<FloatTag>();
+        return internal::makeUnique<FloatTag>();
     case TagType::Double:
-        return nbtinternal::makeUnique<DoubleTag>();
+        return internal::makeUnique<DoubleTag>();
     case TagType::ByteArray:
-        return nbtinternal::makeUnique<ByteArrayTag>();
+        return internal::makeUnique<ByteArrayTag>();
     case TagType::String:
-        return nbtinternal::makeUnique<StringTag>();
+        return internal::makeUnique<StringTag>();
     case TagType::List:
-        return nbtinternal::makeUnique<ListTag>();
+        return internal::makeUnique<ListTag>();
     case TagType::Compound:
-        return nbtinternal::makeUnique<CompoundTag>();
+        return internal::makeUnique<CompoundTag>();
     case TagType::IntArray:
-        return nbtinternal::makeUnique<IntArrayTag>();
+        return internal::makeUnique<IntArrayTag>();
     case TagType::LongArray:
-        return nbtinternal::makeUnique<LongArrayTag>();
+        return internal::makeUnique<LongArrayTag>();
     case TagType::End:
         return nullptr; // End tag is not creatable
     default:
@@ -66,4 +66,4 @@ std::unique_ptr<Tag> Tag::create(const TagType type) {
 }
 bool                 operator==(const Tag& lhs, const Tag& rhs) { return typeid(lhs) == typeid(rhs) && lhs.equals(rhs); }
 bool                 operator!=(const Tag& lhs, const Tag& rhs) { return !(lhs == rhs); }
-} // namespace stratos
+} // namespace stratos::nbt

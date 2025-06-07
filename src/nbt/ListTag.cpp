@@ -24,7 +24,7 @@
 #include "StringTag.h"
 #include "Value.h"
 
-namespace stratos {
+namespace stratos::nbt {
 
 ListTag::ListTag(const std::initializer_list<int8_t> il) { init<ByteTag>(il); }
 ListTag::ListTag(const std::initializer_list<int16_t> il) { init<ShortTag>(il); }
@@ -102,4 +102,4 @@ bool operator==(const ListTag& lhs, const ListTag& rhs) {
 bool operator!=(const ListTag& lhs, const ListTag& rhs) {
     return !(lhs == rhs);
 }
-} // namespace stratos
+} // namespace stratos::nbt

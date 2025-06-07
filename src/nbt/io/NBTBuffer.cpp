@@ -22,7 +22,7 @@
 #include "nbt/ListTag.h"
 #include "network/protocol/PacketSerialization.h"
 
-namespace stratos {
+namespace stratos::nbt {
 std::string                                  NBTBuffer::readTagName() {
     return readModifiedUTF8String();
 }
@@ -80,4 +80,4 @@ void NBTBuffer::writeModifiedUTF8String(const std::string& str) {
     for (const uint8_t b : encoded)
         writeUnsignedByte(b);
 }
-} // stratos
+} // namespace stratos::nbt

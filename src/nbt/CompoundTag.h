@@ -24,7 +24,7 @@
 
 #include <map>
 
-namespace stratos {
+namespace stratos::nbt {
 class TagValue;
 class TagValueInitializer;
 class CompoundTag final : public CRTPTag<CompoundTag> {
@@ -73,8 +73,8 @@ private:
 
 template<class T, class... Args>
 std::pair<CompoundTag::Iterator, bool> CompoundTag::emplace(const std::string& key, Args&&... args) {
-    return put(key, TagValueInitializer(nbtinternal::makeUnique<T>(std::forward<Args>(args)...)));
+    return put(key, TagValueInitializer(internal::makeUnique<T>(std::forward<Args>(args)...)));
 }
-}
+} // namespace stratos::nbt
 
 #endif //COMPOUNDTAG_H

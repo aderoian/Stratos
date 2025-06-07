@@ -24,7 +24,7 @@
 
 #include <memory>
 
-namespace stratos {
+namespace stratos::nbt {
 enum class TagType : std::int8_t;
 class Tag;
 class CompoundTag;
@@ -55,10 +55,10 @@ template <typename T> std::pair<std::string, std::unique_ptr<T>> NBTBuffer::read
         throw std::runtime_error("NBTBuffer::readTag: invalid tag type");
 
     std::string name = readModifiedUTF8String();
-    auto tag = nbtinternal::makeUnique<T>();
+    auto tag = internal::makeUnique<T>();
     tag->read(*this);
     return {std::move(name), std::unique_ptr<T>(tag.release())};
 }
-} // stratos
+} // namespace stratos::nbt
 
 #endif //NBTBUFFER_H

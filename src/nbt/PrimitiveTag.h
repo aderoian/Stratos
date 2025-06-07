@@ -24,8 +24,8 @@
 
 #include <type_traits>
 
-namespace stratos {
-namespace nbtinternal {
+namespace stratos::nbt {
+namespace internal {
 template<class T> struct getPrimitiveType { static_assert(sizeof(T) != sizeof(T), "Invalid type parameter for tag_primitive, can only use types that NBT uses"); };
 template<> struct getPrimitiveType<std::int8_t>  : std::integral_constant<TagType, TagType::Byte> {};
 template<> struct getPrimitiveType<int16_t> : std::integral_constant<TagType, TagType::Short> {};
@@ -33,14 +33,14 @@ template<> struct getPrimitiveType<int32_t> : std::integral_constant<TagType, Ta
 template<> struct getPrimitiveType<int64_t> : std::integral_constant<TagType, TagType::Long> {};
 template<> struct getPrimitiveType<float>   : std::integral_constant<TagType, TagType::Float> {};
 template<> struct getPrimitiveType<double>  : std::integral_constant<TagType, TagType::Double> {};
-}
+} // namespace stratos::nbt::internal
 
 template<class T>
 class PrimitiveTag final : public CRTPTag<PrimitiveTag<T>> {
 public:
     typedef T ValueType; // The type of the value stored in this tag
 
-    static constexpr TagType type = nbtinternal::getPrimitiveType<T>::value;
+    static constexpr TagType type = internal::getPrimitiveType<T>::value;
 
     explicit constexpr PrimitiveTag(T val = 0) noexcept : value(val) {}
 
@@ -103,6 +103,6 @@ void PrimitiveTag<T>::write(NBTBuffer& buffer) const {
         static_assert(std::is_same_v<T, void>, "Unsupported primitive type for NBT");
     }
 }
-} // namespace stratos
+} // namespace stratos::nbt
 
 #endif //PRIMITIVETAG_H

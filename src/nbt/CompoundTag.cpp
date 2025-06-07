@@ -22,7 +22,7 @@
 #include "io/NBTBuffer.h"
 #include "Value.h"
 
-namespace stratos {
+namespace stratos::nbt {
 
 CompoundTag::CompoundTag(std::initializer_list<std::pair<std::string, TagValueInitializer>> init) {
     for (const auto& [name, value] : init) {
@@ -67,4 +67,4 @@ bool operator==(const CompoundTag& lhs, const CompoundTag& rhs) {
 bool operator!=(const CompoundTag& lhs, const CompoundTag& rhs) {
     return !(lhs == rhs);
 }
-} // namespace stratos
+} // namespace stratos::nbt

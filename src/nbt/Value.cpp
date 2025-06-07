@@ -23,7 +23,7 @@
 #include "StringTag.h"
 #include "Value.h"
 
-namespace stratos {
+namespace stratos::nbt {
 TagValue::TagValue(Tag&& t) { tag = std::move(t).moveClone(); }
 TagValue::TagValue(const TagValue& rhs) { rhs.tag ? tag = rhs.tag->clone() : tag = nullptr; }
 TagValue& TagValue::operator=(const TagValue& rhs) {
@@ -288,4 +288,4 @@ bool            operator==(const TagValue& lhs, const TagValue& rhs) {
 bool            operator!=(const TagValue& lhs, const TagValue& rhs) {
     return !(lhs == rhs);
 }
-} // namespace stratos
+} // namespace stratos ::nbt

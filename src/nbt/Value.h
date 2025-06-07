@@ -21,7 +21,7 @@
 #define NBTVALUE_H
 #include "Tag.h"
 
-namespace stratos {
+namespace stratos::nbt {
 
 class TagValue {
 public:
@@ -117,6 +117,6 @@ public:
     explicit TagValueInitializer(std::string&& str);
     explicit TagValueInitializer(const char* str);
 };
-} // namespace stratos
+} // namespace stratos::nbt
 
 #endif //NBTVALUE_H

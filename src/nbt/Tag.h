@@ -22,10 +22,8 @@
 #include <cstdint>
 #include <memory>
 
-namespace stratos {
+namespace stratos::nbt {
 class NBTBuffer;
-}
-namespace stratos {
 
 enum class TagType : std::int8_t {
     End = 0,
@@ -46,12 +44,12 @@ enum class TagType : std::int8_t {
 
 bool isValidType(int type, bool allowEnd = false);
 
-namespace nbtinternal {
+namespace internal {
 template<class T, class... Args>
 std::unique_ptr<T> makeUnique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
-}
+} // namespace stratos::nbt::internal
 
 class Tag {
 public:
@@ -98,8 +96,8 @@ public:
     ~CRTPTag() noexcept override = default; // Ensure CRTPTag is abstract
     [[nodiscard]] TagType getType() const noexcept final { return Sub::type; }
 
-    [[nodiscard]] std::unique_ptr<Tag> clone() const& final { return nbtinternal::makeUnique<Sub>(SubThis()); }
-    std::unique_ptr<Tag> moveClone() && final { return nbtinternal::makeUnique<Sub>(std::move(SubThis())); }
+    [[nodiscard]] std::unique_ptr<Tag> clone() const& final { return internal::makeUnique<Sub>(SubThis()); }
+    std::unique_ptr<Tag> moveClone() && final { return internal::makeUnique<Sub>(std::move(SubThis())); }
 
     Tag& assign(Tag&& rhs) final { return SubThis() = dynamic_cast<Sub&&>(rhs); }
 
@@ -109,6 +107,6 @@ private:
     Sub& SubThis() { return static_cast<Sub&>(*this); }
     const Sub& SubThis() const { return static_cast<const Sub&>(*this); }
 };
-}
+} // namespace stratos::nbt
 
 #endif //TAG_H

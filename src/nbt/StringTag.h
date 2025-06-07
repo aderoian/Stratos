@@ -21,7 +21,7 @@
 #define STRINGTAG_H
 #include "Tag.h"
 
-namespace stratos {
+namespace stratos::nbt {
 class StringTag final : public CRTPTag<StringTag> {
   public:
     static constexpr auto type = TagType::String;
@@ -59,6 +59,6 @@ class StringTag final : public CRTPTag<StringTag> {
 
 inline bool operator==(const StringTag& lhs, const StringTag& rhs) { return lhs.get() == rhs.get(); }
 inline bool operator!=(const StringTag& lhs, const StringTag& rhs) { return !(lhs == rhs); }
-} // namespace stratos
+} // namespace stratos::nbt
 
 #endif //STRINGTAG_H
