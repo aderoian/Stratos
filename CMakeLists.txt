@@ -178,6 +178,8 @@ else ()
     endif ()
 endif()
 target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr)
+target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE zlibstatic)
+target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE vendor/zlib)
 
 set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
@@ -185,3 +187,4 @@ add_test(NAME NetworkSerialization COMMAND "${LOCAL_PROJECT_NAME}Test" --network
 add_test(NAME FileUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --file-utils)
 add_test(NAME StringUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --string-utils)
 add_test(NAME ByteBuffer COMMAND "${LOCAL_PROJECT_NAME}Test" --byte-buffer)
+add_test(NAME NBT COMMAND "${LOCAL_PROJECT_NAME}Test" --nbt)

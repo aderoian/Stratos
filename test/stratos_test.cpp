@@ -17,11 +17,17 @@
  *
  */
 
+#include "nbt/CompoundTag.h"
+#include "nbt/io/NBTBuffer.h"
+#include "nbt/ListTag.h"
+#include "nbt/PrimitiveTag.h"
+#include "nbt/StringTag.h"
 #include "network/protocol/PacketSerialization.h"
 #include "utils/config/Config.h"
+#include "utils/io/ByteBuffer.h"
+#include "utils/io/CompressionUtils.h"
 #include "utils/io/FileUtils.h"
 #include "utils/StringUtils.h"
-#include "utils/io/ByteBuffer.h"
 
 #include <cassert>
 #include <iostream>
@@ -117,7 +123,7 @@ void networkSerializationTest() {
 }
 
 void fileUtilsTest() {
-    stratos::Path path("relativeTest");
+    stratos::Path path("fileUtils");
     if (path.exists()) {
         assert(path.isDirectory());
         assert(path.rmdir());
@@ -208,6 +214,20 @@ void fileUtilsTest() {
         assert(prop1.has_value() && prop1->get().asString() == "value1");
         auto prop2 = config.getProperty("key2");
         assert(!prop2.has_value());
+    }
+
+    path.mkdirs();
+    stratos::Path testBytes = path.resolve("testBytes.dat");
+    {
+        stratos::ByteBuffer buffer;
+        buffer.writeString("Hello, Stratos!", 100);
+        stratos::writeAllBytes(testBytes, buffer.data());
+    }
+    {
+        auto bytes = stratos::readAllBytes(testBytes);
+        stratos::ByteBuffer buffer(bytes);
+        std::string readStr = buffer.readString(100);
+        assert(readStr == "Hello, Stratos!");
     }
 }
 
@@ -596,6 +616,123 @@ void bufferTest() {
     }
 }
 
+void nbtTest() {
+    std::cout << "Running NBT tests" << std::endl;
+    stratos::Path nbtPath("nbt_test");
+    if (!nbtPath.exists()) {
+        throw std::runtime_error("Please create and add test files to the 'nbt_test' directory.");
+    }
+
+    {
+        std::cout << "Testing hello_world.nbt";
+        stratos::Path testFile = nbtPath.resolve("hello_world.nbt");
+        stratos::NBTBuffer buffer(stratos::readAllBytes(testFile));
+        auto [name, tag] = buffer.readTag<stratos::CompoundTag>();
+
+        assert(name == "hello world");
+        assert(tag->hasKey("name"));
+        assert((*tag)["name"].getType() == stratos::TagType::String);
+        assert((*tag)["name"].as<stratos::StringTag>().get() == "Bananrama");
+    }
+    {
+        std::cout << "Testing bigtest.nbt";
+        stratos::Path testFile = nbtPath.resolve("bigtest.nbt");
+        std::ifstream file(testFile.getNativePath(), std::ios::binary | std::ios::ate);
+        std::streamsize size = file.tellg();
+        std::cout << "File size: " << size << "\n";
+        std::cout << "Buffer size " << stratos::readAllBytes(testFile).size() << "\n";
+        stratos::ByteBuffer bytes(stratos::readAllBytes(testFile));
+        stratos::NBTBuffer buffer((stratos::decompress(bytes).data()));
+        auto [name, tag] = buffer.readTag<stratos::CompoundTag>();
+
+        assert(name == "Level");
+        assert(tag->size() == 11);
+        assert(tag->hasKey("nested compound test"));
+        assert(tag->hasKey("intTest"));
+        assert(tag->hasKey("byteTest"));
+        assert(tag->hasKey("stringTest"));
+        assert(tag->hasKey("listTest (long)"));
+        assert(tag->hasKey("doubleTest"));
+        assert(tag->hasKey("floatTest"));
+        assert(tag->hasKey("longTest"));
+        assert(tag->hasKey("listTest (compound)"));
+        assert(tag->hasKey("byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"));
+        assert(tag->hasKey("shortTest"));
+
+        auto nested = (*tag)["nested compound test"].as<stratos::CompoundTag>();
+        assert(nested.hasKey("egg"));
+        assert(nested.hasKey("ham"));
+        assert(nested["egg"].getType() == stratos::TagType::Compound);
+        assert(nested["ham"].getType() == stratos::TagType::Compound);
+        auto egg = nested["egg"].as<stratos::CompoundTag>();
+        auto ham = nested["ham"].as<stratos::CompoundTag>();
+        assert(egg.hasKey("name"));
+        assert(egg.hasKey("value"));
+        assert(ham.hasKey("name"));
+        assert(ham.hasKey("value"));
+        assert(egg["name"].getType() == stratos::TagType::String);
+        assert(egg["value"].getType() == stratos::TagType::Float);
+        assert(egg["name"].as<stratos::StringTag>().get() == "Eggbert");
+        assert(egg["value"].as<stratos::FloatTag>().get() == 0.5f);
+        assert(ham["name"].getType() == stratos::TagType::String);
+        assert(ham["value"].getType() == stratos::TagType::Float);
+        assert(ham["name"].as<stratos::StringTag>().get() == "Hampus");
+        assert(ham["value"].as<stratos::FloatTag>().get() == 0.75f);
+
+        assert((*tag)["intTest"].getType() == stratos::TagType::Int);
+        assert((*tag)["intTest"].as<stratos::IntTag>().get() == 2147483647);
+        assert((*tag)["byteTest"].getType() == stratos::TagType::Byte);
+        assert((*tag)["byteTest"].as<stratos::ByteTag>().get() == 127);
+        assert((*tag)["stringTest"].getType() == stratos::TagType::String);
+        assert((*tag)["stringTest"].as<stratos::StringTag>().get() == "HELLO WORLD THIS IS A TEST STRING ÅÄÖ!");
+
+        auto listTag = (*tag)["listTest (long)"].as<stratos::ListTag>();
+        assert(listTag.getListType() == stratos::TagType::Long);
+        assert(listTag.size() == 5);
+        assert(listTag[0].as<stratos::LongTag>().get() == 11LL);
+        assert(listTag[1].as<stratos::LongTag>().get() == 12LL);
+        assert(listTag.at(2).as<stratos::LongTag>().get() == 13LL);
+        assert(listTag[3].as<stratos::LongTag>().get() == 14LL);
+        assert(listTag[4].as<stratos::LongTag>().get() == 15LL);
+
+        assert((*tag)["doubleTest"].getType() == stratos::TagType::Double);
+        assert((*tag)["doubleTest"].as<stratos::DoubleTag>().get() == 0.49312871321823148);
+        assert((*tag)["floatTest"].getType() == stratos::TagType::Float);
+        assert((*tag)["floatTest"].as<stratos::FloatTag>().get() == 0.49823147058486938f);
+        assert((*tag)["longTest"].getType() == stratos::TagType::Long);
+        assert((*tag)["longTest"].as<stratos::LongTag>().get() == 9223372036854775807LL);
+
+        auto compoundList = (*tag)["listTest (compound)"].as<stratos::ListTag>();
+        assert(compoundList.getListType() == stratos::TagType::Compound);
+        assert(compoundList.size() == 2);
+        auto first = compoundList[0].as<stratos::CompoundTag>();
+        auto second = compoundList[1].as<stratos::CompoundTag>();
+        assert(first.hasKey("created-on"));
+        assert(second.hasKey("created-on"));
+        assert(first.hasKey("name"));
+        assert(second.hasKey("name"));
+        assert(first["created-on"].getType() == stratos::TagType::Long);
+        assert(first["name"].getType() == stratos::TagType::String);
+        assert(second["created-on"].getType() == stratos::TagType::Long);
+        assert(second["name"].getType() == stratos::TagType::String);
+
+        assert(first["created-on"].as<stratos::LongTag>().get() == 1264099775885LL);
+        assert(first["name"].as<stratos::StringTag>().get() == "Compound tag #0");
+        assert(second["created-on"].as<stratos::LongTag>().get() == 1264099775885LL);
+        assert(second["name"].as<stratos::StringTag>().get() == "Compound tag #1");
+
+        assert((*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].getType() == stratos::TagType::ByteArray);
+        assert((*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].as<stratos::ByteArrayTag>().size() == 1000);
+        auto byteArray = (*tag)["byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"].as<stratos::ByteArrayTag>();
+        for (int i = 0; i < 1000; i++) {
+            byteArray[i] == (i*i*255+i*7)%100;
+        }
+
+        assert((*tag)["shortTest"].getType() == stratos::TagType::Short);
+        assert((*tag)["shortTest"].as<stratos::ShortTag>().get() == 32767);
+    }
+}
+
 int main(const int argc, char **argv) {
     for (int i = 1; i < argc; ++i) {
         if (std::string arg = argv[i]; arg == "--network-serialization") {
@@ -606,6 +743,8 @@ int main(const int argc, char **argv) {
             stringUtilsTest();
         } else if (arg == "--byte-buffer") {
             bufferTest();
+        } else if (arg == "--nbt") {
+            nbtTest();
         }
     }
 
