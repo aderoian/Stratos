@@ -28,8 +28,8 @@ std::string                                  NBTBuffer::readTagName() {
 }
 std::pair<std::string, std::unique_ptr<Tag>> NBTBuffer::readTag() {
     auto tag = Tag::create(static_cast<TagType>(readByte()));
-    if (tag->getType() == TagType::End) return {"", nullptr}; // End tag indicates no further tags
-    std::string name = readString(readVarInt());
+    if (!tag || tag->getType() == TagType::End) return {"", nullptr}; // End tag indicates no further tags
+    std::string name = readModifiedUTF8String();
     tag->read(*this);
     return {std::move(name), std::unique_ptr<Tag>(tag.release())};
 }

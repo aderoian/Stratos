@@ -51,7 +51,7 @@ void CompoundTag::read(NBTBuffer& buffer) {
     clear();
     while (true) {
         auto [name, tag] = buffer.readTag();
-        if (tag == nullptr || tag->getType() == TagType::End) break; // End tag indicates no further tags
+        if (!tag || tag->getType() == TagType::End) break; // End tag indicates no further tags
         tags.emplace(std::move(name), std::move(tag));
     }
 }

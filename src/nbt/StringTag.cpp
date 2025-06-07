@@ -21,7 +21,7 @@
 
 #include "io/NBTBuffer.h"
 void stratos::StringTag::read(NBTBuffer& buffer) {
-    buffer.readModifiedUTF8String();
+    value = buffer.readModifiedUTF8String();
 }
 void stratos::StringTag::write(NBTBuffer& buffer) const {
     buffer.writeModifiedUTF8String(value);

@@ -99,7 +99,7 @@ class ByteBuffer {
     auto begin() { return buffer.begin(); }
     auto end() { return buffer.end(); }
     ByteVec& data() { return buffer; }
-    [[nodiscard]] ByteVec data() const { return buffer; }
+    [[nodiscard]] const ByteVec& data() const { return buffer; }
     [[nodiscard]] auto cbegin() const { return buffer.cbegin(); }
     [[nodiscard]] auto cend() const { return buffer.cend(); }
     [[nodiscard]] size_t size() const { return buffer.size(); }

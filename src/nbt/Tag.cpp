@@ -58,6 +58,8 @@ std::unique_ptr<Tag> Tag::create(const TagType type) {
         return nbtinternal::makeUnique<IntArrayTag>();
     case TagType::LongArray:
         return nbtinternal::makeUnique<LongArrayTag>();
+    case TagType::End:
+        return nullptr; // End tag is not creatable
     default:
         throw std::invalid_argument("Invalid tag type");
     }

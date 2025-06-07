@@ -26,8 +26,8 @@ class ByteBuffer;
 // Binary compression
 bool isGzip(const ByteBuffer& buffer);
 bool isZlib(const ByteBuffer& buffer);
-ByteBuffer compress(ByteBuffer input, bool gzip = false);
-ByteBuffer decompress(ByteBuffer input);
+ByteBuffer decompress(const ByteBuffer& buffer);
+ByteBuffer compress(const ByteBuffer& buffer, bool gzip = false);
 
 } // namespace stratos
 

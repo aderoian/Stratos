@@ -29,33 +29,61 @@ bool isGzip(const ByteBuffer& buffer) {
 bool isZlib(const ByteBuffer& buffer) {
     return buffer.size() >= 2 && buffer[0] == 0x78;
 }
-ByteBuffer decompress(ByteBuffer& buffer) {
-    z_stream strm = {};
-    strm.next_in  = buffer.data().data();
+ByteBuffer decompress(const ByteBuffer& buffer) {
+    // z_stream strm = {};
+    // strm.next_in  = buffer.data().data();
+    // strm.avail_in = static_cast<uInt>(buffer.size());
+    //
+    // if (inflateInit2(&strm, 15 + 16) != Z_OK) {
+    //     throw std::runtime_error("Failed to initialize zlib inflater");
+    // }
+    //
+    // ByteBuffer output;
+    // output.resize(1024 * 16);
+    // while (true) {
+    //     strm.next_out  = output.data().data() + strm.total_out;
+    //     strm.avail_out = static_cast<uInt>(output.size() - strm.total_out);
+    //
+    //     const int ret = inflate(&strm, Z_NO_FLUSH);
+    //     if (ret == Z_STREAM_END) break;
+    //     if (ret != Z_OK) {
+    //         inflateEnd(&strm);
+    //         throw std::runtime_error("Error while inflating NBT data");
+    //     }
+    //     if (strm.avail_out == 0) output.resize(output.size() * 2);
+    // }
+    //
+    // output.resize(strm.total_out);
+    // inflateEnd(&strm);
+    // return output;
+    z_stream strm{};
+    strm.next_in = const_cast<Bytef*>(buffer.data().data());
     strm.avail_in = static_cast<uInt>(buffer.size());
 
-    if (inflateInit2(&strm, 15 + 32) != Z_OK) {
-        throw std::runtime_error("Failed to initialize zlib inflater");
-    }
+    if (inflateInit2(&strm, 15 + 32) != Z_OK)
+        throw std::runtime_error("inflateInit2 failed");
 
-    ByteBuffer output;
-    output.resize(1024 * 16);
+    ByteVec output(16 * 1024);
     while (true) {
-        strm.next_out  = output.data().data() + strm.total_out;
+        strm.next_out = output.data() + strm.total_out;
         strm.avail_out = static_cast<uInt>(output.size() - strm.total_out);
 
-        const int ret = inflate(&strm, Z_NO_FLUSH);
+        int ret = inflate(&strm, Z_NO_FLUSH);
         if (ret == Z_STREAM_END) break;
         if (ret != Z_OK) {
+            std::string err = strm.msg ? strm.msg : "unknown";
             inflateEnd(&strm);
-            throw std::runtime_error("Error while inflating NBT data");
+            throw std::runtime_error("inflate failed: " + std::to_string(ret) + " (" + err + ")");
         }
-        if (strm.avail_out == 0) output.resize(output.size() * 2);
+
+        if (strm.avail_out == 0) {
+            output.resize(output.size() * 2);
+        }
     }
 
     output.resize(strm.total_out);
     inflateEnd(&strm);
-    return output;
+    return ByteBuffer(output);
 }
 ByteBuffer compress(const ByteBuffer& buffer, const bool gzip) {
     z_stream strm = {};
@@ -66,7 +94,7 @@ ByteBuffer compress(const ByteBuffer& buffer, const bool gzip) {
     if (const int windowBits = gzip ? (15 + 16) : 15; deflateInit2(&strm, level, Z_DEFLATED, windowBits, 8, Z_DEFAULT_STRATEGY) != Z_OK)
         throw std::runtime_error("Failed to initialize zlib compressor");
 
-    strm.next_in = buffer.data().data();
+    strm.next_in = const_cast<Bytef*>(buffer.data().data());
     strm.avail_in = static_cast<uInt>(buffer.size());
     ByteBuffer output;
     output.resize(1024);

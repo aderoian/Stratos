@@ -77,7 +77,7 @@ void ListTag::read(NBTBuffer& buffer) {
     if (tagType == TagType::End) return;
     int length = buffer.readInt();
     while (length--) {
-        auto tag = Tag::create(static_cast<TagType>(buffer.readByte()));
+        auto tag = Tag::create(tagType);
         tag->read(buffer);
         push_back(TagValueInitializer(std::move(tag)));
     }
