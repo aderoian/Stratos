@@ -34,20 +34,36 @@ std::unique_ptr<Tag> Tag::clone() && {
 }
 std::unique_ptr<Tag> Tag::create(const TagType type) {
     switch (type) {
-    case TagType::Byte: return nbtinternal::makeUnique<ByteTag>();
-    case TagType::Short: return nbtinternal::makeUnique<ShortTag>();
-    case TagType::Int: return nbtinternal::makeUnique<IntTag>();
-    case TagType::Long: return nbtinternal::makeUnique<LongTag>();
-    case TagType::Float: return nbtinternal::makeUnique<FloatTag>();
-    case TagType::Double: return nbtinternal::makeUnique<DoubleTag>();
-    case TagType::ByteArray: return nbtinternal::makeUnique<ByteArrayTag>();
-    case TagType::String: return nbtinternal::makeUnique<StringTag>();
-    case TagType::List: return nbtinternal::makeUnique<ListTag>();
-    case TagType::Compound: return nbtinternal::makeUnique<CompoundTag>();
-    case TagType::IntArray: return nbtinternal::makeUnique<IntArrayTag>();
-    case TagType::LongArray: return nbtinternal::makeUnique<LongArrayTag>();
-    default: throw std::invalid_argument("Invalid tag type");
+    case TagType::Byte:
+        return nbtinternal::makeUnique<ByteTag>();
+    case TagType::Short:
+        return nbtinternal::makeUnique<ShortTag>();
+    case TagType::Int:
+        return nbtinternal::makeUnique<IntTag>();
+    case TagType::Long:
+        return nbtinternal::makeUnique<LongTag>();
+    case TagType::Float:
+        return nbtinternal::makeUnique<FloatTag>();
+    case TagType::Double:
+        return nbtinternal::makeUnique<DoubleTag>();
+    case TagType::ByteArray:
+        return nbtinternal::makeUnique<ByteArrayTag>();
+    case TagType::String:
+        return nbtinternal::makeUnique<StringTag>();
+    case TagType::List:
+        return nbtinternal::makeUnique<ListTag>();
+    case TagType::Compound:
+        return nbtinternal::makeUnique<CompoundTag>();
+    case TagType::IntArray:
+        return nbtinternal::makeUnique<IntArrayTag>();
+    case TagType::LongArray:
+        return nbtinternal::makeUnique<LongArrayTag>();
+    default:
+        throw std::invalid_argument("Invalid tag type");
     }
+}
+bool Tag::equals(const Tag& other) const {
+
 }
 bool                 operator==(const Tag& lhs, const Tag& rhs) { return typeid(lhs) == typeid(rhs) && lhs.equals(rhs); }
 bool                 operator!=(const Tag& lhs, const Tag& rhs) { return !(lhs == rhs); }

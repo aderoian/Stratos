@@ -18,10 +18,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 set(SOURCES
         Server.cpp
         nbt/io/NBTBuffer.cpp
-        nbt/io/NBTCompression.cpp
         nbt/CompoundTag.cpp
         nbt/ListTag.cpp
-        nbt/NBTValue.cpp
+        nbt/Value.cpp
         nbt/StringTag.cpp
         nbt/Tag.cpp
         network/Network.cpp
@@ -35,6 +34,7 @@ set(SOURCES
         utils/crypto/CryptoUtils.cpp
         utils/hash/MD5.cpp
         utils/io/ByteBuffer.cpp
+        utils/io/CompressionUtils.cpp
         utils/io/FileUtils.cpp
         utils/StringUtils.cpp
 )
@@ -42,11 +42,10 @@ set(SOURCES
 set(HEADERS
         Server.h
         nbt/io/NBTBuffer.h
-        nbt/io/NBTCompression.h
         nbt/ArrayTag.h
         nbt/CompoundTag.h
         nbt/ListTag.h
-        nbt/NBTValue.h
+        nbt/Value.h
         nbt/PrimitiveTag.h
         nbt/StringTag.h
         nbt/Tag.h
@@ -62,6 +61,7 @@ set(HEADERS
         utils/hash/MD5.h
         utils/io/FileUtils.h
         utils/io/ByteBuffer.h
+        utils/io/CompressionUtils.h
         utils/MathUtils.h
         utils/StringUtils.h
         utils/TimeUtils.h

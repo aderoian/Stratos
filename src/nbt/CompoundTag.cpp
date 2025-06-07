@@ -20,27 +20,27 @@
 #import "CompoundTag.h"
 
 #include "io/NBTBuffer.h"
-#import "NBTValue.h"
+#import "Value.h"
 
 namespace stratos {
 
 CompoundTag::CompoundTag(std::initializer_list<std::pair<std::string, TagValueInitializer>> init) {
     for (const auto& [name, value] : init) {
-        tags.emplace(std::move(name), std::move(value));
+        tags.emplace(name, value);
     }
 }
 TagValue& CompoundTag::at(const std::string& key) { return tags.at(key); }
 const TagValue& CompoundTag::at(const std::string& key) const {
     return tags.at(key);
 }
-std::pair<CompoundTag::iterator, bool> CompoundTag::put(const std::string& key, TagValueInitializer&& val) {
+std::pair<CompoundTag::Iterator, bool> CompoundTag::put(const std::string& key, TagValueInitializer&& val) {
     if (auto it = tags.find(key); it != tags.end()) {
         it->second = std::move(val);
         return {it, false};
     }
     return tags.emplace(key, std::move(val));
 }
-std::pair<CompoundTag::iterator, bool> CompoundTag::insert(const std::string& key, TagValueInitializer&& val) { return tags.emplace(key, std::move(val)); }
+std::pair<CompoundTag::Iterator, bool> CompoundTag::insert(const std::string& key, TagValueInitializer&& val) { return tags.emplace(key, std::move(val)); }
 bool CompoundTag::erase(const std::string& key) { return tags.erase(key) != 0;}
 bool CompoundTag::hasKey(const std::string& key) const { return tags.contains(key); }
 bool                                   CompoundTag::hasKey(const std::string& key, const TagType type) const {

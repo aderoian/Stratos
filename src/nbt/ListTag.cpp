@@ -20,34 +20,34 @@
 #include "ListTag.h"
 
 #include "io/NBTBuffer.h"
-#include "NBTValue.h"
 #include "PrimitiveTag.h"
 #include "StringTag.h"
+#include "Value.h"
 
 namespace stratos {
 
-ListTag::ListTag(const std::initializer_list<int8_t> init) { ListTag::init<ByteTag>(init); }
-ListTag::ListTag(const std::initializer_list<int16_t> init) { ListTag::init<ShortTag>(init); }
-ListTag::ListTag(const std::initializer_list<int32_t> init) { ListTag::init<IntTag>(init); }
-ListTag::ListTag(const std::initializer_list<int64_t> init) { ListTag::init<LongTag>(init); }
-ListTag::ListTag(const std::initializer_list<float> init) { ListTag::init<FloatTag>(init); }
-ListTag::ListTag(const std::initializer_list<double> init) { ListTag::init<DoubleTag>(init); }
-ListTag::ListTag(const std::initializer_list<std::string> init) { ListTag::init<StringTag>(init); }
-ListTag::ListTag(const std::initializer_list<ByteArrayTag> init) { ListTag::init<ByteArrayTag>(init); }
-ListTag::ListTag(const std::initializer_list<ListTag> init) { ListTag::init<ListTag>(init); }
-ListTag::ListTag(const std::initializer_list<CompoundTag> init) { ListTag::init<CompoundTag>(init); }
-ListTag::ListTag(const std::initializer_list<IntArrayTag> init) { ListTag::init<IntArrayTag>(init); }
-ListTag::ListTag(const std::initializer_list<LongArrayTag> init) { ListTag::init<LongArrayTag>(init); }
-ListTag::ListTag(const std::initializer_list<TagValue> init) {
-    if (init.size() == 0) {
+ListTag::ListTag(const std::initializer_list<int8_t> il) { init<ByteTag>(il); }
+ListTag::ListTag(const std::initializer_list<int16_t> il) { init<ShortTag>(il); }
+ListTag::ListTag(const std::initializer_list<int32_t> il) { init<IntTag>(il); }
+ListTag::ListTag(const std::initializer_list<int64_t> il) { init<LongTag>(il); }
+ListTag::ListTag(const std::initializer_list<float> il) { init<FloatTag>(il); }
+ListTag::ListTag(const std::initializer_list<double> il) { init<DoubleTag>(il); }
+ListTag::ListTag(const std::initializer_list<std::string> il) { init<StringTag>(il); }
+ListTag::ListTag(const std::initializer_list<ByteArrayTag> il) { init<ByteArrayTag>(il); }
+ListTag::ListTag(const std::initializer_list<ListTag> il) { init<ListTag>(il); }
+ListTag::ListTag(const std::initializer_list<CompoundTag> il) { init<CompoundTag>(il); }
+ListTag::ListTag(const std::initializer_list<IntArrayTag> il) { init<IntArrayTag>(il); }
+ListTag::ListTag(const std::initializer_list<LongArrayTag> il) { init<LongArrayTag>(il); }
+ListTag::ListTag(const std::initializer_list<TagValue> il) {
+    if (il.size() == 0) {
         tagType = TagType::Null; // empty list
     } else {
-        tagType = init.begin()->getType(); // set content type from first element
-        tags.reserve(init.size());
-        for (const auto& val : init) {
+        tagType = il.begin()->getType(); // set content type from first element
+        tags.reserve(il.size());
+        for (const auto& val : il) {
             if (tagType != val.getType()) throw std::invalid_argument("The tag type does not match the list's content type");
         }
-        tags.assign(init.begin(), init.end());
+        tags.assign(il.begin(), il.end());
     }
 }
 TagValue&       ListTag::at(size_t i) { return tags.at(i); }

@@ -29,34 +29,34 @@ class TagValueInitializer;
 class CompoundTag final : public CRTPTag<CompoundTag> {
     typedef std::map<std::string, TagValue> TagMap;
 public:
-    typedef TagMap::iterator iterator;
-    typedef TagMap::const_iterator constantIterator;
+    typedef TagMap::iterator Iterator;
+    typedef TagMap::const_iterator ConstantIterator;
 
-    CompoundTag() {}
+    CompoundTag() = default;
     CompoundTag(std::initializer_list<std::pair<std::string, TagValueInitializer>> init);
 
     TagValue& at(const std::string& key);
-    const TagValue& at(const std::string& key) const;
+    [[nodiscard]] const TagValue& at(const std::string& key) const;
 
     TagValue& operator[](const std::string& key) { return tags[key]; }
 
-    std::pair<iterator, bool> put(const std::string& key, TagValueInitializer&& val);
-    std::pair<iterator, bool> insert(const std::string& key, TagValueInitializer&& val);
+    std::pair<Iterator, bool> put(const std::string& key, TagValueInitializer&& val);
+    std::pair<Iterator, bool> insert(const std::string& key, TagValueInitializer&& val);
     template<class T, class... Args>
-    std::pair<iterator, bool> emplace(const std::string& key, Args&&... args);
+    std::pair<Iterator, bool> emplace(const std::string& key, Args&&... args);
     bool erase(const std::string& key);
-    size_t size() const { return tags.size(); }
+    [[nodiscard]] size_t size() const { return tags.size(); }
     void clear() { tags.clear(); }
 
-    bool hasKey(const std::string& key) const;
-    bool hasKey(const std::string& key, TagType type) const;
+    [[nodiscard]] bool hasKey(const std::string& key) const;
+    [[nodiscard]] bool hasKey(const std::string& key, TagType type) const;
 
-    iterator begin() { return tags.begin(); }
-    iterator end()   { return tags.end(); }
-    constantIterator begin() const  { return tags.begin(); }
-    constantIterator end() const    { return tags.end(); }
-    constantIterator cbegin() const { return tags.cbegin(); }
-    constantIterator cend() const   { return tags.cend(); }
+    Iterator begin() { return tags.begin(); }
+    Iterator end()   { return tags.end(); }
+    [[nodiscard]] ConstantIterator begin() const  { return tags.begin(); }
+    [[nodiscard]] ConstantIterator end() const    { return tags.end(); }
+    [[nodiscard]] ConstantIterator cbegin() const { return tags.cbegin(); }
+    [[nodiscard]] ConstantIterator cend() const   { return tags.cend(); }
 
     void read(NBTBuffer& buffer) override;
     void write(NBTBuffer& buffer) const override;
@@ -69,7 +69,7 @@ private:
 };
 
 template<class T, class... Args>
-std::pair<CompoundTag::iterator, bool> CompoundTag::emplace(const std::string& key, Args&&... args) {
+std::pair<CompoundTag::Iterator, bool> CompoundTag::emplace(const std::string& key, Args&&... args) {
     return put(key, TagValue(make_unique<T>(std::forward<Args>(args)...)));
 }
 }

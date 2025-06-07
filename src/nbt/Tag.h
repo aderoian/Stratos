@@ -56,9 +56,9 @@ std::unique_ptr<T> makeUnique(Args&&... args) {
 class Tag {
 public:
     virtual ~Tag() = default;
-    virtual TagType getType() const = 0;
+    [[nodiscard]] virtual TagType getType() const = 0;
 
-    virtual std::unique_ptr<Tag> clone() const& = 0;
+    [[nodiscard]] virtual std::unique_ptr<Tag> clone() const& = 0;
     virtual std::unique_ptr<Tag> moveClone() && = 0;
     std::unique_ptr<Tag> clone() &&;
 
@@ -78,7 +78,7 @@ public:
     friend bool operator!=(const Tag& lhs, const Tag& rhs);
 
 private:
-    virtual bool equals(const Tag& other) const = 0;
+    [[nodiscard]] virtual bool equals(const Tag& other) const = 0;
 };
 
 template<class T>
@@ -96,22 +96,22 @@ template <class Sub>
 class CRTPTag : public Tag {
 public:
     ~CRTPTag() noexcept override = 0; // Ensure CRTPTag is abstract
-    TagType getType() const noexcept final { return Sub::type; }
+    [[nodiscard]] TagType getType() const noexcept final { return Sub::type; }
 
-    std::unique_ptr<Tag> clone() const& final { return nbtinternal::makeUnique<Sub>(SubThis()); }
+    [[nodiscard]] std::unique_ptr<Tag> clone() const& final { return nbtinternal::makeUnique<Sub>(SubThis()); }
     std::unique_ptr<Tag> moveClone() && final { return nbtinternal::makeUnique<Sub>(std::move(SubThis())); }
 
     Tag& assign(Tag&& rhs) final { return SubThis() = dynamic_cast<Sub&&>(rhs); }
 
 private:
-    bool equals(const Tag& rhs) const final { return SubThis() == static_cast<const Sub&>(rhs); }
+    [[nodiscard]] bool equals(const Tag& rhs) const final { return SubThis() == static_cast<const Sub&>(rhs); }
 
     Sub& SubThis() { return static_cast<Sub&>(*this); }
     const Sub& SubThis() const { return static_cast<const Sub&>(*this); }
 };
 
 template<class Sub>
-CRTPTag<Sub>::~CRTPTag() noexcept override {}
+CRTPTag<Sub>::~CRTPTag() noexcept override = default;
 
 }
 

@@ -19,6 +19,7 @@
 
 #ifndef ARRAYTAG_H
 #define ARRAYTAG_H
+#include "io/NBTBuffer.h"
 #include "Tag.h"
 
 #include <vector>
@@ -39,8 +40,8 @@ template <class T> class ArrayTag final : public CRTPTag<ArrayTag<T>> {
     typedef T                ValueType;
     static constexpr TagType type = nbtinternal::getArrayType<T>::value;
 
-    ArrayTag() {};
-    explicit ArrayTag(std::initializer_list<T> init) : data(init) {}
+    ArrayTag() = default;
+    ArrayTag(std::initializer_list<T> init) : data(init) {}
     explicit ArrayTag(std::vector<T>&& vec) noexcept : data(std::move(vec)) {}
 
     std::vector<T>&       get() { return data; }
@@ -54,7 +55,7 @@ template <class T> class ArrayTag final : public CRTPTag<ArrayTag<T>> {
 
     void   push_back(T val) { data.push_back(val); }
     void   pop_back() { data.pop_back(); }
-    size_t size() const { return data.size(); }
+    [[nodiscard]] size_t size() const { return data.size(); }
     void   clear() { data.clear(); }
 
     iterator      begin() { return data.begin(); }
@@ -64,13 +65,13 @@ template <class T> class ArrayTag final : public CRTPTag<ArrayTag<T>> {
     constIterator cbegin() const { return data.cbegin(); }
     constIterator cend() const { return data.cend(); }
 
-    void read(ByteBuffer& buffer) override;
-    void write(ByteBuffer& buffer) const override;
+    void read(NBTBuffer& buffer) override;
+    void write(NBTBuffer& buffer) const override;
 
   private:
     std::vector<T> data;
 };
-template <class T> void ArrayTag<T>::read(ByteBuffer& buffer) {
+template <class T> void ArrayTag<T>::read(NBTBuffer& buffer) {
     clear();
     int size = buffer.readInt();
     data.reserve(size);
@@ -97,7 +98,7 @@ template <class T> void ArrayTag<T>::read(ByteBuffer& buffer) {
         throw std::runtime_error("Invalid array tag type");
     }
 }
-template <class T> void ArrayTag<T>::write(ByteBuffer& buffer) const {
+template <class T> void ArrayTag<T>::write(NBTBuffer& buffer) const {
     buffer.writeInt(data.size());
     switch (type) {
     case TagType::ByteArray: {

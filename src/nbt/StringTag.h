@@ -22,18 +22,18 @@
 #include "Tag.h"
 
 namespace stratos {
-class StringTag final : CRTPTag<StringTag> {
+class StringTag final : public CRTPTag<StringTag> {
   public:
     static constexpr auto type = TagType::String;
 
-    StringTag() {}
+    StringTag() = default;
     explicit StringTag(const std::string& str) : value(str) {}
     explicit StringTag(std::string&& str) noexcept : value(std::move(str)) {}
     explicit StringTag(const char* str) : value(str) {}
 
     explicit           operator std::string&() { return value; }
     explicit           operator const std::string&() const { return value; }
-    const std::string& get() const { return value; }
+    [[nodiscard]] const std::string& get() const { return value; }
 
     StringTag& operator=(const std::string& str) {
         value = str;

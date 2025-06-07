@@ -28,10 +28,10 @@
 namespace stratos {
 class TagValue;
 class TagValueInitializer;
-class ListTag final : CRTPTag<ListTag> {
+class ListTag final : public CRTPTag<ListTag> {
 public:
-    typedef std::vector<TagValue>::iterator iterator;
-    typedef std::vector<TagValue>::const_iterator constIterator;
+    typedef std::vector<TagValue>::iterator Iterator;
+    typedef std::vector<TagValue>::const_iterator ConstIterator;
 
     static constexpr auto type = TagType::List;
 
@@ -41,23 +41,23 @@ public:
     ListTag(): ListTag(TagType::Null) {}
     explicit ListTag(const TagType type) : tagType(type) {}
 
-    ListTag(std::initializer_list<int8_t> init);
-    ListTag(std::initializer_list<int16_t> init);
-    ListTag(std::initializer_list<int32_t> init);
-    ListTag(std::initializer_list<int64_t> init);
-    ListTag(std::initializer_list<float> init);
-    ListTag(std::initializer_list<double> init);
-    ListTag(std::initializer_list<std::string> init);
-    ListTag(std::initializer_list<ByteArrayTag> init);
-    ListTag(std::initializer_list<ListTag> init);
-    ListTag(std::initializer_list<CompoundTag> init);
-    ListTag(std::initializer_list<IntArrayTag> init);
-    ListTag(std::initializer_list<LongArrayTag> init);
+    ListTag(std::initializer_list<int8_t> il);
+    ListTag(std::initializer_list<int16_t> il);
+    ListTag(std::initializer_list<int32_t> il);
+    ListTag(std::initializer_list<int64_t> il);
+    ListTag(std::initializer_list<float> il);
+    ListTag(std::initializer_list<double> il);
+    ListTag(std::initializer_list<std::string> il);
+    ListTag(std::initializer_list<ByteArrayTag> il);
+    ListTag(std::initializer_list<ListTag> il);
+    ListTag(std::initializer_list<CompoundTag> il);
+    ListTag(std::initializer_list<IntArrayTag> il);
+    ListTag(std::initializer_list<LongArrayTag> il);
 
-    ListTag(std::initializer_list<TagValue> init);
+    ListTag(std::initializer_list<TagValue> il);
 
     TagValue& at(size_t i);
-    const TagValue& at(size_t i) const;
+    [[nodiscard]] const TagValue& at(size_t i) const;
 
     TagValue& operator[](size_t i) { return tags[i]; }
     const TagValue& operator[](size_t i) const { return tags[i]; }
@@ -67,18 +67,18 @@ public:
     template<class T, class... Args>
     void emplace_back(Args&&... args);
     void pop_back() { tags.pop_back(); }
-    size_t size() const { return tags.size(); }
+    [[nodiscard]] size_t size() const { return tags.size(); }
     void clear() { tags.clear(); }
     void reset(TagType type = TagType::Null);
 
-    iterator begin() { return tags.begin(); }
-    iterator end()   { return tags.end(); }
-    constIterator begin() const  { return tags.begin(); }
-    constIterator end() const    { return tags.end(); }
-    constIterator cbegin() const { return tags.cbegin(); }
-    constIterator cend() const   { return tags.cend(); }
+    Iterator begin() { return tags.begin(); }
+    Iterator end()   { return tags.end(); }
+    [[nodiscard]] ConstIterator begin() const  { return tags.begin(); }
+    [[nodiscard]] ConstIterator end() const    { return tags.end(); }
+    [[nodiscard]] ConstIterator cbegin() const { return tags.cbegin(); }
+    [[nodiscard]] ConstIterator cend() const   { return tags.cend(); }
 
-    TagType getListType() const { return tagType; }
+    [[nodiscard]] TagType getListType() const { return tagType; }
 
     void read(NBTBuffer& buffer) override;
     void write(NBTBuffer& buffer) const override;
