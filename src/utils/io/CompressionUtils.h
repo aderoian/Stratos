@@ -17,20 +17,18 @@
  *
  */
 
-#ifndef NBTCOMPRESSION_H
-#define NBTCOMPRESSION_H
+#ifndef COMPRESSIONUTILS_H
+#define COMPRESSIONUTILS_H
 
 namespace stratos {
 class ByteBuffer;
-}
-namespace stratos {
 
+// Binary compression
 bool isGzip(const ByteBuffer& buffer);
 bool isZlib(const ByteBuffer& buffer);
-
-ByteBuffer decompress(ByteBuffer& buffer);
-ByteBuffer compress(const ByteBuffer& buffer, bool gzip = false);
+ByteBuffer compress(ByteBuffer input, bool gzip = false);
+ByteBuffer decompress(ByteBuffer input);
 
 } // namespace stratos
 
-#endif //NBTCOMPRESSION_H
+#endif //COMPRESSIONUTILS_H

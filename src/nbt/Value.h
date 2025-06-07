@@ -25,14 +25,14 @@ namespace stratos {
 
 class TagValue {
 public:
-    TagValue() noexcept {}
+    TagValue() noexcept = default;
     explicit TagValue(std::unique_ptr<Tag>&& t) noexcept: tag(std::move(t)) {}
     explicit TagValue(Tag&& t);
 
     TagValue(TagValue&&) noexcept = default;
     TagValue& operator=(TagValue&&) noexcept = default;
 
-    explicit TagValue(const TagValue& rhs);
+    TagValue(const TagValue& rhs);
     TagValue& operator=(const TagValue& rhs);
 
     TagValue& operator=(Tag&& t);
@@ -41,7 +41,7 @@ public:
     explicit operator Tag&() { return get(); }
     explicit operator const Tag&() const { return get(); }
     Tag& get() { return *tag; }
-    const Tag& get() const { return *tag; }
+    [[nodiscard]] const Tag& get() const { return *tag; }
 
     template<class T>
     T& as();
@@ -70,22 +70,22 @@ public:
     explicit operator bool() const { return tag != nullptr; }
 
     TagValue& at(const std::string& key);
-    const TagValue& at(const std::string& key) const;
+    [[nodiscard]] const TagValue& at(const std::string& key) const;
 
     TagValue& operator[](const std::string& key);
     TagValue& operator[](const char* key); //need this overload because of conflict with built-in operator[]
 
     TagValue& at(size_t i);
-    const TagValue& at(size_t i) const;
+    [[nodiscard]] const TagValue& at(size_t i) const;
 
     TagValue& operator[](size_t i);
     const TagValue& operator[](size_t i) const;
 
     std::unique_ptr<Tag>& get_ptr() { return tag; }
-    const std::unique_ptr<Tag>& get_ptr() const { return tag; }
+    [[nodiscard]] const std::unique_ptr<Tag>& get_ptr() const { return tag; }
     void set_ptr(std::unique_ptr<Tag>&& t) { tag = std::move(t); }
 
-    TagType getType() const;
+    [[nodiscard]] TagType getType() const;
 
     friend bool operator==(const TagValue& lhs, const TagValue& rhs);
     friend bool operator!=(const TagValue& lhs, const TagValue& rhs);

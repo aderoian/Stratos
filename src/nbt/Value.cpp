@@ -17,12 +17,11 @@
  *
  */
 
-#include "NBTValue.h"
-
 #include "CompoundTag.h"
 #include "ListTag.h"
 #include "PrimitiveTag.h"
 #include "StringTag.h"
+#include "Value.h"
 
 namespace stratos {
 TagValue::TagValue(Tag&& t) { tag = std::move(t).moveClone(); }

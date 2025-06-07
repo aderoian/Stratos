@@ -17,9 +17,8 @@
  *
  */
 
-#include "NBTCompression.h"
-
-#include "utils/io/ByteBuffer.h"
+#include "ByteBuffer.h"
+#include "CompressionUtils.h"
 #include "zlib.h"
 
 namespace stratos {
