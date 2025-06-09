@@ -19,6 +19,7 @@
 
 #ifndef PACKETSERIALIZATION_H
 #define PACKETSERIALIZATION_H
+#include "math/Ints.h"
 #include "utils/Types.h"
 
 #include <array>
@@ -45,8 +46,10 @@ int constexpr CONTINUE_BIT = 0x80;
 bool                  readBoolean(const ByteVec& buffer, size_t& offset);
 int8_t                readByte(const ByteVec& buffer, size_t& offset);
 uint8_t               readUnsignedByte(const ByteVec& buffer, size_t& offset);
+math::int12_t         readInt12(const ByteVec& buffer, size_t& offset);
 short                 readShort(const ByteVec& buffer, size_t& offset);
 uint16_t              readUnsignedShort(const ByteVec& buffer, size_t& offset);
+math::int26_t         readInt26(const ByteVec& buffer, size_t& offset);
 int                   readInt(const ByteVec& buffer, size_t& offset);
 int64_t               readLong(const ByteVec& buffer, size_t& offset);
 float                 readFloat(const ByteVec& buffer, size_t& offset);
@@ -62,8 +65,10 @@ ByteVec               readByteArray(const ByteVec& buffer, size_t& offset, size_
 void writeBoolean(ByteVec& buffer, bool value);
 void writeByte(ByteVec& buffer, int8_t value);
 void writeUnsignedByte(ByteVec& buffer, uint8_t value);
+void writeInt12(ByteVec& buffer, math::int12_t value);
 void writeShort(ByteVec& buffer, short value);
 void writeUnsignedShort(ByteVec& buffer, uint16_t value);
+void writeInt26(ByteVec& buffer, math::int26_t value);
 void writeInt(ByteVec& buffer, int value);
 void writeLong(ByteVec& buffer, int64_t value);
 void writeFloat(ByteVec& buffer, float value);

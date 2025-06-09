@@ -40,6 +40,12 @@ uint8_t stratos::readUnsignedByte(const ByteVec& buffer, size_t& offset) {
     const auto value = static_cast<uint8_t>(buffer[offset++]);
     return value;
 }
+stratos::math::int12_t stratos::readInt12(const ByteVec& buffer, size_t& offset) {
+    isReadable(buffer, offset, sizeof(math::int12_t));
+    uint16_t val = static_cast<uint16_t>(buffer[offset++]) << 4 | buffer[offset++] >> 4;
+    if (val & (1 << 11)) val |= 0xF000;
+    return static_cast<int16_t>(val);
+}
 short stratos::readShort(const ByteVec& buffer, size_t& offset) {
     isReadable(buffer, offset, sizeof(short));
     const auto high = static_cast<int16_t>(buffer[offset++]);
@@ -51,6 +57,12 @@ uint16_t stratos::readUnsignedShort(const ByteVec& buffer, size_t& offset) {
     const auto high = static_cast<uint16_t>(buffer[offset++]);
     const auto low  = static_cast<uint16_t>(buffer[offset++]);
     return static_cast<uint16_t>(high << 8 | low & 0xFF);
+}
+stratos::math::int26_t stratos::readInt26(const ByteVec& buffer, size_t& offset) {
+    isReadable(buffer, offset, sizeof(math::int12_t));
+    uint32_t val =buffer[offset++] << 18 | buffer[offset++] << 10 | buffer[offset++] << 2  | buffer[offset++] >> 6;
+    if (val & 1 << 25) val |= 0xFC000000;
+    return static_cast<int32_t>(val);
 }
 int stratos::readInt(const ByteVec& buffer, size_t& offset) {
     isReadable(buffer, offset, sizeof(int));
@@ -113,6 +125,12 @@ void stratos::writeByte(ByteVec& buffer, const int8_t value) {
 void stratos::writeUnsignedByte(ByteVec& buffer, const uint8_t value) {
     buffer.push_back(value);
 }
+void stratos::writeInt12(ByteVec& buffer, const math::int12_t value) {
+    if (value < -2048 || value > 2047) throw std::out_of_range("Value out of int12 range");
+    const uint16_t uval = static_cast<uint16_t>(value & 0x0FFF);
+    buffer.push_back(uval >> 4 & 0xFF);
+    buffer.push_back(uval << 4 & 0xF0);
+}
 void stratos::writeShort(ByteVec& buffer, const short value) {
     buffer.push_back(static_cast<unsigned char>(value >> 8 & 0xFF));
     buffer.push_back(static_cast<unsigned char>(value & 0xFF));
@@ -120,6 +138,14 @@ void stratos::writeShort(ByteVec& buffer, const short value) {
 void stratos::writeUnsignedShort(ByteVec& buffer, const uint16_t value) {
     buffer.push_back(static_cast<unsigned char>(value >> 8 & 0xFF));
     buffer.push_back(static_cast<unsigned char>(value & 0xFF));
+}
+void stratos::writeInt26(ByteVec& buffer, const math::int26_t value) {
+    if (value < -(1 << 25) || value >= 1 << 25) throw std::out_of_range("Value out of int26 range");
+    const uint32_t uval = static_cast<uint32_t>(value & 0x03FFFFFF);
+    buffer.push_back(uval >> 18 & 0xFF);
+    buffer.push_back(uval >> 10 & 0xFF);
+    buffer.push_back(uval >> 2  & 0xFF);
+    buffer.push_back(uval << 6  & 0xC0);
 }
 void stratos::writeInt(ByteVec& buffer, const int value) {
     buffer.push_back(static_cast<unsigned char>(value >> 24 & 0xFF));

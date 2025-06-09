@@ -34,6 +34,7 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        math/Ints.h
         network/Network.h
         network/session/NetworkClient.h
         network/session/SessionAuth.h
