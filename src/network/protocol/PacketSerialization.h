@@ -141,8 +141,10 @@ class PacketBuffer {
     std::vector<LoginProperty> readLoginProperty();
     std::optional<std::string> readPrefixedOptionalString(int maxChars);
     std::vector<uint8_t> readInferredByteArray();
+    ResourcePackHeader readResourcePackHeader();
     std::optional<std::vector<uint8_t>> readPrefixedOptionalInferredByteArray();
     std::optional<std::vector<uint8_t>> readPrefixedOptionalPrefixedByteArray();
+    std::vector<ResourcePackHeader> readPrefixedResourcePackHeaderArray();
 
     void writeBoolean(const bool value) { stratos::writeBoolean(buffer, value); }
     void writeByte(const int8_t value) { stratos::writeByte(buffer, value); }
@@ -169,12 +171,24 @@ class PacketBuffer {
     void writeUUID(const UUID& uuid);
     void writeBitSet(const std::vector<uint64_t>& longs) { stratos::writeBitSet(buffer, longs); }
     void writeFixedBitSet(const std::vector<bool>& bits, const size_t length) { stratos::writeFixedBitSet(buffer, bits, length); }
-    void                       writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
+    void writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
     void writePrefixedByteArray(const std::vector<uint8_t>& bytes);
     void writeLoginProperty(const std::vector<LoginProperty>& properties);
+    void writeResourcePackHeader(const ResourcePackHeader& header);
+    void writeRegistryEntry(const RegistryEntry& entry);
+    void writeRegistryTagData(const RegistryTagData& data);
+    void writeReportDetail(const ReportDetail& detail);
+    void writeServerLink(const ServerLink& link);
     void writePrefixedOptionalString(const std::optional<std::string>& str, int maxChars);
+    void writePrefixedOptionalUUID(const std::optional<UUID>& uuid);
     void writePrefixedOptionalByteArray(const std::optional<std::vector<uint8_t>>& bytes);
     void writePrefixedOptionalPrefixedByteArray(const std::optional<std::vector<uint8_t>>& bytes);
+    void writePrefixedResourcePackHeaderArray(const std::vector<ResourcePackHeader>& headers);
+    void writePrefixedRegistryEntryArray(const std::vector<RegistryEntry>& entries);
+    void writePrefixedRegistryTagDataArray(const std::vector<RegistryTagData>& data);
+    void writePrefixedIdentifierArray(const std::vector<Identifier>& identifiers);
+    void writePrefixedReportDetailArray(const std::vector<ReportDetail>& details);
+    void writePrefixedServerLinkArray(const std::vector<ServerLink>& serverLinks);
 
     [[nodiscard]] const ByteVec& getBuffer() const { return buffer; }
     [[nodiscard]] size_t         getOffset() const { return offset; }

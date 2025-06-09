@@ -19,10 +19,13 @@
 
 #ifndef TYPES_H
 #define TYPES_H
+#include <cstdint>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace stratos {
+using ByteVec = std::vector<uint8_t>;
 
 struct Identifier {
     std::string namespaceName;
@@ -43,6 +46,80 @@ struct LoginProperty {
     std::string name; // String(16)
     std::string value; // String(32767)
     std::optional<std::string> signature; // String(1024), prefixed optional
+};
+
+enum class ChatMode {
+    Enabled = 0,
+    CommandsOnly = 1,
+    Hidden = 2
+};
+
+enum class Hand {
+    Left = 0,
+    Right = 1
+};
+
+enum class ParticleStatus {
+    All = 0,
+    Decreased = 1,
+    Minimal = 2
+};
+
+enum class ResourcePackResult {
+    SuccessfullyDownloaded = 0,
+    Declined = 1,
+    FailedDownload = 2,
+    Accepted = 3,
+    Downloaded = 4,
+    InvalidURL = 5,
+    FailedReload = 6,
+    Discarded = 7
+};
+
+struct ResourcePackHeader {
+    std::string packNamespace;
+    std::string id;
+    std::string version;
+};
+
+struct RegistryEntry {
+    Identifier id;
+    std::optional<ByteVec> data; // TODO: replace this with a NBT tag
+};
+
+struct RegistryTag {
+    Identifier tagKey;
+    int id;
+};
+
+struct RegistryTagData {
+    Identifier registryKey;
+    std::vector<RegistryTag> entries;
+};
+
+struct ReportDetail {
+    std::string title;
+    std::string description;
+};
+
+enum class LinkLabel {
+    BugReport = 0,
+    CommunityGuidelines = 1,
+    Support = 2,
+    Status = 3,
+    Feedback = 4,
+    Community = 5,
+    Website = 6,
+    Forums = 7,
+    News = 8,
+    Announcements = 9
+};
+
+struct ServerLink {
+    bool isDefault; // Not sent over network
+    LinkLabel defaultLabel;
+    std::string customLabel; // Text Component
+    std::string url;
 };
 
 }

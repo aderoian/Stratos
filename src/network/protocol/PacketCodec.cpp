@@ -22,6 +22,7 @@
 #include "../session/NetworkClient.h"
 #include "network/Network.h"
 #include "network/session/SessionAuth.h"
+#include "nlohmann/detail/input/parser.hpp"
 #include "PacketSerialization.h"
 #include "Server.h"
 #include "utils/config/Config.h"
@@ -50,12 +51,12 @@ void stratos::LegacyServerListPing::decrypt(PacketBuffer& buffer) {
     payload = buffer.readByte();
 
     // None of this matters, but we need to read the payload to avoid deserialization errors
-    buffer.readByte(); // Packet identifier
+    buffer.readByte();          // Packet identifier
     buffer.readStringUTF16BE(); // MC|Pinghost
-    buffer.readShort(); // Remaining length
-    buffer.readByte(); // Protocol version
+    buffer.readShort();         // Remaining length
+    buffer.readByte();          // Protocol version
     buffer.readStringUTF16BE(); // Server address
-    buffer.readInt(); // Server port
+    buffer.readInt();           // Server port
 }
 void stratos::LegacyServerListPong::encrypt(PacketBuffer& buffer) {
     buffer.writeByte(0xFF); // Kick packet identifier
@@ -114,10 +115,147 @@ void stratos::LoginPluginRequest::encrypt(PacketBuffer& buffer) {
 void stratos::LoginCookieRequest::encrypt(PacketBuffer& buffer) {
     buffer.writeIdentifier(cookie);
 }
+void stratos::ConfigurationClientInformation::decrypt(PacketBuffer& buffer) {
+    locale = buffer.readString(16);
+    viewDistance = buffer.readByte();
+    chatMode = buffer.readVarIntEnum<ChatMode>([](const int& value) -> ChatMode {
+        switch (value) {
+        case 0:
+            return ChatMode::Enabled;
+        case 1:
+            return ChatMode::CommandsOnly;
+        case 2:
+            return ChatMode::Hidden;
+        default:
+            throw PacketSerializationException("Unknown chat mode value: " + std::to_string(value));
+        }
+    });
+    chatColors = buffer.readBoolean();
+    skinParts = buffer.readUnsignedByte();
+    mainHand = buffer.readVarIntEnum<Hand>([](const int& value) -> Hand {
+        switch (value) {
+        case 0:
+            return Hand::Left;
+        case 1:
+            return Hand::Right;
+        default:
+            throw PacketSerializationException("Unknown hand value: " + std::to_string(value));
+        }
+    });
+    enableTextFiltering = buffer.readBoolean();
+    allowServerListing = buffer.readBoolean();
+    particleStatus = buffer.readVarIntEnum<ParticleStatus>([](const int& value) -> ParticleStatus {
+        switch (value) {
+        case 0:
+            return ParticleStatus::All;
+        case 1:
+            return ParticleStatus::Decreased;
+        case 2:
+            return ParticleStatus::Minimal;
+        default:
+            throw PacketSerializationException("Unknown particle status value: " + std::to_string(value));
+        }
+    });
+}
+void stratos::ConfigurationCookieResponse::decrypt(PacketBuffer& buffer) {
+    key = buffer.readIdentifier();
+    value = buffer.readPrefixedOptionalPrefixedByteArray();
+}
+void stratos::ConfigurationServerPluginMessage::decrypt(PacketBuffer& buffer) {
+    channel = buffer.readIdentifier();
+    data = buffer.readInferredByteArray();
+}
+void stratos::ConfigurationServerboundKeepAlive::decrypt(PacketBuffer& buffer) {
+    id = buffer.readLong();
+}
+void stratos::ConfigurationPong::decrypt(PacketBuffer& buffer) {
+    id = buffer.readInt();
+}
+void stratos::ConfigurationResourcePackResponse::decrypt(PacketBuffer& buffer) {
+    uuid = buffer.readUUID();
+    result = buffer.readVarIntEnum<ResourcePackResult>([](const int& value) -> ResourcePackResult {
+        switch (value) {
+        case 0:
+            return ResourcePackResult::SuccessfullyDownloaded;
+        case 1:
+            return ResourcePackResult::Declined;
+        case 2:
+            return ResourcePackResult::FailedDownload;
+        case 3:
+            return ResourcePackResult::Accepted;
+        case 4:
+            return ResourcePackResult::Downloaded;
+        case 5:
+            return ResourcePackResult::InvalidURL;
+        case 6:
+            return ResourcePackResult::FailedReload;
+        case 7:
+            return ResourcePackResult::Discarded;
+        default:
+            throw PacketSerializationException("Unknown resource pack result value: " + std::to_string(value));
+        }
+    });
+}
+void stratos::ServerboundKnownPacks::decrypt(PacketBuffer& buffer) {
+    knownPacks = buffer.readPrefixedResourcePackHeaderArray();
+}
+void stratos::ConfigurationCookieRequest::encrypt(PacketBuffer& buffer) {
+    buffer.writeIdentifier(key);
+}
+void stratos::ConfigurationClientboundPluginMessage::encrypt(PacketBuffer& buffer) {
+    buffer.writeIdentifier(channel);
+    buffer.writeByteArray(data);
+}
+void stratos::ConfigurationDisconnect::encrypt(PacketBuffer& buffer) {
+    buffer.writeString(reason, 32767);
+}
+void stratos::ConfigurationClientboundKeepAlive::encrypt(PacketBuffer& buffer) {
+    buffer.writeLong(id);
+}
+void stratos::ConfigurationPing::encrypt(PacketBuffer& buffer) {
+    buffer.writeInt(id);
+}
+void stratos::RegistryDataPacket::encrypt(PacketBuffer& buffer) {
+    buffer.writeIdentifier(registryKey);
+    buffer.writePrefixedRegistryEntryArray(entries);
+}
+void stratos::ConfigurationRemoveRemoveResourcePack::encrypt(PacketBuffer& buffer) {
+    buffer.writePrefixedOptionalUUID(uuid);
+}
+void stratos::ConfigurationAddResourcePack::encrypt(PacketBuffer& buffer) {
+    buffer.writeUUID(uuid);
+    buffer.writeString(url, 32767);
+    buffer.writeString(hash, 40);
+    buffer.writeBoolean(forced);
+    buffer.writePrefixedOptionalString(prompt, 32767);
+}
+void stratos::ConfigurationStoreCookie::encrypt(PacketBuffer& buffer) {
+    buffer.writeIdentifier(key);
+    buffer.writePrefixedByteArray(value);
+}
+void stratos::ConfigurationTransfer::encrypt(PacketBuffer& buffer) {
+    buffer.writeString(host, 255);
+    buffer.writeVarInt(port);
+}
+void stratos::FeatureFlags::encrypt(PacketBuffer& buffer) {
+    buffer.writePrefixedIdentifierArray(features);
+}
+void stratos::ConfigurationUpdateTags::encrypt(PacketBuffer& buffer) {
+    buffer.writePrefixedRegistryTagDataArray(tags);
+}
+void stratos::ClientboundKnownPacks::encrypt(PacketBuffer& buffer) {
+    buffer.writePrefixedResourcePackHeaderArray(knownPackets);
+}
+void stratos::ConfigurationCustomReportDetails::encrypt(PacketBuffer& buffer) {
+    buffer.writePrefixedReportDetailArray(details);
+}
+void stratos::ConfigurationServerLinks::encrypt(PacketBuffer& buffer) {
+    buffer.writePrefixedServerLinkArray(links);
+}
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
     case ClientHandshake::Intent::Status:
-        connection->changeState(Status);
+        connection->changeState(ProtocolState::Status);
         break;
     case ClientHandshake::Intent::Login:
     case ClientHandshake::Intent::Transfer: // TODO: Figure out how to handle transfer
@@ -132,7 +270,7 @@ bool stratos::HandshakePacketHandler::handle(LegacyServerListPing& packet) {
     return true;
 }
 bool stratos::StatusPacketHandler::handle(StatusRequest& packet) {
-    if (connection->getState() == Status) {
+    if (connection->getState() == ProtocolState::Status) {
         constexpr auto STATUS_RESPONSE_FORMAT = R"({{"version":{{"name":"{}","protocol":{}}},"players":{{"max":{},"online":{},"sample":[]}},"description":{{"text":"{}"}}}})";
         connection->sendPacket(std::make_unique<StatusResponse>(
             std::format(STATUS_RESPONSE_FORMAT, std::string(PROTOCOL_VERSION_STRING), PROTOCOL_VERSION, server->getMaxPlayers(), server->getOnlinePlayers(), server->getMotd())));
@@ -140,7 +278,7 @@ bool stratos::StatusPacketHandler::handle(StatusRequest& packet) {
     return true;
 }
 bool stratos::StatusPacketHandler::handle(PingRequest& packet) {
-    if (connection->getState() == Status)
+    if (connection->getState() == ProtocolState::Status)
         connection->sendPacket(std::make_unique<PongResponse>(packet.timestamp));
     return true;
 }
@@ -179,3 +317,27 @@ bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) {
     return true;
 }
 bool stratos::LoginPacketHandler::handle(LoginCookieResponse& packet) { return false; }
+bool stratos::ConfigurationPacketHandler::handle(ConfigurationClientInformation& packet) {
+    return PacketHandler::handle(packet);
+}
+bool stratos::ConfigurationPacketHandler::handle(ConfigurationCookieResponse& packet) {
+    return PacketHandler::handle(packet);
+}
+bool stratos::ConfigurationPacketHandler::handle(ConfigurationServerPluginMessage& packet) {
+    return PacketHandler::handle(packet);
+}
+bool stratos::ConfigurationPacketHandler::handle(AcknowledgeFinishConfiguration& packet) {
+    return PacketHandler::handle(packet);
+}
+bool stratos::ConfigurationPacketHandler::handle(ConfigurationServerboundKeepAlive& packet) {
+    return PacketHandler::handle(packet);
+}
+bool stratos::ConfigurationPacketHandler::handle(ConfigurationPong& packet) {
+    return PacketHandler::handle(packet);
+}
+bool stratos::ConfigurationPacketHandler::handle(ConfigurationResourcePackResponse& packet) {
+    return PacketHandler::handle(packet);
+}
+bool stratos::ConfigurationPacketHandler::handle(ServerboundKnownPacks& packet) {
+    return PacketHandler::handle(packet);
+}

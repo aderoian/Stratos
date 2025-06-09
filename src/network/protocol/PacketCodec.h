@@ -30,6 +30,14 @@
 #define PROTOCOL_VERSION_STRING "1.21.5"
 
 namespace stratos {
+class ServerboundKnownPacks;
+class ConfigurationResourcePackResponse;
+class ConfigurationPong;
+class ConfigurationServerboundKeepAlive;
+class AcknowledgeFinishConfiguration;
+class ConfigurationServerPluginMessage;
+class ConfigurationCookieResponse;
+class ConfigurationClientInformation;
 class EncryptionResponse;
 class LoginCookieResponse;
 class LoginAcknowledge;
@@ -58,6 +66,15 @@ public:
     virtual bool handle(LoginPluginResponse&) { return false; }
     virtual bool handle(LoginAcknowledge&) { return false; }
     virtual bool handle(LoginCookieResponse&) { return false; }
+
+    virtual bool handle(ConfigurationClientInformation&) { return false; }
+    virtual bool handle(ConfigurationCookieResponse&) { return false; }
+    virtual bool handle(ConfigurationServerPluginMessage&) { return false; }
+    virtual bool handle(AcknowledgeFinishConfiguration&) { return false; }
+    virtual bool handle(ConfigurationServerboundKeepAlive&) { return false; }
+    virtual bool handle(ConfigurationPong&) { return false; }
+    virtual bool handle(ConfigurationResourcePackResponse&) { return false; }
+    virtual bool handle(ServerboundKnownPacks&) { return false; }
 };
 
 #define PACKET_ACCEPT \
@@ -295,6 +312,298 @@ public:
     void encrypt(PacketBuffer& buffer) override;
 };
 
+// Configuration Packets
+
+class ConfigurationClientInformation final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x00;
+
+    std::string locale; // String(16)
+    int8_t viewDistance;
+    ChatMode chatMode; // VarInt Enum
+    bool chatColors;
+    uint8_t skinParts;
+    Hand mainHand; // VarInt Enum
+    bool enableTextFiltering;
+    bool allowServerListing;
+    ParticleStatus particleStatus; // VarInt Enum
+    ConfigurationClientInformation() : Packet(ID), ServerboundPacket(ID), viewDistance(0), chatMode(), chatColors(false), skinParts(0), mainHand(), enableTextFiltering(false), allowServerListing(false), particleStatus() {}
+    ~ConfigurationClientInformation() override = default;
+    void decrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationCookieResponse final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x01;
+
+    Identifier key;
+    std::optional<std::vector<uint8_t>> value; // prefixed optional prefixed ByteArray(5120)
+    ConfigurationCookieResponse() : Packet(ID), ServerboundPacket(ID), key({"",""}), value() {}
+    ~ConfigurationCookieResponse() override = default;
+    void decrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationServerPluginMessage final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x02;
+
+    Identifier channel;
+    std::vector<uint8_t> data; // prefixed ByteArray(32767)
+    ConfigurationServerPluginMessage() : Packet(ID), ServerboundPacket(ID), channel({"",""}), data() {}
+    ~ConfigurationServerPluginMessage() override = default;
+    void decrypt(PacketBuffer& buffer) override;
+};
+
+class AcknowledgeFinishConfiguration final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x03;
+
+    AcknowledgeFinishConfiguration() : Packet(ID), ServerboundPacket(ID) {}
+    ~AcknowledgeFinishConfiguration() override = default;
+    void decrypt(PacketBuffer& buffer) override {}
+};
+
+class ConfigurationServerboundKeepAlive final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x04;
+
+    int64_t id;
+    ConfigurationServerboundKeepAlive() : Packet(ID), ServerboundPacket(ID), id(0) {}
+    ~ConfigurationServerboundKeepAlive() override = default;
+    void decrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationPong final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x05;
+
+    int id;
+    ConfigurationPong() : Packet(ID), ServerboundPacket(ID), id(0) {}
+    ~ConfigurationPong() override = default;
+    void decrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationResourcePackResponse final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x06;
+
+    UUID uuid;
+    ResourcePackResult result; // VarInt Enum
+    ConfigurationResourcePackResponse() : Packet(ID), ServerboundPacket(ID), uuid(), result() {}
+    ~ConfigurationResourcePackResponse() override = default;
+    void decrypt(PacketBuffer& buffer) override;
+};
+
+class ServerboundKnownPacks final : public ServerboundPacket {
+public:
+    PACKET_ACCEPT
+    constexpr static int ID = 0x07;
+
+    std::vector<ResourcePackHeader> knownPacks; // prefixed array;
+    ServerboundKnownPacks() : Packet(ID), ServerboundPacket(ID) {}
+    ~ServerboundKnownPacks() override = default;
+    void decrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationCookieRequest final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x00;
+
+    Identifier key;
+    ConfigurationCookieRequest() : Packet(ID), ClientboundPacket(ID), key({"",""}) {}
+    explicit ConfigurationCookieRequest(Identifier  key) : Packet(ID), ClientboundPacket(ID), key(std::move(key)) {}
+    ~ConfigurationCookieRequest() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationClientboundPluginMessage final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x01;
+
+    Identifier channel;
+    std::vector<uint8_t> data; // ByteArray
+    ConfigurationClientboundPluginMessage() : Packet(ID), ClientboundPacket(ID), channel({"",""}) {}
+    ConfigurationClientboundPluginMessage(Identifier channel, std::vector<uint8_t> data)
+        : Packet(ID), ClientboundPacket(ID), channel(std::move(channel)), data(std::move(data)) {}
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationDisconnect final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x02;
+
+    std::string reason; // Text Component
+    ConfigurationDisconnect() : Packet(ID), ClientboundPacket(ID) {}
+    explicit ConfigurationDisconnect(std::string&& reason) : Packet(ID), ClientboundPacket(ID), reason(std::move(reason)) {}
+    ~ConfigurationDisconnect() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class FinishConfiguration final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x03;
+
+    FinishConfiguration() : Packet(ID), ClientboundPacket(ID) {}
+    ~FinishConfiguration() override = default;
+    void encrypt(PacketBuffer& buffer) override {}
+};
+
+class ConfigurationClientboundKeepAlive final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x04;
+
+    int64_t id;
+    ConfigurationClientboundKeepAlive() : Packet(ID), ClientboundPacket(ID), id(0) {}
+    explicit ConfigurationClientboundKeepAlive(const int64_t id) : Packet(ID), ClientboundPacket(ID), id(id) {}
+    ~ConfigurationClientboundKeepAlive() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationPing final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x05;
+
+    int id;
+    ConfigurationPing() : Packet(ID), ClientboundPacket(ID), id(0) {}
+    explicit ConfigurationPing(const int id) : Packet(ID), ClientboundPacket(ID), id(id) {}
+    ~ConfigurationPing() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ResetChat final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x06;
+
+    ResetChat() : Packet(ID), ClientboundPacket(ID) {}
+    ~ResetChat() override = default;
+    void encrypt(PacketBuffer& buffer) override {}
+};
+
+class RegistryDataPacket final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x07;
+
+    Identifier registryKey;
+    std::vector<RegistryEntry> entries;
+    RegistryDataPacket() : Packet(ID), ClientboundPacket(ID), registryKey({"",""}) {}
+    RegistryDataPacket(Identifier registryKey, std::vector<RegistryEntry>& entries)
+        : Packet(ID), ClientboundPacket(ID), registryKey(std::move(registryKey)), entries(std::move(entries)) {}
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationRemoveRemoveResourcePack final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x08;
+
+    std::optional<UUID> uuid; // prefixed optional UUID
+    ConfigurationRemoveRemoveResourcePack() : Packet(ID), ClientboundPacket(ID), uuid(std::nullopt) {}
+    explicit ConfigurationRemoveRemoveResourcePack(const UUID& uuid) : Packet(ID), ClientboundPacket(ID), uuid(uuid) {}
+    ~ConfigurationRemoveRemoveResourcePack() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationAddResourcePack final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x09;
+
+    UUID uuid;
+    std::string url; // String(32767)
+    std::string hash; // String(40)
+    bool forced;
+    std::optional<std::string> prompt; // prefixed optional Text Component
+    ConfigurationAddResourcePack() : Packet(ID), ClientboundPacket(ID), uuid(), forced(false), prompt(std::nullopt) {}
+    ConfigurationAddResourcePack(const UUID uuid, std::string url, std::string hash, const bool forced, std::optional<std::string> prompt = std::nullopt)
+        : Packet(ID), ClientboundPacket(ID), uuid(uuid), url(std::move(url)), hash(std::move(hash)), forced(forced), prompt(std::move(prompt)) {}
+    ~ConfigurationAddResourcePack() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationStoreCookie final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x0A;
+
+    Identifier key;
+    std::vector<uint8_t> value; // prefixed ByteArray(5120)
+    ConfigurationStoreCookie() : Packet(ID), ClientboundPacket(ID), key({"",""}), value() {}
+    ConfigurationStoreCookie(Identifier  key, std::vector<uint8_t>&& value) : Packet(ID), ClientboundPacket(ID), key(std::move(key)), value(std::move(value)) {}
+    ~ConfigurationStoreCookie() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationTransfer final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x0B;
+
+    std::string host; // String(32767)
+    int port; // VarInt
+    ConfigurationTransfer() : Packet(ID), ClientboundPacket(ID), port(0) {}
+    ConfigurationTransfer(std::string host, const int port) : Packet(ID), ClientboundPacket(ID), host(std::move(host)), port(port) {}
+    ~ConfigurationTransfer() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class FeatureFlags final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x0C;
+
+    std::vector<Identifier> features; // prefixed array
+    FeatureFlags() : Packet(ID), ClientboundPacket(ID) {}
+    explicit FeatureFlags(std::vector<Identifier>& features) : Packet(ID), ClientboundPacket(ID), features(std::move(features)) {}
+    ~FeatureFlags() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationUpdateTags final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x0D;
+
+    std::vector<RegistryTagData> tags; // prefixed array
+    ConfigurationUpdateTags() : Packet(ID), ClientboundPacket(ID) {}
+    explicit ConfigurationUpdateTags(std::vector<RegistryTagData>& tags) : Packet(ID), ClientboundPacket(ID), tags(std::move(tags)) {}
+    ~ConfigurationUpdateTags() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ClientboundKnownPacks final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x0E;
+
+    std::vector<ResourcePackHeader> knownPackets; // prefixed array
+    ClientboundKnownPacks() : Packet(ID), ClientboundPacket(ID) {}
+    explicit ClientboundKnownPacks(std::vector<ResourcePackHeader>& knownPackets) : Packet(ID), ClientboundPacket(ID), knownPackets(std::move(knownPackets)) {}
+    ~ClientboundKnownPacks() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationCustomReportDetails final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x0F;
+
+    std::vector<ReportDetail> details; // prefixed array [{String(128), String(4096)}]
+    ConfigurationCustomReportDetails() : Packet(ID), ClientboundPacket(ID) {}
+    explicit ConfigurationCustomReportDetails(std::vector<ReportDetail>& details) : Packet(ID), ClientboundPacket(ID), details(std::move(details)) {}
+    ~ConfigurationCustomReportDetails() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
+class ConfigurationServerLinks final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x10;
+
+    std::vector<ServerLink> links; // prefixed array
+    ConfigurationServerLinks() : Packet(ID), ClientboundPacket(ID) {}
+    explicit ConfigurationServerLinks(std::vector<ServerLink>& links) : Packet(ID), ClientboundPacket(ID), links(std::move(links)) {}
+    ~ConfigurationServerLinks() override = default;
+    void encrypt(PacketBuffer& buffer) override;
+};
+
 class HandshakePacketHandler final : public PacketHandler {
 public:
     using PacketHandler::handle;
@@ -333,6 +642,14 @@ class ConfigurationPacketHandler final : public PacketHandler {
 public:
     using PacketHandler::handle;
     explicit ConfigurationPacketHandler(NetworkConnection* connection) : connection(std::move(connection)) {}
+    bool handle(ConfigurationClientInformation& packet) override;
+    bool handle(ConfigurationCookieResponse& packet) override;
+    bool handle(ConfigurationServerPluginMessage& packet) override;
+    bool handle(AcknowledgeFinishConfiguration& packet) override;
+    bool handle(ConfigurationServerboundKeepAlive& packet) override;
+    bool handle(ConfigurationPong& packet) override;
+    bool handle(ConfigurationResourcePackResponse& packet) override;
+    bool handle(ServerboundKnownPacks& packet) override;
 protected:
     NetworkConnection* connection;
 };
