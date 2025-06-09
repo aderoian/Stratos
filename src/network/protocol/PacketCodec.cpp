@@ -34,14 +34,14 @@ void stratos::ClientHandshake::decrypt(PacketBuffer& buffer) {
     serverPort      = buffer.readUnsignedShort();
 
     // Read the intent
-    intent = buffer.readVarIntEnum<Intent>([](const int& value) -> Intent {
+    intent = buffer.readVarIntEnum<HandshakeIntent>([](const int& value) -> HandshakeIntent {
         switch (value) {
         case 0x01:
-            return Intent::Status;
+            return HandshakeIntent::Status;
         case 0x02:
-            return Intent::Login;
+            return HandshakeIntent::Login;
         case 0x03:
-            return Intent::Transfer;
+            return HandshakeIntent::Transfer;
         default:
             throw PacketSerializationException("Unknown intent value: " + std::to_string(value));
         }
@@ -84,8 +84,9 @@ void stratos::EncryptionResponse::decrypt(PacketBuffer& buffer) {
 }
 void stratos::LoginPluginResponse::decrypt(PacketBuffer& buffer) {
     messageId = buffer.readVarInt();
-    data = buffer.readPrefixedOptionalInferredByteArray();
+    data      = buffer.readPrefixedOptionalInferredByteArray();
 }
+void stratos::LoginAcknowledge::decrypt(PacketBuffer& buffer) {}
 void stratos::LoginCookieResponse::decrypt(PacketBuffer& buffer) {
     cookie = buffer.readIdentifier();
     payload = buffer.readPrefixedOptionalPrefixedByteArray();
@@ -163,8 +164,9 @@ void stratos::ConfigurationCookieResponse::decrypt(PacketBuffer& buffer) {
 }
 void stratos::ConfigurationServerPluginMessage::decrypt(PacketBuffer& buffer) {
     channel = buffer.readIdentifier();
-    data = buffer.readInferredByteArray();
+    data    = buffer.readInferredByteArray();
 }
+void stratos::AcknowledgeFinishConfiguration::decrypt(PacketBuffer& buffer) {}
 void stratos::ConfigurationServerboundKeepAlive::decrypt(PacketBuffer& buffer) {
     id = buffer.readLong();
 }
@@ -209,12 +211,14 @@ void stratos::ConfigurationClientboundPluginMessage::encrypt(PacketBuffer& buffe
 void stratos::ConfigurationDisconnect::encrypt(PacketBuffer& buffer) {
     buffer.writeString(reason, 32767);
 }
+void stratos::FinishConfiguration::encrypt(PacketBuffer& buffer) {}
 void stratos::ConfigurationClientboundKeepAlive::encrypt(PacketBuffer& buffer) {
     buffer.writeLong(id);
 }
 void stratos::ConfigurationPing::encrypt(PacketBuffer& buffer) {
     buffer.writeInt(id);
 }
+void stratos::ResetChat::encrypt(PacketBuffer& buffer) {}
 void stratos::RegistryDataPacket::encrypt(PacketBuffer& buffer) {
     buffer.writeIdentifier(registryKey);
     buffer.writePrefixedRegistryEntryArray(entries);
@@ -254,11 +258,11 @@ void stratos::ConfigurationServerLinks::encrypt(PacketBuffer& buffer) {
 }
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
-    case ClientHandshake::Intent::Status:
-        connection->changeState(ProtocolState::Status);
+    case HandshakeIntent::Status:
+        connection->changeState(Status);
         break;
-    case ClientHandshake::Intent::Login:
-    case ClientHandshake::Intent::Transfer: // TODO: Figure out how to handle transfer
+    case HandshakeIntent::Login:
+    case HandshakeIntent::Transfer: // TODO: Figure out how to handle transfer
         connection->changeState(Login);
     default:;
     }

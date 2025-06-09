@@ -42,6 +42,13 @@ struct Identifier {
     }
 };
 
+enum class HandshakeIntent {
+    None = 0,
+    Status = 0x01,
+    Login = 0x02,
+    Transfer = 0x03
+};
+
 struct LoginProperty {
     std::string name; // String(16)
     std::string value; // String(32767)
