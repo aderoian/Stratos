@@ -40,6 +40,12 @@ uint8_t stratos::readUnsignedByte(const ByteVec& buffer, size_t& offset) {
     const auto value = static_cast<uint8_t>(buffer[offset++]);
     return value;
 }
+stratos::math::int12_t stratos::readInt12(const ByteVec& buffer, size_t& offset) {
+    isReadable(buffer, offset, sizeof(math::int12_t));
+    uint16_t val = static_cast<uint16_t>(buffer[offset++]) << 4 | buffer[offset++] >> 4;
+    if (val & (1 << 11)) val |= 0xF000;
+    return static_cast<int16_t>(val);
+}
 short stratos::readShort(const ByteVec& buffer, size_t& offset) {
     isReadable(buffer, offset, sizeof(short));
     const auto high = static_cast<int16_t>(buffer[offset++]);
@@ -51,6 +57,12 @@ uint16_t stratos::readUnsignedShort(const ByteVec& buffer, size_t& offset) {
     const auto high = static_cast<uint16_t>(buffer[offset++]);
     const auto low  = static_cast<uint16_t>(buffer[offset++]);
     return static_cast<uint16_t>(high << 8 | low & 0xFF);
+}
+stratos::math::int26_t stratos::readInt26(const ByteVec& buffer, size_t& offset) {
+    isReadable(buffer, offset, sizeof(math::int12_t));
+    uint32_t val =buffer[offset++] << 18 | buffer[offset++] << 10 | buffer[offset++] << 2  | buffer[offset++] >> 6;
+    if (val & 1 << 25) val |= 0xFC000000;
+    return static_cast<int32_t>(val);
 }
 int stratos::readInt(const ByteVec& buffer, size_t& offset) {
     isReadable(buffer, offset, sizeof(int));
@@ -113,6 +125,12 @@ void stratos::writeByte(ByteVec& buffer, const int8_t value) {
 void stratos::writeUnsignedByte(ByteVec& buffer, const uint8_t value) {
     buffer.push_back(value);
 }
+void stratos::writeInt12(ByteVec& buffer, const math::int12_t value) {
+    if (value < -2048 || value > 2047) throw std::out_of_range("Value out of int12 range");
+    const uint16_t uval = static_cast<uint16_t>(value & 0x0FFF);
+    buffer.push_back(uval >> 4 & 0xFF);
+    buffer.push_back(uval << 4 & 0xF0);
+}
 void stratos::writeShort(ByteVec& buffer, const short value) {
     buffer.push_back(static_cast<unsigned char>(value >> 8 & 0xFF));
     buffer.push_back(static_cast<unsigned char>(value & 0xFF));
@@ -120,6 +138,14 @@ void stratos::writeShort(ByteVec& buffer, const short value) {
 void stratos::writeUnsignedShort(ByteVec& buffer, const uint16_t value) {
     buffer.push_back(static_cast<unsigned char>(value >> 8 & 0xFF));
     buffer.push_back(static_cast<unsigned char>(value & 0xFF));
+}
+void stratos::writeInt26(ByteVec& buffer, const math::int26_t value) {
+    if (value < -(1 << 25) || value >= 1 << 25) throw std::out_of_range("Value out of int26 range");
+    const uint32_t uval = static_cast<uint32_t>(value & 0x03FFFFFF);
+    buffer.push_back(uval >> 18 & 0xFF);
+    buffer.push_back(uval >> 10 & 0xFF);
+    buffer.push_back(uval >> 2  & 0xFF);
+    buffer.push_back(uval << 6  & 0xC0);
 }
 void stratos::writeInt(ByteVec& buffer, const int value) {
     buffer.push_back(static_cast<unsigned char>(value >> 24 & 0xFF));
@@ -282,6 +308,17 @@ stratos::Identifier stratos::PacketBuffer::readIdentifier() {
         rawIdentifier.substr(colonPos + 1) // name
     };
 }
+stratos::math::Position stratos::PacketBuffer::readPosition() {
+    const int64_t  rawPosition = readLong();
+    math::Position position;
+    position.x = static_cast<int32_t>(rawPosition >> 38);
+    position.y = static_cast<int32_t>(rawPosition << 52 >> 52);
+    position.z = static_cast<int32_t>(rawPosition << 26 >> 38);
+    return position;
+}
+stratos::math::Angle stratos::PacketBuffer::readAngle() {
+    return readUnsignedByte();
+}
 stratos::UUID stratos::PacketBuffer::readUUID() {
     stratos::isReadable(buffer, offset, 16);
     UUID uuid;
@@ -310,15 +347,32 @@ std::vector<uint8_t> stratos::PacketBuffer::readInferredByteArray() {
     while (offset < buffer.size()) result.push_back(stratos::readByte(buffer, offset));
     return result;
 }
+stratos::ResourcePackHeader         stratos::PacketBuffer::readResourcePackHeader() {
+    return {readString(32767), readString(32767), readString(32767)};
+}
 std::optional<std::vector<uint8_t>> stratos::PacketBuffer::readPrefixedOptionalInferredByteArray() {
     return stratos::readBoolean(buffer, offset) ? std::make_optional(readInferredByteArray()) : std::nullopt;
 }
 std::optional<std::vector<uint8_t>> stratos::PacketBuffer::readPrefixedOptionalPrefixedByteArray() {
     return stratos::readBoolean(buffer, offset) ? std::make_optional(readPrefixedByteArray()) : std::nullopt;
 }
+std::vector<stratos::ResourcePackHeader> stratos::PacketBuffer::readPrefixedResourcePackHeaderArray() {
+    const int length = stratos::readVarInt(buffer, offset);
+    std::vector<ResourcePackHeader> headers;
+    headers.reserve(length);
+    for (int i = 0; i < length; ++i)
+        headers.push_back(readResourcePackHeader());
+    return headers;
+}
 void stratos::PacketBuffer::writeIdentifier(const Identifier& identifier) {
     const std::string fullIdent = identifier.namespaceName + ":" + identifier.name;
     stratos::writeString(buffer, fullIdent, 32767);
+}
+void stratos::PacketBuffer::writePosition(const math::Position& position) {
+    writeLong((static_cast<int64_t>(position.x) & 0x3FFFFFFLL) << 38 | (static_cast<int64_t>(position.z) & 0x3FFFFFFLL) << 12 | static_cast<int64_t>(position.y) & 0xFFFL);
+}
+void stratos::PacketBuffer::writeAngle(const math::Angle& angle) {
+    writeUnsignedByte(angle);
 }
 void stratos::PacketBuffer::writeUUID(const UUID& uuid) {
     for (const auto& byte : uuid) buffer.push_back(byte);
@@ -335,6 +389,32 @@ void stratos::PacketBuffer::writeLoginProperty(const std::vector<LoginProperty>&
         writePrefixedOptionalString(signature, 1024);
     }
 }
+void stratos::PacketBuffer::writeResourcePackHeader(const ResourcePackHeader& header) {
+    writeString(header.packNamespace, 32767);
+    writeString(header.id, 32767);
+    writeString(header.version, 32767);
+}
+void stratos::PacketBuffer::writeRegistryEntry(const RegistryEntry& entry) {
+    writeIdentifier(entry.id);
+    writeBoolean(entry.data.has_value());
+    if (entry.data.has_value()) writePrefixedByteArray(entry.data.value());
+}
+void stratos::PacketBuffer::writeRegistryTagData(const RegistryTagData& data) {
+    writeIdentifier(data.registryKey);
+    writeVarInt(static_cast<int>(data.entries.size()));
+    for (const auto& [key, id] : data.entries) {
+        writeIdentifier(key);
+        writeVarInt(id);
+    }
+}
+void stratos::PacketBuffer::writeReportDetail(const ReportDetail& detail) {
+    writeString(detail.title, 128);
+    writeString(detail.description, 4096);
+}
+void stratos::PacketBuffer::writeServerLink(const ServerLink& link) {
+    link.isDefault ? writeVarInt(static_cast<int>(link.defaultLabel)) : writeString(link.customLabel, 32767);
+    writeString(link.url, 32767);
+}
 void stratos::PacketBuffer::writePrefixedOptionalString(const std::optional<std::string>& str, const int maxChars) {
     if (str) {
         stratos::writeBoolean(buffer, true);
@@ -342,6 +422,10 @@ void stratos::PacketBuffer::writePrefixedOptionalString(const std::optional<std:
     } else {
         stratos::writeBoolean(buffer, false);
     }
+}
+void stratos::PacketBuffer::writePrefixedOptionalUUID(const std::optional<UUID>& uuid) {
+    writeBoolean(uuid.has_value());
+    if (uuid.has_value()) writeUUID(uuid.value());
 }
 void stratos::PacketBuffer::writePrefixedOptionalByteArray(const std::optional<std::vector<uint8_t>>& bytes) {
     if (bytes) {
@@ -358,4 +442,30 @@ void stratos::PacketBuffer::writePrefixedOptionalPrefixedByteArray(const std::op
     } else {
         stratos::writeBoolean(buffer, false);
     }
+}
+void stratos::PacketBuffer::writePrefixedResourcePackHeaderArray(const std::vector<ResourcePackHeader>& headers) {
+    writeVarInt(static_cast<int>(headers.size()));
+    for (const auto& header : headers) writeResourcePackHeader(header);
+}
+void stratos::PacketBuffer::writePrefixedRegistryEntryArray(const std::vector<RegistryEntry>& entries) {
+    writeVarInt(static_cast<int>(entries.size()));
+    for (const auto& entry : entries) writeRegistryEntry(entry);
+}
+void stratos::PacketBuffer::writePrefixedRegistryTagDataArray(const std::vector<RegistryTagData>& data) {
+    writeVarInt(static_cast<int>(data.size()));
+    for (const auto& entry : data) {
+        writeRegistryTagData(entry);
+    }
+}
+void stratos::PacketBuffer::writePrefixedIdentifierArray(const std::vector<Identifier>& identifiers) {
+    writeVarInt(static_cast<int>(identifiers.size()));
+    for (const auto& identifier : identifiers) writeIdentifier(identifier);
+}
+void stratos::PacketBuffer::writePrefixedReportDetailArray(const std::vector<ReportDetail>& details) {
+    writeVarInt(static_cast<int>(details.size()));
+    for (const auto& detail : details) writeReportDetail(detail);
+}
+void stratos::PacketBuffer::writePrefixedServerLinkArray(const std::vector<ServerLink>& serverLinks) {
+    writeVarInt(static_cast<int>(serverLinks.size()));
+    for (const auto& link : serverLinks) writeServerLink(link);
 }

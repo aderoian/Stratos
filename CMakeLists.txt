@@ -42,6 +42,9 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        math/Angle.h
+        math/Ints.h
+        math/Position.h
         nbt/io/NBTBuffer.h
         nbt/ArrayTag.h
         nbt/CompoundTag.h

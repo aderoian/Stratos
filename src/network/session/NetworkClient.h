@@ -60,7 +60,7 @@ class NetworkConnection final : public TCPConnection {
     [[nodiscard]] bool hasSendData() const { return sendQueue.size_approx() > 0; }
     [[nodiscard]] bool isDisconnected() const { return disconnected.load(std::memory_order_acquire); }
     [[nodiscard]] ProtocolState getState() const { return state; }
-    [[nodiscard]] ClientHandshake::Intent getIntent() const { return intent; }
+    [[nodiscard]] HandshakeIntent getIntent() const { return intent; }
     [[nodiscard]] std::optional<std::reference_wrapper<SessionInfo>> getSessionInfo() const { return sessionInfo ? std::make_optional(std::ref(*sessionInfo)) : std::nullopt; }
     void updateSessionInfo(SessionInfo&& info);
 
@@ -73,7 +73,7 @@ class NetworkConnection final : public TCPConnection {
     std::atomic<bool> disconnected = false;
 
     ProtocolState state;
-    ClientHandshake::Intent intent = ClientHandshake::Intent::None;
+    HandshakeIntent intent = HandshakeIntent::None;
     std::unique_ptr<PacketHandler> packetHandler;
     std::unique_ptr<SessionInfo> sessionInfo = nullptr;
 
