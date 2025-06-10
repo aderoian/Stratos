@@ -17,18 +17,17 @@
  *
  */
 
-#ifndef INTS_H
-#define INTS_H
-#include <cstdint>
+#ifndef POSITION_H
+#define POSITION_H
 
 namespace stratos::math {
-typedef int32_t int26_t; // 26-bit signed integer
-typedef int16_t int12_t; // 12-bit signed integer
 
-constexpr int26_t INT26_MIN = -(1 << 25);
-constexpr int26_t INT26_MAX =  (1 << 25) - 1;
-constexpr int12_t INT12_MIN = -(1 << 11);
-constexpr int12_t INT12_MAX =  (1 << 11) - 1;
-} // namespace stratos::math
+typedef struct {
+    int x;
+    int y;
+    int z;
+} Position;
 
-#endif //INTS_H
+}
+
+#endif //POSITION_H

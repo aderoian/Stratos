@@ -308,6 +308,14 @@ stratos::Identifier stratos::PacketBuffer::readIdentifier() {
         rawIdentifier.substr(colonPos + 1) // name
     };
 }
+stratos::math::Position stratos::PacketBuffer::readPosition() {
+    const int64_t rawPosition = readLong();
+    math::Position position;
+    position.x = static_cast<int32_t>(rawPosition >> 38);
+    position.y = static_cast<int32_t>(rawPosition << 52 >> 52);
+    position.z = static_cast<int32_t>(rawPosition << 26 >> 38);
+    return position;
+}
 stratos::UUID stratos::PacketBuffer::readUUID() {
     stratos::isReadable(buffer, offset, 16);
     UUID uuid;
@@ -356,6 +364,9 @@ std::vector<stratos::ResourcePackHeader> stratos::PacketBuffer::readPrefixedReso
 void stratos::PacketBuffer::writeIdentifier(const Identifier& identifier) {
     const std::string fullIdent = identifier.namespaceName + ":" + identifier.name;
     stratos::writeString(buffer, fullIdent, 32767);
+}
+void stratos::PacketBuffer::writePosition(const math::Position& position) {
+    writeLong((static_cast<int64_t>(position.x) & 0x3FFFFFFLL) << 38 | (static_cast<int64_t>(position.z) & 0x3FFFFFFLL) << 12 | static_cast<int64_t>(position.y) & 0xFFFL);
 }
 void stratos::PacketBuffer::writeUUID(const UUID& uuid) {
     for (const auto& byte : uuid) buffer.push_back(byte);
