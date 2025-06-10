@@ -47,6 +47,17 @@ void networkSerializationTest() {
     assert(stratos::readByte(buffer, offset) == -42);
     assert(stratos::readUnsignedByte(buffer, offset) == 230);
 
+    // Test writing and reading an int12
+    std::cout << "Testing int12 serialization..." << std::endl;
+    stratos::writeInt12(buffer, 2047); // max positive int12
+    stratos::writeInt12(buffer, -2048); // min negative int12
+    stratos::writeInt12(buffer, 1234); // valid int12
+    stratos::writeInt12(buffer, -1234); // valid negative int12
+    assert(stratos::readInt12(buffer, offset) == 2047);
+    assert(stratos::readInt12(buffer, offset) == -2048);
+    assert(stratos::readInt12(buffer, offset) == 1234);
+    assert(stratos::readInt12(buffer, offset) == -1234);
+
     // Test writing and reading a short
     std::cout << "Testing short serialization..." << std::endl;
     stratos::writeShort(buffer, 12345);
@@ -55,6 +66,17 @@ void networkSerializationTest() {
     assert(stratos::readShort(buffer, offset) == 12345);
     assert(stratos::readShort(buffer, offset) == -12345);
     assert(stratos::readUnsignedShort(buffer, offset) == 54321);
+
+    // Test writing and reading an int26
+    std::cout << "Testing int26 serialization..." << std::endl;
+    stratos::writeInt26(buffer, 33554431); // max positive int26
+    stratos::writeInt26(buffer, -33554432); // min negative int26
+    stratos::writeInt26(buffer, 12345678); // valid int26
+    stratos::writeInt26(buffer, -12345678); // valid negative int26
+    assert(stratos::readInt26(buffer, offset) == 33554431);
+    assert(stratos::readInt26(buffer, offset) == -33554432);
+    assert(stratos::readInt26(buffer, offset) == 12345678);
+    assert(stratos::readInt26(buffer, offset) == -12345678);
 
     // Test writing and reading an int
     std::cout << "Testing int serialization..." << std::endl;

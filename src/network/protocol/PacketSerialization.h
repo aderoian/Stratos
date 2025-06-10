@@ -19,6 +19,9 @@
 
 #ifndef PACKETSERIALIZATION_H
 #define PACKETSERIALIZATION_H
+#include "math/Angle.h"
+#include "math/Ints.h"
+#include "math/Position.h"
 #include "utils/Types.h"
 
 #include <array>
@@ -45,8 +48,10 @@ int constexpr CONTINUE_BIT = 0x80;
 bool                  readBoolean(const ByteVec& buffer, size_t& offset);
 int8_t                readByte(const ByteVec& buffer, size_t& offset);
 uint8_t               readUnsignedByte(const ByteVec& buffer, size_t& offset);
+math::int12_t         readInt12(const ByteVec& buffer, size_t& offset);
 short                 readShort(const ByteVec& buffer, size_t& offset);
 uint16_t              readUnsignedShort(const ByteVec& buffer, size_t& offset);
+math::int26_t         readInt26(const ByteVec& buffer, size_t& offset);
 int                   readInt(const ByteVec& buffer, size_t& offset);
 int64_t               readLong(const ByteVec& buffer, size_t& offset);
 float                 readFloat(const ByteVec& buffer, size_t& offset);
@@ -62,8 +67,10 @@ ByteVec               readByteArray(const ByteVec& buffer, size_t& offset, size_
 void writeBoolean(ByteVec& buffer, bool value);
 void writeByte(ByteVec& buffer, int8_t value);
 void writeUnsignedByte(ByteVec& buffer, uint8_t value);
+void writeInt12(ByteVec& buffer, math::int12_t value);
 void writeShort(ByteVec& buffer, short value);
 void writeUnsignedShort(ByteVec& buffer, uint16_t value);
+void writeInt26(ByteVec& buffer, math::int26_t value);
 void writeInt(ByteVec& buffer, int value);
 void writeLong(ByteVec& buffer, int64_t value);
 void writeFloat(ByteVec& buffer, float value);
@@ -129,8 +136,8 @@ class PacketBuffer {
     // TODO: readSlot
     // TODO: readHashedSlot
     // TODO: readNBT
-    // TODO: readPosition
-    // TODO: readAngle
+    math::Position        readPosition();
+    math::Angle           readAngle();
     UUID                  readUUID();
     std::vector<uint64_t> readBitSet() { return stratos::readBitSet(buffer, offset); }
     std::vector<bool>     readFixedBitSet(const size_t length) { return stratos::readFixedBitSet(buffer, offset, length); }
@@ -141,8 +148,10 @@ class PacketBuffer {
     std::vector<LoginProperty> readLoginProperty();
     std::optional<std::string> readPrefixedOptionalString(int maxChars);
     std::vector<uint8_t> readInferredByteArray();
+    ResourcePackHeader readResourcePackHeader();
     std::optional<std::vector<uint8_t>> readPrefixedOptionalInferredByteArray();
     std::optional<std::vector<uint8_t>> readPrefixedOptionalPrefixedByteArray();
+    std::vector<ResourcePackHeader> readPrefixedResourcePackHeaderArray();
 
     void writeBoolean(const bool value) { stratos::writeBoolean(buffer, value); }
     void writeByte(const int8_t value) { stratos::writeByte(buffer, value); }
@@ -164,17 +173,29 @@ class PacketBuffer {
     // TODO: writeSlot
     // TODO: writeHashedSlot
     // TODO: writeNBT
-    // TODO: writePosition
-    // TODO: writeAngle
+    void writePosition(const math::Position& position);
+    void writeAngle(const math::Angle& angle);
     void writeUUID(const UUID& uuid);
     void writeBitSet(const std::vector<uint64_t>& longs) { stratos::writeBitSet(buffer, longs); }
     void writeFixedBitSet(const std::vector<bool>& bits, const size_t length) { stratos::writeFixedBitSet(buffer, bits, length); }
-    void                       writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
+    void writeByteArray(const ByteVec& values) { stratos::writeByteArray(buffer, values); }
     void writePrefixedByteArray(const std::vector<uint8_t>& bytes);
     void writeLoginProperty(const std::vector<LoginProperty>& properties);
+    void writeResourcePackHeader(const ResourcePackHeader& header);
+    void writeRegistryEntry(const RegistryEntry& entry);
+    void writeRegistryTagData(const RegistryTagData& data);
+    void writeReportDetail(const ReportDetail& detail);
+    void writeServerLink(const ServerLink& link);
     void writePrefixedOptionalString(const std::optional<std::string>& str, int maxChars);
+    void writePrefixedOptionalUUID(const std::optional<UUID>& uuid);
     void writePrefixedOptionalByteArray(const std::optional<std::vector<uint8_t>>& bytes);
     void writePrefixedOptionalPrefixedByteArray(const std::optional<std::vector<uint8_t>>& bytes);
+    void writePrefixedResourcePackHeaderArray(const std::vector<ResourcePackHeader>& headers);
+    void writePrefixedRegistryEntryArray(const std::vector<RegistryEntry>& entries);
+    void writePrefixedRegistryTagDataArray(const std::vector<RegistryTagData>& data);
+    void writePrefixedIdentifierArray(const std::vector<Identifier>& identifiers);
+    void writePrefixedReportDetailArray(const std::vector<ReportDetail>& details);
+    void writePrefixedServerLinkArray(const std::vector<ServerLink>& serverLinks);
 
     [[nodiscard]] const ByteVec& getBuffer() const { return buffer; }
     [[nodiscard]] size_t         getOffset() const { return offset; }
