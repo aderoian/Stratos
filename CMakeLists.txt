@@ -34,6 +34,7 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        math/Angle.h
         math/Ints.h
         math/Position.h
         network/Network.h

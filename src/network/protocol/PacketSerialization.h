@@ -19,6 +19,7 @@
 
 #ifndef PACKETSERIALIZATION_H
 #define PACKETSERIALIZATION_H
+#include "math/Angle.h"
 #include "math/Ints.h"
 #include "math/Position.h"
 #include "utils/Types.h"
@@ -136,7 +137,7 @@ class PacketBuffer {
     // TODO: readHashedSlot
     // TODO: readNBT
     math::Position        readPosition();
-    // TODO: readAngle
+    math::Angle           readAngle();
     UUID                  readUUID();
     std::vector<uint64_t> readBitSet() { return stratos::readBitSet(buffer, offset); }
     std::vector<bool>     readFixedBitSet(const size_t length) { return stratos::readFixedBitSet(buffer, offset, length); }
@@ -173,7 +174,7 @@ class PacketBuffer {
     // TODO: writeHashedSlot
     // TODO: writeNBT
     void writePosition(const math::Position& position);
-    // TODO: writeAngle
+    void writeAngle(const math::Angle& angle);
     void writeUUID(const UUID& uuid);
     void writeBitSet(const std::vector<uint64_t>& longs) { stratos::writeBitSet(buffer, longs); }
     void writeFixedBitSet(const std::vector<bool>& bits, const size_t length) { stratos::writeFixedBitSet(buffer, bits, length); }
