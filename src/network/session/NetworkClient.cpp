@@ -31,6 +31,9 @@ void NetworkSession::tick() {
     // TODO: Should we always empty or consume a fix amount per tick?
     processReceived();
 }
+void NetworkSession::beginConfiguration() {
+
+}
 void NetworkSession::processReceived() {
     while (true) {
         std::optional<std::unique_ptr<ServerboundPacket>> optionalPacket = connection->receivePacket();
@@ -121,7 +124,7 @@ void NetworkConnection::changeState(const ProtocolState newState) {
         receiveBuf.reserve(512);
         break;
     case Configuration:
-        packetHandler = std::make_unique<ConfigurationPacketHandler>(this);
+        packetHandler = std::make_unique<PacketHandler>(); // Network connection does not handle configuration packets directly
         receiveBuf.reserve(1024);
         break;
     case Play:

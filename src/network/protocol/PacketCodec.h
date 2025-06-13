@@ -581,7 +581,7 @@ protected:
 class ConfigurationPacketHandler final : public PacketHandler {
 public:
     using PacketHandler::handle;
-    explicit ConfigurationPacketHandler(NetworkConnection* connection) : connection(connection) {}
+    explicit ConfigurationPacketHandler(NetworkSession* session) : session(session) {}
     bool handle(ConfigurationClientInformation& packet) override;
     bool handle(ConfigurationCookieResponse& packet) override;
     bool handle(ConfigurationServerPluginMessage& packet) override;
@@ -591,7 +591,7 @@ public:
     bool handle(ConfigurationResourcePackResponse& packet) override;
     bool handle(ServerboundKnownPacks& packet) override;
 protected:
-    NetworkConnection* connection;
+    NetworkSession* session;
 };
 
 class PlayPacketHandler final : public PacketHandler {

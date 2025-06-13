@@ -44,9 +44,7 @@ class NetworkConnection final : public TCPConnection {
     using TCPConnection::receive;
     using TCPConnection::send;
 
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, NetworkManager* network, std::shared_ptr<spdlog::logger> logger, const std::shared_ptr<WorkerThread>& eventLoop) : TCPConnection(socketFd, address, port), network(network), logger(std::move(logger)), eventLoop(eventLoop) {
-        changeState(Handshaking);
-    }
+    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, NetworkManager* network, std::shared_ptr<spdlog::logger> logger, const std::shared_ptr<WorkerThread>& eventLoop) : TCPConnection(socketFd, address, port), network(network), logger(std::move(logger)), eventLoop(eventLoop) { changeState(Handshaking); }
     ~NetworkConnection() override = default;
 
     std::optional<std::unique_ptr<ServerboundPacket>> receivePacket();
@@ -101,7 +99,7 @@ class NetworkConnection final : public TCPConnection {
 class NetworkSession {
   public:
     explicit NetworkSession(NetworkManager* networkManager, SessionId id, std::shared_ptr<NetworkConnection> connection)
-        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)), packetHandler(std::make_unique<PlayPacketHandler>(this)) {}
+        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)), packetHandler(std::make_unique<ConfigurationPacketHandler>(this)) {}
     ~NetworkSession() = default;
 
     [[nodiscard]] std::string getIp() const { return sessionId.ip; }
@@ -110,6 +108,7 @@ class NetworkSession {
     [[nodiscard]] bool        isStale() const { return !isConnected() && connection->isClosed(); }
 
     void tick();
+    void beginConfiguration();
 
     template <typename T> void send(T& packet) const { send(std::move(packet)); }
     template <typename T> void send(T&& packet) const { connection->sendPacket(std::make_unique<T>(std::move(packet))); }
@@ -119,7 +118,7 @@ class NetworkSession {
     SessionId       sessionId;
     std::shared_ptr<NetworkConnection>   connection;
 
-    std::unique_ptr<PlayPacketHandler> packetHandler;
+    std::unique_ptr<PacketHandler> packetHandler;
 
     // Processes received packets
     void processReceived();
