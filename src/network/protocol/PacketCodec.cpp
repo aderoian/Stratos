@@ -317,6 +317,7 @@ bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
 }
 bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }
 bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) {
+    connection->createNetworkSession();
     connection->changeState(Configuration);
     return true;
 }

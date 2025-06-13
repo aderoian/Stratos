@@ -44,7 +44,9 @@ class NetworkConnection final : public TCPConnection {
     using TCPConnection::receive;
     using TCPConnection::send;
 
-    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, NetworkManager* network, std::shared_ptr<spdlog::logger> logger, std::shared_ptr<WorkerThread> eventLoop) : TCPConnection(socketFd, address, port), network(network), logger(std::move(logger)), eventLoop(std::move(eventLoop)) { changeState(Handshaking); }
+    NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, NetworkManager* network, std::shared_ptr<spdlog::logger> logger, const std::shared_ptr<WorkerThread>& eventLoop) : TCPConnection(socketFd, address, port), network(network), logger(std::move(logger)), eventLoop(eventLoop) {
+        changeState(Handshaking);
+    }
     ~NetworkConnection() override = default;
 
     std::optional<std::unique_ptr<ServerboundPacket>> receivePacket();
@@ -63,6 +65,7 @@ class NetworkConnection final : public TCPConnection {
     [[nodiscard]] HandshakeIntent getIntent() const { return intent; }
     [[nodiscard]] std::optional<std::reference_wrapper<SessionInfo>> getSessionInfo() const { return sessionInfo ? std::make_optional(std::ref(*sessionInfo)) : std::nullopt; }
     void updateSessionInfo(SessionInfo&& info);
+    void createNetworkSession();
 
   private:
     NetworkManager* network;

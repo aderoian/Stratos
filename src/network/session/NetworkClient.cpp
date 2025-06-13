@@ -164,6 +164,14 @@ void NetworkConnection::updateSessionInfo(SessionInfo&& info) {
         sessionInfo = std::make_unique<SessionInfo>(std::move(info));
     }
 }
+void NetworkConnection::createNetworkSession() {
+    const std::shared_ptr<NetworkConnection> self = eventLoop->getConnection(socketFd);
+    if (!self) { // Edge case, should never happen
+        logger->critical("Cannot create network session for client {}:{}, failed to get instance of self", address, port);
+        disconnect("Internal server error.");
+    }
+    network->createSession(self);
+}
 int NetworkConnection::flushReceive () {
     int totalReceived = 0;
     ByteVec segment;
