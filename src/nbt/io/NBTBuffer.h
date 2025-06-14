@@ -20,6 +20,7 @@
 #ifndef NBTBUFFER_H
 #define NBTBUFFER_H
 #include "nbt/Tag.h"
+#include "network/Network.h"
 #include "utils/io/ByteBuffer.h"
 
 #include <memory>
@@ -34,11 +35,14 @@ class StringTag;
 class NBTBuffer : public ByteBuffer {
   public:
     NBTBuffer() = default;
-    explicit NBTBuffer(const ByteVec& buffer) {
-        this->buffer = buffer;
-        offset       = 0;
-    }
-    explicit NBTBuffer(ByteVec&& buffer) : ByteBuffer(std::move(buffer)) {}
+    explicit NBTBuffer(const ByteVec& data) : ByteBuffer(data, 0) {}
+    explicit NBTBuffer(ByteVec&& data) : ByteBuffer(std::move(data), 0) {}
+    NBTBuffer(const ByteVec& data, const size_t offset) : ByteBuffer(data, offset) {}
+    NBTBuffer(ByteVec&& data, const size_t offset) : ByteBuffer(std::move(data), offset) {}
+    NBTBuffer(const NBTBuffer&) = delete;
+    NBTBuffer& operator=(const NBTBuffer&) = delete;
+    NBTBuffer(NBTBuffer&&) = default;
+    NBTBuffer& operator=(NBTBuffer&&) = default;
 
     std::string readTagName();
     std::pair<std::string, std::unique_ptr<Tag>> readTag();
@@ -46,7 +50,7 @@ class NBTBuffer : public ByteBuffer {
     std::string readModifiedUTF8String();
     void writeTagName(const std::string& tagName);
     void writeTag(const std::string& name, const std::unique_ptr<Tag>& tag);
-    void writeModifiedUTF8String(const std::string& str);
+    void                                                             writeModifiedUTF8String(const std::string& str);
 };
 
 template <typename T> std::pair<std::string, std::unique_ptr<T>> NBTBuffer::readTag() {

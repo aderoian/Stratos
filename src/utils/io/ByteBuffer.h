@@ -51,6 +51,19 @@ class ByteBuffer {
     ByteBuffer() : offset(0) {}
     explicit ByteBuffer(const ByteVec& data) : offset(0), buffer(data) {}
     explicit ByteBuffer(ByteVec&& data) : offset(0), buffer(std::move(data)) {}
+    ByteBuffer(const ByteVec& data, const size_t offset) : offset(offset), buffer(data) {
+        if (offset > data.size())
+            throw BufferOverflowException("Offset exceeds buffer size");
+    }
+    ByteBuffer(ByteVec&& data, const size_t offset) : offset(offset), buffer(std::move(data)) {
+        if (offset > data.size())
+            throw BufferOverflowException("Offset exceeds buffer size");
+    }
+    ByteBuffer(const ByteBuffer&) = delete;
+    ByteBuffer& operator=(const ByteBuffer&) = delete;
+    ByteBuffer(ByteBuffer&&) = default;
+    ByteBuffer& operator=(ByteBuffer&&) = default;
+    virtual ~ByteBuffer() = default;
     
     bool                  readBoolean();
     int8_t                readByte();
