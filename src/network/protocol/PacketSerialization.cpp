@@ -168,7 +168,7 @@ void stratos::PacketBuffer::writeResourcePackHeader(const ResourcePackHeader& he
 void stratos::PacketBuffer::writeRegistryEntry(const RegistryEntry& entry) {
     writeIdentifier(entry.id);
     writeBoolean(entry.data.has_value());
-    if (entry.data.has_value()) writePrefixedByteArray(entry.data.value());
+    if (entry.data.has_value()) writeByteArray(entry.data.value());
 }
 void stratos::PacketBuffer::writeRegistryTagData(const RegistryTagData& data) {
     writeIdentifier(data.registryKey);

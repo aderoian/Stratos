@@ -19,8 +19,14 @@
 
 #include "NetworkClient.h"
 
+#include "nbt/CompoundTag.h"
+#include "nbt/ListTag.h"
+#include "nbt/NBT.h"
+#include "nbt/PrimitiveTag.h"
+#include "nbt/StringTag.h"
 #include "network/Network.h"
 #include "network/protocol/PacketSerialization.h"
+#include "Server.h"
 #include "spdlog/logger.h"
 
 namespace stratos {
@@ -31,8 +37,135 @@ void NetworkSession::tick() {
     // TODO: Should we always empty or consume a fix amount per tick?
     processReceived();
 }
-void NetworkSession::beginConfiguration() {
+void NetworkSession::beginConfiguration() const {
+    // TODO: R&D the proper configuration process
 
+    // Send Registries
+    // TODO: Registry API
+
+    // TODO: Dimension API (really part of the World API)
+    const nbt::CompoundTag dimensionType{
+        nbt::CompoundTag::CompoundElement{"has_skylight", nbt::ByteTag{true}},
+        nbt::CompoundTag::CompoundElement{"has_ceiling", nbt::ByteTag{false}},
+        nbt::CompoundTag::CompoundElement{"ultrawarm", nbt::ByteTag{false}},
+        nbt::CompoundTag::CompoundElement{"natural", nbt::ByteTag{true}},
+        nbt::CompoundTag::CompoundElement{"coordinate_scale", nbt::DoubleTag{1.0}},
+        nbt::CompoundTag::CompoundElement{"bed_works", nbt::ByteTag{true}},
+        nbt::CompoundTag::CompoundElement{"respawn_anchor_works", nbt::ByteTag{false}},
+        nbt::CompoundTag::CompoundElement{"min_y", nbt::IntTag{-64}},
+        nbt::CompoundTag::CompoundElement{"height", nbt::IntTag{384}},
+        nbt::CompoundTag::CompoundElement{"logical_height", nbt::IntTag{384}},
+        nbt::CompoundTag::CompoundElement{"infiniburn", nbt::StringTag{"#minecraft:infiniburn_overworld"}},
+        nbt::CompoundTag::CompoundElement{"effects", nbt::StringTag{"minecraft:overworld"}},
+        nbt::CompoundTag::CompoundElement{"ambient_light", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"piglin_safe", nbt::ByteTag{false}},
+        nbt::CompoundTag::CompoundElement{"has_raids", nbt::ByteTag{false}},
+        nbt::CompoundTag::CompoundElement{"monster_spawn_light_level", nbt::CompoundTag{nbt::CompoundTag::CompoundElement{"type", nbt::StringTag{"minecraft:uniform"}},
+                                                                                        nbt::CompoundTag::CompoundElement{"max_inclusive", nbt::IntTag{7}},
+                                                                                        nbt::CompoundTag::CompoundElement{"min_inclusive", nbt::IntTag{0}}}},
+        nbt::CompoundTag::CompoundElement{"monster_spawn_block_light_limit", nbt::IntTag{0}}};
+
+    const nbt::CompoundTag plainsBiome{
+        nbt::CompoundTag::CompoundElement{"has_precipitation", nbt::ByteTag{true}}, nbt::CompoundTag::CompoundElement{"temperature", nbt::FloatTag{0.8}},
+        nbt::CompoundTag::CompoundElement{"downfall", nbt::FloatTag{0.4}},
+        nbt::CompoundTag::CompoundElement{
+            "effects",
+            nbt::CompoundTag{nbt::CompoundTag::CompoundElement{"fog_color", nbt::IntTag{12638463}}, nbt::CompoundTag::CompoundElement{"water_color", nbt::IntTag{4159204}},
+                             nbt::CompoundTag::CompoundElement{"water_fog_color", nbt::IntTag{329011}}, nbt::CompoundTag::CompoundElement{"sky_color", nbt::IntTag{329011}},
+                             nbt::CompoundTag::CompoundElement{"mood_sound", nbt::CompoundTag{nbt::CompoundTag::CompoundElement{"tick_delay", nbt::IntTag{6000}},
+                                                                                              nbt::CompoundTag::CompoundElement{"block_search_extent", nbt::IntTag{8}},
+                                                                                              nbt::CompoundTag::CompoundElement{"sound", nbt::StringTag{"minecraft:ambient.cave"}},
+                                                                                              nbt::CompoundTag::CompoundElement{"offset", nbt::FloatTag{2.0f}}}}}}};
+
+    const nbt::CompoundTag catVariant{
+        nbt::CompoundTag::CompoundElement{"asset_id", nbt::StringTag{"minecraft:entity/cat/all_black"}}, nbt::CompoundTag::CompoundElement{"spawn_conditions", nbt::ListTag{}}
+    };
+    const nbt::CompoundTag cowVariant{
+        nbt::CompoundTag::CompoundElement{"asset_id", nbt::StringTag{"minecraft:entity/cow/temperate_cow"}}, nbt::CompoundTag::CompoundElement{"spawn_conditions", nbt::ListTag{}}
+    };
+    const nbt::CompoundTag chickenVariant{
+        nbt::CompoundTag::CompoundElement{"asset_id", nbt::StringTag{"minecraft:entity/chicken/temperate_chicken"}}, nbt::CompoundTag::CompoundElement{"spawn_conditions", nbt::ListTag{}}
+    };
+    const nbt::CompoundTag frogVariant{
+        nbt::CompoundTag::CompoundElement{"asset_id", nbt::StringTag{"minecraft:entity/frog/temperate_frog"}}, nbt::CompoundTag::CompoundElement{"spawn_conditions", nbt::ListTag{}}
+    };
+    const nbt::CompoundTag paintingVariant{
+        nbt::CompoundTag::CompoundElement{"asset_id", nbt::StringTag{"minecraft:earth"}}, nbt::CompoundTag::CompoundElement{"height", nbt::IntTag{2}},
+        nbt::CompoundTag::CompoundElement{"width", nbt::IntTag{2}},nbt::CompoundTag::CompoundElement{"title", nbt::CompoundTag{
+            nbt::CompoundTag::CompoundElement{"translate", nbt::StringTag{"painting.minecraft.earth.title"}},
+            nbt::CompoundTag::CompoundElement{"color", nbt::StringTag{"yellow"}}
+        }}
+    };
+    const nbt::CompoundTag pigVariant{
+        nbt::CompoundTag::CompoundElement{"asset_id", nbt::StringTag{"minecraft:entity/pig/temperate_pig"}}, nbt::CompoundTag::CompoundElement{"spawn_conditions", nbt::ListTag{}}
+    };
+    const nbt::CompoundTag wolfVariant{
+        nbt::CompoundTag::CompoundElement{"assets", nbt::CompoundTag{
+            nbt::CompoundTag::CompoundElement{"angry", nbt::StringTag{"minecraft:entity/wolf/wolf_ashen_angry"}},
+            nbt::CompoundTag::CompoundElement{"tame", nbt::StringTag{"minecraft:entity/wolf/wolf_ashen_tame"}},
+            nbt::CompoundTag::CompoundElement{"wild", nbt::StringTag{"minecraft:entity/wolf/wolf_ashen"}}
+        }}, nbt::CompoundTag::CompoundElement{"spawn_conditions", nbt::ListTag{}}
+    };
+    const nbt::CompoundTag wolfSoundVariant{
+        nbt::CompoundTag::CompoundElement{"ambient_sound", nbt::StringTag{"minecraft:entity.wolf_angry.ambient"}},
+        nbt::CompoundTag::CompoundElement{"death_sound", nbt::StringTag{"minecraft:entity.wolf_angry.death"}},
+        nbt::CompoundTag::CompoundElement{"growl_sound", nbt::StringTag{"minecraft:entity.wolf_angry.growl"}},
+        nbt::CompoundTag::CompoundElement{"hurt_sound", nbt::StringTag{"minecraft:entity.wolf_angry.hurt"}},
+        nbt::CompoundTag::CompoundElement{"pant_sound", nbt::StringTag{"minecraft:entity.wolf_angry.pant"}},
+        nbt::CompoundTag::CompoundElement{"whine_sound", nbt::StringTag{"minecraft:entity.wolf_angry.whine"}}
+    };
+
+
+    RegistryEntry dimensionTypeEntry{Identifier{"minecraft", "overworld"}, std::make_optional(nbt::writeNetworkNBT(dimensionType))};
+    RegistryEntry plainsBiomeEntry{Identifier{"minecraft", "plains"}, std::make_optional(nbt::writeNetworkNBT(plainsBiome))};
+    RegistryEntry catVariantEntry{Identifier{"minecraft", "cat/all_black"}, std::make_optional(nbt::writeNetworkNBT(catVariant))};
+    RegistryEntry cowVariantEntry{Identifier{"minecraft", "cow/temperate"}, std::make_optional(nbt::writeNetworkNBT(cowVariant))};
+    RegistryEntry chickenVariantEntry{Identifier{"minecraft", "chicken/temperate"}, std::make_optional(nbt::writeNetworkNBT(chickenVariant))};
+    RegistryEntry frogVariantEntry{Identifier{"minecraft", "frog/temperate"}, std::make_optional(nbt::writeNetworkNBT(frogVariant))};
+    RegistryEntry paintingVariantEntry{Identifier{"minecraft", "earth"}, std::make_optional(nbt::writeNetworkNBT(paintingVariant))};
+    RegistryEntry pigVariantEntry{Identifier{"minecraft", "pig/temperate"}, std::make_optional(nbt::writeNetworkNBT(pigVariant))};
+    RegistryEntry wolfVariantEntry{Identifier{"minecraft", "ashen"}, std::make_optional(nbt::writeNetworkNBT(wolfVariant))};
+    RegistryEntry wolfSoundVariantEntry{Identifier{"minecraft", "angry"}, std::make_optional(nbt::writeNetworkNBT(wolfSoundVariant))};
+    send(RegistryDataPacket(Identifier{"minecraft", "dimension_type"}, std::vector{std::move(dimensionTypeEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "worldgen/biome"}, std::vector{std::move(plainsBiomeEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "cat_variant"}, std::vector{std::move(catVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "cow_variant"}, std::vector{std::move(cowVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "chicken_variant"}, std::vector{std::move(chickenVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "frog_variant"}, std::vector{std::move(frogVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "painting_variant"}, std::vector{std::move(paintingVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "pig_variant"}, std::vector{std::move(pigVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "wolf_variant"}, std::vector{std::move(wolfVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "wolf_sound_variant"}, std::vector{std::move(wolfSoundVariantEntry)}));
+    send(FinishConfiguration());
+}
+void NetworkSession::changeState(const ProtocolState newState) const {
+    connection->changeState(newState);
+}
+void NetworkSession::loginPlayer() {
+    send(LoginPlay(
+        0,
+        false,
+        std::vector{Identifier{"minecraft", "overworld"}},
+        networkManager->getServer()->getMaxPlayers(),
+        12, // TODO: View distance from server.properties
+        10, // TODO: Simulation distance from server.properties
+        false,
+        true,
+        false,
+        0, // TODO: Figure out what Dimension ID is
+        Identifier{"minecraft", "overworld"},
+        0, // TODO: Hashed seed, should be generated by the server
+        1,
+        -1, // Previous gamemode, -1 means no previous gamemode
+        false,
+        false,
+        false,
+        std::nullopt,
+        std::nullopt,
+        0, // Portal cooldown
+        63, // Sea level, default value
+        true
+        ));
 }
 void NetworkSession::processReceived() {
     while (true) {

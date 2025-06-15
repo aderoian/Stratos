@@ -19,6 +19,7 @@
 
 #ifndef PACKETCODEC_H
 #define PACKETCODEC_H
+#include "math/Position.h"
 #include "Packet.h"
 #include "utils/Types.h"
 
@@ -442,7 +443,7 @@ public:
     std::vector<RegistryEntry> entries;
 
     RegistryDataPacket() : Packet(ID), ClientboundPacket(ID), registryKey({"",""}) {}
-    RegistryDataPacket(Identifier registryKey, std::vector<RegistryEntry>& entries)
+    RegistryDataPacket(Identifier registryKey, std::vector<RegistryEntry>&& entries)
         : Packet(ID), ClientboundPacket(ID), registryKey(std::move(registryKey)), entries(std::move(entries)) {}
     CLIENTBOUND_PACKET_FOOTER(RegistryDataPacket)
 };
@@ -542,6 +543,45 @@ public:
     ConfigurationServerLinks() : Packet(ID), ClientboundPacket(ID) {}
     explicit ConfigurationServerLinks(std::vector<ServerLink>& links) : Packet(ID), ClientboundPacket(ID), links(std::move(links)) {}
     CLIENTBOUND_PACKET_FOOTER(ConfigurationServerLinks)
+};
+
+// Play Packets
+class LoginPlay final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x2B;
+    int entityId; // int
+    bool isHardcore;
+    std::vector<Identifier> dimensions; // prefixed array
+    int maxPlayers; // VarInt
+    int viewDistance; // VarInt
+    int simulationDistance; // VarInt
+    bool reducedDebugInfo;
+    bool enableRespawnScreen;
+    bool doLimitedCrafting;
+    int dimensionType; // VarInt
+    Identifier dimensionName;
+    long hashedSeed;
+    uint8_t gamemode;
+    int8_t previousGamemode;
+    bool debug;
+    bool flat;
+    bool hasDeathLocation;
+    std::optional<Identifier> deathDimension; // optional identifier
+    std::optional<math::Position> deathPosition; // optional position
+    int portalCooldown; // VarInt
+    int seaLevel; // VarInt
+    bool                          enforcesSecureChat;
+
+    LoginPlay(const int entity_id, const bool is_hardcore, const std::vector<Identifier> dimensions, const int max_players, const int view_distance, const int simulation_distance, const bool reduced_debug_info,
+              bool const enable_respawn_screen, bool const do_limited_crafting, const int dimension_type, const Identifier dimension_name, const long hashed_seed, const uint8_t gamemode, const int8_t previous_gamemode,
+              const bool debug, const bool flat, const bool has_death_location, const std::optional<Identifier> death_dimension, const std::optional<math::Position> death_position, const int portal_cooldown,
+              const int sea_level, const bool enforces_secure_chat)
+        : Packet(ID), ClientboundPacket(ID), entityId(entity_id), isHardcore(is_hardcore), dimensions(dimensions), maxPlayers(max_players), viewDistance(view_distance),
+          simulationDistance(simulation_distance), reducedDebugInfo(reduced_debug_info), enableRespawnScreen(enable_respawn_screen), doLimitedCrafting(do_limited_crafting),
+          dimensionType(dimension_type), dimensionName(dimension_name), hashedSeed(hashed_seed), gamemode(gamemode), previousGamemode(previous_gamemode), debug(debug), flat(flat),
+          hasDeathLocation(has_death_location), deathDimension(death_dimension), deathPosition(death_position), portalCooldown(portal_cooldown), seaLevel(sea_level),
+          enforcesSecureChat(enforces_secure_chat) {}
+    CLIENTBOUND_PACKET_FOOTER(LoginPlay)
 };
 
 class HandshakePacketHandler final : public PacketHandler {

@@ -99,7 +99,7 @@ class NetworkConnection final : public TCPConnection {
 class NetworkSession {
   public:
     explicit NetworkSession(NetworkManager* networkManager, SessionId id, std::shared_ptr<NetworkConnection> connection)
-        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)), packetHandler(std::make_unique<ConfigurationPacketHandler>(this)) {}
+        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)), packetHandler(std::make_unique<ConfigurationPacketHandler>(this)) { beginConfiguration(); }
     ~NetworkSession() = default;
 
     [[nodiscard]] std::string getIp() const { return sessionId.ip; }
@@ -108,7 +108,9 @@ class NetworkSession {
     [[nodiscard]] bool        isStale() const { return !isConnected() && connection->isClosed(); }
 
     void tick();
-    void beginConfiguration();
+    void beginConfiguration() const;
+    void changeState(ProtocolState newState) const;
+    void loginPlayer();
 
     template <typename T> void send(T& packet) const { send(std::move(packet)); }
     template <typename T> void send(T&& packet) const { connection->sendPacket(std::make_unique<T>(std::move(packet))); }

@@ -256,6 +256,32 @@ void stratos::ConfigurationCustomReportDetails::encrypt(PacketBuffer& buffer) {
 void stratos::ConfigurationServerLinks::encrypt(PacketBuffer& buffer) {
     buffer.writePrefixedServerLinkArray(links);
 }
+void stratos::LoginPlay::encrypt(PacketBuffer& buffer) {
+    buffer.writeInt(entityId);
+    buffer.writeBoolean(isHardcore);
+    buffer.writePrefixedIdentifierArray(dimensions);
+    buffer.writeVarInt(maxPlayers);
+    buffer.writeVarInt(viewDistance);
+    buffer.writeVarInt(simulationDistance);
+    buffer.writeBoolean(reducedDebugInfo);
+    buffer.writeBoolean(enableRespawnScreen);
+    buffer.writeBoolean(doLimitedCrafting);
+    buffer.writeVarInt(dimensionType);
+    buffer.writeIdentifier(dimensionName);
+    buffer.writeLong(hashedSeed);
+    buffer.writeVarInt(gamemode);
+    buffer.writeVarInt(previousGamemode);
+    buffer.writeBoolean(debug);
+    buffer.writeBoolean(flat);
+    buffer.writeBoolean(hasDeathLocation);
+    if (hasDeathLocation) {
+        buffer.writeIdentifier(deathDimension.value());
+        buffer.writePosition(deathPosition.value());
+    }
+    buffer.writeVarInt(portalCooldown);
+    buffer.writeVarInt(seaLevel);
+    buffer.writeBoolean(enforcesSecureChat);
+}
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
     case HandshakeIntent::Status:
@@ -304,7 +330,7 @@ bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
         return false;
     }
     connection->clientSecret = std::move(rsaDecrypt(connection->encryptionKey, packet.sharedSecret));
-    connection->encryptionEnabled = true;
+    connection->encryptionEnabled = false;
 
     if (server->isOnlineMode()) {
         authenticate(connection, server->getName(), connection->clientSecret, *connection->encryptionKey);
@@ -332,7 +358,9 @@ bool stratos::ConfigurationPacketHandler::handle(ConfigurationServerPluginMessag
     return PacketHandler::handle(packet);
 }
 bool stratos::ConfigurationPacketHandler::handle(AcknowledgeFinishConfiguration& packet) {
-    return PacketHandler::handle(packet);
+    session->changeState(Play);
+    session->loginPlayer();
+    return true;
 }
 bool stratos::ConfigurationPacketHandler::handle(ConfigurationServerboundKeepAlive& packet) {
     return PacketHandler::handle(packet);

@@ -33,7 +33,7 @@ bool stratos::NetworkManager::start() {
     if (running) throw std::runtime_error("Attempted to start NetworkManager while it is already running");
     running = true;
 
-    encryptionEnabled = true; // TODO: settings from server config
+    encryptionEnabled = false; // TODO: settings from server config
     if (encryptionEnabled) {
         try {
             encryptionKey = std::move(generateEncryptionKey());
