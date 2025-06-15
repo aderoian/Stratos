@@ -50,6 +50,7 @@ std::unique_ptr<Tag> readNetworkNBT(const ByteBuffer& buffer);
 template <typename T>
 std::unique_ptr<T> readNetworkNBT(const ByteBuffer& buffer);
 ByteVec writeNetworkNBT(const std::unique_ptr<Tag>& tag);
+ByteVec writeNetworkNBT(const Tag& tag);
 template <typename T>
 std::unique_ptr<T> readNBTFromFile(const Path& path, const bool compressed) { return readNBTFromBytes<T>(stratos::readAllBytes(path), compressed); }
 template <typename T>

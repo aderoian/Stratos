@@ -32,6 +32,7 @@ class CompoundTag final : public CRTPTag<CompoundTag> {
 public:
     typedef TagMap::iterator Iterator;
     typedef TagMap::const_iterator ConstantIterator;
+    typedef std::pair<std::string, TagValueInitializer> CompoundElement;
 
     static constexpr auto type = TagType::Compound;
 

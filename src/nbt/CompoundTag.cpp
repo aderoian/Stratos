@@ -57,9 +57,11 @@ void CompoundTag::read(NBTBuffer& buffer) {
 }
 void CompoundTag::write(NBTBuffer& buffer) const {
     for (const auto& [name, value] : tags) {
+        buffer.writeByte(static_cast<int8_t>(value.getType()));
         buffer.writeTagName(name);
         value.get().write(buffer);
     }
+    buffer.writeByte(static_cast<int8_t>(TagType::End));
 }
 bool operator==(const CompoundTag& lhs, const CompoundTag& rhs) {
     return lhs.tags == rhs.tags;

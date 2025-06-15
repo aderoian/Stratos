@@ -36,8 +36,11 @@ std::unique_ptr<stratos::nbt::Tag> stratos::nbt::readNetworkNBT(const ByteBuffer
     return readNetworkNBT<Tag>(buffer);
 }
 ByteVec stratos::nbt::writeNetworkNBT(const std::unique_ptr<Tag>& tag) {
+    return writeNetworkNBT(*tag);
+}
+stratos::nbt::ByteVec stratos::nbt::writeNetworkNBT(const Tag& tag) {
     NBTBuffer nbtBuf;
-    nbtBuf.writeByte(static_cast<int8_t>(tag->getType()));
-    tag->write(nbtBuf);
+    nbtBuf.writeByte(static_cast<int8_t>(tag.getType()));
+    tag.write(nbtBuf);
     return nbtBuf.data();
 }
