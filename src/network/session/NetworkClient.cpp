@@ -115,6 +115,134 @@ void NetworkSession::beginConfiguration() const {
         nbt::CompoundTag::CompoundElement{"whine_sound", nbt::StringTag{"minecraft:entity.wolf_angry.whine"}}
     };
 
+    const nbt::CompoundTag inFireDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.1}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"inFire"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag campfireDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.1}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"inFire"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag lightningDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.1}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"lightningBold"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag onFireDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"onFire"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag lavaDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.1}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"lava"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag hotFloorDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.1}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"hotFloor"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag inWallDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"inWall"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag crammingDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"cramming"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag drownDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"drown"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag starveDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"starve"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag cactusDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.1}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"cactus"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag fallDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"fall"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag enderPearlDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"fall"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag flyIntoWallDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"flyIntoWall"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag outOfWorldDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"outOfWorld"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+
+    const nbt::CompoundTag genericDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"generic"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+
+    const nbt::CompoundTag magicDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"magic"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag witherDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"wither"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag dragonBreathDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"dragonBreath"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag dryOutDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"dryOut"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag sweetBerryBushDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"sweetBerryBush"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag freezeDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"freeze"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag stalagmiteDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"stalagmite"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag outsideBorderDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"outsideBorder"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+    const nbt::CompoundTag genericKillDamageEntry{
+        nbt::CompoundTag::CompoundElement{"exhaustion", nbt::FloatTag{0.0}},
+        nbt::CompoundTag::CompoundElement{"message_id", nbt::StringTag{"genericKill"}},
+        nbt::CompoundTag::CompoundElement{"scaling", nbt::StringTag{"when_caused_by_living_non_player"}}
+    };
+
 
     RegistryEntry dimensionTypeEntry{Identifier{"minecraft", "overworld"}, std::make_optional(nbt::writeNetworkNBT(dimensionType))};
     RegistryEntry plainsBiomeEntry{Identifier{"minecraft", "plains"}, std::make_optional(nbt::writeNetworkNBT(plainsBiome))};
@@ -126,6 +254,7 @@ void NetworkSession::beginConfiguration() const {
     RegistryEntry pigVariantEntry{Identifier{"minecraft", "pig/temperate"}, std::make_optional(nbt::writeNetworkNBT(pigVariant))};
     RegistryEntry wolfVariantEntry{Identifier{"minecraft", "ashen"}, std::make_optional(nbt::writeNetworkNBT(wolfVariant))};
     RegistryEntry wolfSoundVariantEntry{Identifier{"minecraft", "angry"}, std::make_optional(nbt::writeNetworkNBT(wolfSoundVariant))};
+
     send(RegistryDataPacket(Identifier{"minecraft", "dimension_type"}, std::vector{std::move(dimensionTypeEntry)}));
     send(RegistryDataPacket(Identifier{"minecraft", "worldgen/biome"}, std::vector{std::move(plainsBiomeEntry)}));
     send(RegistryDataPacket(Identifier{"minecraft", "cat_variant"}, std::vector{std::move(catVariantEntry)}));
@@ -136,6 +265,33 @@ void NetworkSession::beginConfiguration() const {
     send(RegistryDataPacket(Identifier{"minecraft", "pig_variant"}, std::vector{std::move(pigVariantEntry)}));
     send(RegistryDataPacket(Identifier{"minecraft", "wolf_variant"}, std::vector{std::move(wolfVariantEntry)}));
     send(RegistryDataPacket(Identifier{"minecraft", "wolf_sound_variant"}, std::vector{std::move(wolfSoundVariantEntry)}));
+    send(RegistryDataPacket(Identifier{"minecraft", "damage_type"}, std::vector{
+        RegistryEntry{Identifier{"minecraft", "in_fire"}, std::make_optional(nbt::writeNetworkNBT(inFireDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "campfire"}, std::make_optional(nbt::writeNetworkNBT(campfireDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "lightning_bolt"}, std::make_optional(nbt::writeNetworkNBT(lightningDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "on_fire"}, std::make_optional(nbt::writeNetworkNBT(onFireDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "lava"}, std::make_optional(nbt::writeNetworkNBT(lavaDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "hot_floor"}, std::make_optional(nbt::writeNetworkNBT(hotFloorDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "in_wall"}, std::make_optional(nbt::writeNetworkNBT(inWallDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "cramming"}, std::make_optional(nbt::writeNetworkNBT(crammingDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "drown"}, std::make_optional(nbt::writeNetworkNBT(drownDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "starve"}, std::make_optional(nbt::writeNetworkNBT(starveDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "cactus"}, std::make_optional(nbt::writeNetworkNBT(cactusDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "fall"}, std::make_optional(nbt::writeNetworkNBT(fallDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "ender_pearl"}, std::make_optional(nbt::writeNetworkNBT(enderPearlDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "fly_into_wall"}, std::make_optional(nbt::writeNetworkNBT(flyIntoWallDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "out_of_world"}, std::make_optional(nbt::writeNetworkNBT(outOfWorldDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "generic"}, std::make_optional(nbt::writeNetworkNBT(genericDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "magic"}, std::make_optional(nbt::writeNetworkNBT(magicDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "wither"}, std::make_optional(nbt::writeNetworkNBT(witherDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "dragon_breath"}, std::make_optional(nbt::writeNetworkNBT(dragonBreathDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "dry_out"}, std::make_optional(nbt::writeNetworkNBT(dryOutDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "sweet_berry_bush"}, std::make_optional(nbt::writeNetworkNBT(sweetBerryBushDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "freeze"}, std::make_optional(nbt::writeNetworkNBT(freezeDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "stalagmite"}, std::make_optional(nbt::writeNetworkNBT(stalagmiteDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "outside_border"}, std::make_optional(nbt::writeNetworkNBT(outsideBorderDamageEntry))},
+        RegistryEntry{Identifier{"minecraft", "generic_kill"}, std::make_optional(nbt::writeNetworkNBT(genericKillDamageEntry))}
+    }));
     send(FinishConfiguration());
 }
 void NetworkSession::changeState(const ProtocolState newState) const {
@@ -171,7 +327,7 @@ void NetworkSession::processReceived() {
     while (true) {
         std::optional<std::unique_ptr<ServerboundPacket>> optionalPacket = connection->receivePacket();
         if (!optionalPacket) break; // No more packets to process
-        if (auto packet = std::move(*optionalPacket); !packetHandler->handle(*packet)) {
+        if (const auto packet = std::move(*optionalPacket); !packet->accept(*packetHandler)) {
             networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);
         }
     }

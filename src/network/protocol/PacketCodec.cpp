@@ -269,8 +269,8 @@ void stratos::LoginPlay::encrypt(PacketBuffer& buffer) {
     buffer.writeVarInt(dimensionType);
     buffer.writeIdentifier(dimensionName);
     buffer.writeLong(hashedSeed);
-    buffer.writeVarInt(gamemode);
-    buffer.writeVarInt(previousGamemode);
+    buffer.writeByte(gamemode);
+    buffer.writeByte(previousGamemode);
     buffer.writeBoolean(debug);
     buffer.writeBoolean(flat);
     buffer.writeBoolean(hasDeathLocation);
