@@ -19,6 +19,7 @@
 
 #ifndef PACKETCODEC_H
 #define PACKETCODEC_H
+#include "math/Angle.h"
 #include "math/Position.h"
 #include "Packet.h"
 #include "utils/Types.h"
@@ -558,6 +559,25 @@ class GameEventPacket final : public ClientboundPacket {
 };
 
 // Play Packets
+class SynchronizePlayerPosition final : public ClientboundPacket {
+  public:
+    constexpr static int ID = 0x41;
+    int teleportId; // VarInt
+    double x;
+    double y;
+    double z;
+    double velocityX;
+    double velocityY;
+    double velocityZ;
+    float yaw;
+    float pitch;
+    int flags;
+
+    SynchronizePlayerPosition() : Packet(ID), ClientboundPacket(ID), teleportId(), x(), y(), z(), velocityX(), velocityY(), velocityZ(), yaw(), pitch(), flags() {}
+    SynchronizePlayerPosition(const int teleportId, const double x, const double y, const double z, const double velocityX, const double velocityY, const double velocityZ, const float yaw, const float pitch, const int flags = 0)
+        : Packet(ID), ClientboundPacket(ID), teleportId(teleportId), x(x), y(y), z(z), velocityX(velocityX), velocityY(velocityY), velocityZ(velocityZ), yaw(yaw), pitch(pitch), flags(flags) {}
+    CLIENTBOUND_PACKET_FOOTER(SynchronizePlayerPosition)
+};
 class LoginPlay final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x2B;
@@ -598,6 +618,29 @@ public:
           hasDeathLocation(has_death_location), deathDimension(death_dimension), deathPosition(death_position), portalCooldown(portal_cooldown), seaLevel(sea_level),
           enforcesSecureChat(enforces_secure_chat) {}
     CLIENTBOUND_PACKET_FOOTER(LoginPlay)
+};
+
+class SetCenterChunk final : public ClientboundPacket {
+  public:
+    constexpr static int ID = 0x57;
+    int chunkX; // VarInt
+    int chunkZ; // VarInt
+
+    SetCenterChunk() : Packet(ID), ClientboundPacket(ID), chunkX(0), chunkZ(0) {}
+    SetCenterChunk(const int chunkX, const int chunkZ) : Packet(ID), ClientboundPacket(ID), chunkX(chunkX), chunkZ(chunkZ) {}
+    CLIENTBOUND_PACKET_FOOTER(SetCenterChunk)
+};
+
+class SetDefaultSpawnPosition final : public ClientboundPacket {
+  public:
+    constexpr static int ID = 0x5A;
+    math::Position location;
+    float angle;
+
+    SetDefaultSpawnPosition() : Packet(ID), ClientboundPacket(ID), location(), angle() {}
+    SetDefaultSpawnPosition(const math::Position location, const float angle)
+        : Packet(ID), ClientboundPacket(ID), location(location), angle(angle) {}
+    CLIENTBOUND_PACKET_FOOTER(SetDefaultSpawnPosition)
 };
 
 class HandshakePacketHandler final : public PacketHandler {

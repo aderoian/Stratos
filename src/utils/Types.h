@@ -146,5 +146,15 @@ enum class GameEvent {
     StartWaitingForChunks = 13
 };
 
+constexpr int FLAG_RELATIVE_X = 0x0001;
+constexpr int FLAG_RELATIVE_Y = 0x0002;
+constexpr int FLAG_RELATIVE_Z = 0x0004;
+constexpr int FLAG_RELATIVE_YAW = 0x0008;
+constexpr int FLAG_RELATIVE_PITCH = 0x0010;
+constexpr int FLAG_RELATIVE_VELOCITY_X = 0x0020;
+constexpr int FLAG_RELATIVE_VELOCITY_Y = 0x0040;
+constexpr int FLAG_RELATIVE_VELOCITY_Z = 0x0080;
+constexpr int FLAG_ROTATE_VELOCITY = 0x0100;
+
 }
 #endif //TYPES_H

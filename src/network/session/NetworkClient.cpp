@@ -322,7 +322,13 @@ void NetworkSession::loginPlayer() {
         63, // Sea level, default value
         true
         ));
+
+    send(SetDefaultSpawnPosition(math::Position{8, 64, 8}, 0)); // TODO: Spawn position should be determined by the server
+    send(SetCenterChunk(0, 0));
+    send(SynchronizePlayerPosition(0, 8, 64, 8, 0, 0, 0, 0, 0));
     send(GameEventPacket(GameEvent::StartWaitingForChunks));
+
+
 }
 void NetworkSession::processReceived() {
     while (true) {

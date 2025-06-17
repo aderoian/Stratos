@@ -260,6 +260,18 @@ void stratos::GameEventPacket::encrypt(PacketBuffer& buffer) {
     buffer.writeUnsignedByte(static_cast<uint8_t>(event));
     buffer.writeFloat(data);
 }
+void stratos::SynchronizePlayerPosition::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(teleportId);
+    buffer.writeDouble(x);
+    buffer.writeDouble(y);
+    buffer.writeDouble(z);
+    buffer.writeDouble(velocityX);
+    buffer.writeDouble(velocityY);
+    buffer.writeDouble(velocityZ);
+    buffer.writeFloat(yaw);
+    buffer.writeFloat(pitch);
+    buffer.writeInt(flags);
+}
 void stratos::LoginPlay::encrypt(PacketBuffer& buffer) {
     buffer.writeInt(entityId);
     buffer.writeBoolean(isHardcore);
@@ -285,6 +297,14 @@ void stratos::LoginPlay::encrypt(PacketBuffer& buffer) {
     buffer.writeVarInt(portalCooldown);
     buffer.writeVarInt(seaLevel);
     buffer.writeBoolean(enforcesSecureChat);
+}
+void stratos::SetCenterChunk::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(chunkX);
+    buffer.writeVarInt(chunkZ);
+}
+void stratos::SetDefaultSpawnPosition::encrypt(PacketBuffer& buffer) {
+    buffer.writePosition(location);
+    buffer.writeFloat(angle);
 }
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
