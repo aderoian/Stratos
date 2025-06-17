@@ -545,6 +545,18 @@ public:
     CLIENTBOUND_PACKET_FOOTER(ConfigurationServerLinks)
 };
 
+class GameEventPacket final : public ClientboundPacket {
+  public:
+    constexpr static int ID = 0x22;
+    GameEvent event;
+    float data;
+
+    GameEventPacket() : Packet(ID), ClientboundPacket(ID), event(), data(0) {}
+    explicit GameEventPacket(const GameEvent event, const float data = 0.0f)
+        : Packet(ID), ClientboundPacket(ID), event(event), data(data){}
+    CLIENTBOUND_PACKET_FOOTER(GameEventPacket)
+};
+
 // Play Packets
 class LoginPlay final : public ClientboundPacket {
 public:
@@ -572,6 +584,10 @@ public:
     int seaLevel; // VarInt
     bool                          enforcesSecureChat;
 
+    LoginPlay()
+        : Packet(ID), ClientboundPacket(ID), entityId(0), isHardcore(false), maxPlayers(0), viewDistance(0), simulationDistance(0), reducedDebugInfo(false),
+          enableRespawnScreen(false), doLimitedCrafting(false), dimensionType(0), dimensionName(Identifier{"", ""}), hashedSeed(0), gamemode(0), previousGamemode(0), debug(false),
+          flat(false), hasDeathLocation(false), portalCooldown(0), seaLevel(0), enforcesSecureChat(false) {}
     LoginPlay(const int entity_id, const bool is_hardcore, const std::vector<Identifier> dimensions, const int max_players, const int view_distance, const int simulation_distance, const bool reduced_debug_info,
               bool const enable_respawn_screen, bool const do_limited_crafting, const int dimension_type, const Identifier dimension_name, const long hashed_seed, const uint8_t gamemode, const int8_t previous_gamemode,
               const bool debug, const bool flat, const bool has_death_location, const std::optional<Identifier> death_dimension, const std::optional<math::Position> death_position, const int portal_cooldown,

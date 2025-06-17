@@ -129,5 +129,22 @@ struct ServerLink {
     std::string url;
 };
 
+enum class GameEvent {
+    NoRespawnBlockAvailable = 0,
+    BeginRaining = 1,
+    EndRaining = 2,
+    ChangeGameMode = 3,
+    WinGame = 4,
+    DemoEvent = 5,
+    ArrowHitPlayer = 6,
+    RainLevelChange = 7,
+    ThunderLevelChange = 8,
+    PlayPufferfishStingSound = 9,
+    PlayElderGuardianCurseSound = 10,
+    EnableRespawnScreen = 11,
+    LimitedCrafting = 12,
+    StartWaitingForChunks = 13
+};
+
 }
 #endif //TYPES_H

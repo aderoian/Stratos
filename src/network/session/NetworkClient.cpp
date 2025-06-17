@@ -322,6 +322,7 @@ void NetworkSession::loginPlayer() {
         63, // Sea level, default value
         true
         ));
+    send(GameEventPacket(GameEvent::StartWaitingForChunks));
 }
 void NetworkSession::processReceived() {
     while (true) {

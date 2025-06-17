@@ -256,6 +256,10 @@ void stratos::ConfigurationCustomReportDetails::encrypt(PacketBuffer& buffer) {
 void stratos::ConfigurationServerLinks::encrypt(PacketBuffer& buffer) {
     buffer.writePrefixedServerLinkArray(links);
 }
+void stratos::GameEventPacket::encrypt(PacketBuffer& buffer) {
+    buffer.writeUnsignedByte(static_cast<uint8_t>(event));
+    buffer.writeFloat(data);
+}
 void stratos::LoginPlay::encrypt(PacketBuffer& buffer) {
     buffer.writeInt(entityId);
     buffer.writeBoolean(isHardcore);
