@@ -31,6 +31,7 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
+        utils/collection/Palette.cpp
         utils/config/Config.cpp
         utils/crypto/CryptoUtils.cpp
         utils/hash/MD5.cpp
@@ -61,6 +62,7 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        utils/collection/Palette.h
         utils/config/Config.h
         utils/crypto/CryptoUtils.h
         utils/hash/MD5.h
@@ -72,6 +74,7 @@ set(HEADERS
         utils/TimeUtils.h
         utils/Types.h
         utils/UUID.h
+        utils/Validate.h
 )
 
 # Project
@@ -193,3 +196,4 @@ add_test(NAME FileUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --file-utils)
 add_test(NAME StringUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --string-utils)
 add_test(NAME ByteBuffer COMMAND "${LOCAL_PROJECT_NAME}Test" --byte-buffer)
 add_test(NAME NBT COMMAND "${LOCAL_PROJECT_NAME}Test" --nbt)
+add_test(NAME Palette COMMAND "${LOCAL_PROJECT_NAME}Test" --palette)

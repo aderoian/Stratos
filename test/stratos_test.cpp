@@ -17,6 +17,7 @@
  *
  */
 
+#include "utils/collection/Palette.h"
 #include "nbt/CompoundTag.h"
 #include "nbt/io/NBTBuffer.h"
 #include "nbt/ListTag.h"
@@ -29,6 +30,7 @@
 #include "utils/io/CompressionUtils.h"
 #include "utils/io/FileUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/Validate.h"
 
 #include <cassert>
 #include <iostream>
@@ -754,6 +756,79 @@ void nbtTest() {
     }
 }
 
+void paletteTest() {
+    // Empty Palette
+    {
+        stratos::Palette palette(2, 10); // 2 bits per entry, 10 entries, max value 3 (0, 1, 2, 3)
+        assert(palette.getBitsPerEntry() == 2);
+        assert(palette.getMaxValue() == 3);
+        assert(palette.getSize() == 10);
+
+        // Out of range checks
+        try {
+            palette.set(0, 4);
+        } catch (stratos::ValidateException& e) {
+            assert(e.what() == std::string("Value is out of range"));
+        } catch (std::exception&) {
+            assert(false);
+        }
+
+        try {
+            palette.set(11, 0);
+        } catch (stratos::ValidateException& e) {
+            assert(e.what() == std::string("Value is out of range"));
+        } catch (std::exception&) {
+            assert(false);
+        }
+
+        // Populate
+        palette.set(0, 0);
+        palette.set(1, 1);
+        palette.set(2, 2);
+        palette.set(3, 3);
+        palette.set(4, 0);
+        palette.set(5, 1);
+        palette.set(6, 2);
+        palette.set(7, 3);
+        palette.set(8, 0);
+        palette.set(9, 1);
+
+        // Test Get
+        assert(palette.get(0) == 0);
+        assert(palette.get(1) == 1);
+        assert(palette.get(2) == 2);
+        assert(palette.get(3) == 3);
+        assert(palette.get(4) == 0);
+        assert(palette.get(5) == 1);
+        assert(palette.get(6) == 2);
+        assert(palette.get(7) == 3);
+        assert(palette.get(8) == 0);
+        assert(palette.get(9) == 1);
+
+        // Test Out of Range
+        try {
+            assert(palette.get(11) == 0);
+        } catch (stratos::ValidateException& e) {
+            assert(e.what() == std::string("Value is out of range"));
+        } catch (std::exception&) {
+            assert(false);
+        }
+
+        // Test Swap
+        assert(palette.swap(0, 1) == 0);
+        assert(palette.get(0) == 1);
+        assert(palette.get(1) == 1);
+        assert(palette.swap(1, 2) == 1);
+        assert(palette.get(1) == 2);
+
+        // Test Write Indices
+        const std::vector expected = {1, 2, 2, 3, 0, 1, 2, 3, 0, 1};
+        std::vector<int> out;
+        palette.writeIndices(out);
+        assert(out == expected);
+    }
+}
+
 int main(const int argc, char **argv) {
     for (int i = 1; i < argc; ++i) {
         if (std::string arg = argv[i]; arg == "--network-serialization") {
@@ -766,6 +841,8 @@ int main(const int argc, char **argv) {
             bufferTest();
         } else if (arg == "--nbt") {
             nbtTest();
+        } else if (arg == "--palette") {
+            paletteTest();
         }
     }
 
