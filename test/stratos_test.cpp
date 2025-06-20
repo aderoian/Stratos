@@ -20,6 +20,7 @@
 #include "nbt/CompoundTag.h"
 #include "nbt/io/NBTBuffer.h"
 #include "nbt/ListTag.h"
+#include "nbt/NBT.h"
 #include "nbt/PrimitiveTag.h"
 #include "nbt/StringTag.h"
 #include "network/protocol/PacketSerialization.h"
@@ -35,113 +36,91 @@
 #include <string>
 void networkSerializationTest() {
     std::cout << "Running network serialization test..." << std::endl;
-    stratos::ByteVec buffer;
+    stratos::ByteBuffer buffer;
     size_t offset = 0;
 
     // Test writing and reading a boolean
     std::cout << "Testing boolean serialization..." << std::endl;
-    stratos::writeBoolean(buffer, true);
-    stratos::writeBoolean(buffer, false);
-    assert(stratos::readBoolean(buffer, offset) == true);
-    assert(stratos::readBoolean(buffer, offset) == false);
+    buffer.writeBoolean(true);
+    buffer.writeBoolean(false);
+    assert(buffer.readBoolean() == true);
+    assert(buffer.readBoolean() == false);
 
     // Test writing and reading a byte
     std::cout << "Testing byte serialization..." << std::endl;
-    stratos::writeByte(buffer, 42);
-    stratos::writeByte(buffer, -42);
-    stratos::writeUnsignedByte(buffer, 230);
-    assert(stratos::readByte(buffer, offset) == 42);
-    assert(stratos::readByte(buffer, offset) == -42);
-    assert(stratos::readUnsignedByte(buffer, offset) == 230);
-
-    // Test writing and reading an int12
-    std::cout << "Testing int12 serialization..." << std::endl;
-    stratos::writeInt12(buffer, 2047); // max positive int12
-    stratos::writeInt12(buffer, -2048); // min negative int12
-    stratos::writeInt12(buffer, 1234); // valid int12
-    stratos::writeInt12(buffer, -1234); // valid negative int12
-    assert(stratos::readInt12(buffer, offset) == 2047);
-    assert(stratos::readInt12(buffer, offset) == -2048);
-    assert(stratos::readInt12(buffer, offset) == 1234);
-    assert(stratos::readInt12(buffer, offset) == -1234);
+    buffer.writeByte(42);
+    buffer.writeByte(-42);
+    buffer.writeUnsignedByte(230);
+    assert(buffer.readByte() == 42);
+    assert(buffer.readByte() == -42);
+    assert(buffer.readUnsignedByte() == 230);
 
     // Test writing and reading a short
     std::cout << "Testing short serialization..." << std::endl;
-    stratos::writeShort(buffer, 12345);
-    stratos::writeShort(buffer, -12345);
-    stratos::writeUnsignedShort(buffer, 54321);
-    assert(stratos::readShort(buffer, offset) == 12345);
-    assert(stratos::readShort(buffer, offset) == -12345);
-    assert(stratos::readUnsignedShort(buffer, offset) == 54321);
-
-    // Test writing and reading an int26
-    std::cout << "Testing int26 serialization..." << std::endl;
-    stratos::writeInt26(buffer, 33554431); // max positive int26
-    stratos::writeInt26(buffer, -33554432); // min negative int26
-    stratos::writeInt26(buffer, 12345678); // valid int26
-    stratos::writeInt26(buffer, -12345678); // valid negative int26
-    assert(stratos::readInt26(buffer, offset) == 33554431);
-    assert(stratos::readInt26(buffer, offset) == -33554432);
-    assert(stratos::readInt26(buffer, offset) == 12345678);
-    assert(stratos::readInt26(buffer, offset) == -12345678);
+    buffer.writeShort(12345);
+    buffer.writeShort(-12345);
+    buffer.writeUnsignedShort(54321);
+    assert(buffer.readShort() == 12345);
+    assert(buffer.readShort() == -12345);
+    assert(buffer.readUnsignedShort() == 54321);
 
     // Test writing and reading an int
     std::cout << "Testing int serialization..." << std::endl;
-    stratos::writeInt(buffer, 123456789);
-    stratos::writeInt(buffer, -123456789);
-    assert(stratos::readInt(buffer, offset) == 123456789);
-    assert(stratos::readInt(buffer, offset) == -123456789);
+    buffer.writeInt(123456789);
+    buffer.writeInt(-123456789);
+    assert(buffer.readInt() == 123456789);
+    assert(buffer.readInt() == -123456789);
 
     // Test writing and reading a long
     std::cout << "Testing long serialization..." << std::endl;
-    stratos::writeLong(buffer, 1234567890123456789LL);
-    stratos::writeLong(buffer, -1234567890123456789LL);
-    assert(stratos::readLong(buffer, offset) == 1234567890123456789LL);
-    assert(stratos::readLong(buffer, offset) == -1234567890123456789LL);
+    buffer.writeLong(1234567890123456789LL);
+    buffer.writeLong(-1234567890123456789LL);
+    assert(buffer.readLong() == 1234567890123456789LL);
+    assert(buffer.readLong() == -1234567890123456789LL);
 
     // Test writing and reading a float
     std::cout << "Testing float serialization..." << std::endl;
-    stratos::writeFloat(buffer, 3.14f);
-    stratos::writeFloat(buffer, -3.14f);
-    assert(stratos::readFloat(buffer, offset) == 3.14f);
-    assert(stratos::readFloat(buffer, offset) == -3.14f);
+    buffer.writeFloat(3.14f);
+    buffer.writeFloat(-3.14f);
+    assert(buffer.readFloat() == 3.14f);
+    assert(buffer.readFloat() == -3.14f);
 
     // Test writing and reading a double
     std::cout << "Testing double serialization..." << std::endl;
-    stratos::writeDouble(buffer, 3.141592653589793);
-    stratos::writeDouble(buffer, -3.141592653589793);
-    assert(stratos::readDouble(buffer, offset) == 3.141592653589793);
-    assert(stratos::readDouble(buffer, offset) == -3.141592653589793);
+    buffer.writeDouble(3.141592653589793);
+    buffer.writeDouble(-3.141592653589793);
+    assert(buffer.readDouble() == 3.141592653589793);
+    assert(buffer.readDouble() == -3.141592653589793);
 
     // Test writing and reading a VarInt
     std::cout << "Testing VarInt serialization..." << std::endl;
-    stratos::writeVarInt(buffer, 123456);
-    stratos::writeVarInt(buffer, -123456);
-    assert(stratos::readVarInt(buffer, offset) == 123456);
-    assert(stratos::readVarInt(buffer, offset) == -123456);
+    buffer.writeVarInt(123456);
+    buffer.writeVarInt(-123456);
+    assert(buffer.readVarInt() == 123456);
+    assert(buffer.readVarInt() == -123456);
 
     // Test writing and reading a string
     std::cout << "Testing string serialization..." << std::endl;
     const std::string testString = "Hello, world!";
-    stratos::writeString(buffer, testString, 100);
+    buffer.writeString(testString, 100);
     const std::string testString2 = "Another test string with special characters: !@#$%^&*()";
-    stratos::writeString(buffer, testString2, 100);
+    buffer.writeString(testString2, 100);
     std::string testString3 = "A string with a length that exceeds the maximum allowed length.";
     try {
-        stratos::writeString(buffer, testString, 10);
+        buffer.writeString(testString, 10);
         assert(false); // Should not reach here
     } catch (const stratos::PacketSerializationException& e) {
 
     }
-    assert(stratos::readString(buffer, offset, 100) == testString);
-    assert(stratos::readString(buffer, offset, 100) == testString2);
+    assert(buffer.readString(100) == testString);
+    assert(buffer.readString(100) == testString2);
 
     // Test writing and reading a VarLong
     std::cout << "Testing VarLong serialization..." << std::endl;
-    stratos::writeVarLong(buffer, 1234567890123456789LL);
-    stratos::writeVarLong(buffer, -1234567890123456789LL);
-    assert(stratos::readVarLong(buffer, offset) == 1234567890123456789LL);
-    assert(stratos::readVarLong(buffer, offset) == -1234567890123456789LL);
+    buffer.writeVarLong(1234567890123456789LL);
+    buffer.writeVarLong(-1234567890123456789LL);
+    assert(buffer.readVarLong() == 1234567890123456789LL);
+    assert(buffer.readVarLong() == -1234567890123456789LL);
 }
 
 void fileUtilsTest() {
@@ -754,6 +733,24 @@ void nbtTest() {
 
         assert((*tag)["shortTest"].getType() == nbt::TagType::Short);
         assert((*tag)["shortTest"].as<nbt::ShortTag>().get() == 32767);
+    }
+
+    {
+        const nbt::CompoundTag plainsBiome{
+            nbt::CompoundTag::CompoundElement{"has_precipitation", nbt::ByteTag{true}}, nbt::CompoundTag::CompoundElement{"temperature", nbt::FloatTag{0.8}},
+            nbt::CompoundTag::CompoundElement{"downfall", nbt::FloatTag{0.4}},
+            nbt::CompoundTag::CompoundElement{
+                "effects",
+                nbt::CompoundTag{nbt::CompoundTag::CompoundElement{"fog_color", nbt::IntTag{12638463}}, nbt::CompoundTag::CompoundElement{"water_color", nbt::IntTag{4159204}},
+                                 nbt::CompoundTag::CompoundElement{"water_fog_color", nbt::IntTag{329011}}, nbt::CompoundTag::CompoundElement{"sky_color", nbt::IntTag{329011}},
+                                 nbt::CompoundTag::CompoundElement{"mood_sound", nbt::CompoundTag{nbt::CompoundTag::CompoundElement{"tick_delay", nbt::IntTag{6000}},
+                                                                                                  nbt::CompoundTag::CompoundElement{"block_search_extent", nbt::IntTag{8}},
+                                                                                                  nbt::CompoundTag::CompoundElement{"sound", nbt::StringTag{"minecraft:ambient.cave"}},
+                                                                                                  nbt::CompoundTag::CompoundElement{"offset", nbt::FloatTag{2.0f}}}}}}};
+
+
+        ByteVec bytes = nbt::writeNetworkNBT(plainsBiome);
+        auto tag =  nbt::readNetworkNBT(nbt::NBTBuffer(bytes));
     }
 }
 
