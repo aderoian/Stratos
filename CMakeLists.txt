@@ -31,7 +31,7 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
-        utils/collection/Palette.cpp
+        utils/collection/PalettedStorage.cpp
         utils/config/Config.cpp
         utils/crypto/CryptoUtils.cpp
         utils/hash/MD5.cpp
@@ -62,7 +62,7 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
-        utils/collection/Palette.h
+        utils/collection/PalettedStorage.h
         utils/config/Config.h
         utils/crypto/CryptoUtils.h
         utils/hash/MD5.h

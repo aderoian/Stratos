@@ -17,7 +17,6 @@
  *
  */
 
-#include "utils/collection/Palette.h"
 #include "nbt/CompoundTag.h"
 #include "nbt/io/NBTBuffer.h"
 #include "nbt/ListTag.h"
@@ -25,6 +24,7 @@
 #include "nbt/PrimitiveTag.h"
 #include "nbt/StringTag.h"
 #include "network/protocol/PacketSerialization.h"
+#include "utils/collection/PalettedStorage.h"
 #include "utils/config/Config.h"
 #include "utils/io/ByteBuffer.h"
 #include "utils/io/CompressionUtils.h"
@@ -759,7 +759,7 @@ void nbtTest() {
 void paletteTest() {
     // Empty Palette
     {
-        stratos::Palette palette(2, 10); // 2 bits per entry, 10 entries, max value 3 (0, 1, 2, 3)
+        stratos::PackedIntegerContainer palette(2, 10); // 2 bits per entry, 10 entries, max value 3 (0, 1, 2, 3)
         assert(palette.getBitsPerEntry() == 2);
         assert(palette.getMaxValue() == 3);
         assert(palette.getSize() == 10);
