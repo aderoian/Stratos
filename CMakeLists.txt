@@ -70,6 +70,7 @@ set(HEADERS
         utils/io/ByteBuffer.h
         utils/io/CompressionUtils.h
         utils/MathUtils.h
+        utils/Predicate.h
         utils/StringUtils.h
         utils/TimeUtils.h
         utils/Types.h
