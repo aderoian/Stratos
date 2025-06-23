@@ -29,6 +29,7 @@
 #include "utils/io/ByteBuffer.h"
 #include "utils/io/CompressionUtils.h"
 #include "utils/io/FileUtils.h"
+#include "utils/Predicate.h"
 #include "utils/StringUtils.h"
 #include "utils/Validate.h"
 
@@ -828,6 +829,83 @@ void paletteTest() {
         assert(out == expected);
     }
 }
+class PredicateIntValue {
+public:
+    int value;
+    explicit PredicateIntValue(int v) : value(v) {}
+    [[nodiscard]] bool isZero() const { return value == 0; }
+    [[nodiscard]] bool isPositive() const { return value > 0; }
+    [[nodiscard]] bool isNegative() const { return value < 0; }
+    [[nodiscard]] bool isGreaterThan(int v) const { return value > v; }
+    [[nodiscard]] bool isLessThan(int v) const { return value < v; }
+};
+
+void predicateTest() {
+    // No Args Predicate
+    {
+        stratos::Predicate predicate = &PredicateIntValue::isPositive;
+        PredicateIntValue value(5);
+        assert(predicate(value) == true);
+    }
+
+    // Arg Predicate
+    {
+        stratos::Predicate predicate = stratos::makePredicate(&PredicateIntValue::isGreaterThan, 3);
+        PredicateIntValue value(5);
+        assert(predicate(value) == true);
+    }
+
+    // AND Predicate
+    {
+        stratos::Predicate predicate1 = &PredicateIntValue::isPositive;
+        stratos::Predicate predicate2 = stratos::makePredicate(&PredicateIntValue::isGreaterThan, 3);
+        stratos::Predicate andPredicate = predicate1 && predicate2;
+        PredicateIntValue value(5);
+        assert(andPredicate(value) == true);
+    }
+
+    // OR Predicate
+    {
+        stratos::Predicate predicate1 = &PredicateIntValue::isPositive;
+        stratos::Predicate predicate2 = &PredicateIntValue::isNegative;
+        stratos::Predicate orPredicate = predicate1 || predicate2;
+        PredicateIntValue value(-5);
+        assert(orPredicate(value) == true);
+    }
+
+    // NOT Predicate
+    {
+        stratos::Predicate predicate = &PredicateIntValue::isPositive;
+        stratos::Predicate notPredicate = !predicate;
+        PredicateIntValue value(-5);
+        assert(notPredicate(value) == true);
+    }
+
+    // AND Predicate Callable
+    {
+        stratos::Predicate predicate1 = stratos::makePredicate(&PredicateIntValue::isGreaterThan, 3);
+        stratos::Predicate andPredicate = predicate1 && &PredicateIntValue::isNegative;
+        PredicateIntValue value(5);
+        assert(andPredicate(value) == false);
+    }
+
+    // OR Predicate Callable
+    {
+        stratos::Predicate predicate1 = stratos::makePredicate(&PredicateIntValue::isGreaterThan, 3);
+        stratos::Predicate orPredicate = predicate1 || &PredicateIntValue::isZero;
+        PredicateIntValue value(5);
+        assert(orPredicate(value) == true);
+    }
+
+    // Polymorphic Predicate
+    {
+        stratos::Predicate predicate = PositiveNumberPredicate() && stratos::makePredicate(&PredicateIntValue::isGreaterThan, 3);
+        PredicateIntValue value(5);
+        assert(predicate(value) == true);
+        value.value = -5;
+        assert(predicate(value) == false);
+    }
+}
 
 int main(const int argc, char **argv) {
     for (int i = 1; i < argc; ++i) {
@@ -843,6 +921,8 @@ int main(const int argc, char **argv) {
             nbtTest();
         } else if (arg == "--palette") {
             paletteTest();
+        } else if (arg == "--predicate") {
+            predicateTest();
         }
     }
 
