@@ -62,6 +62,7 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        utils/collection/Iterable.h
         utils/collection/PalettedStorage.h
         utils/config/Config.h
         utils/crypto/CryptoUtils.h
