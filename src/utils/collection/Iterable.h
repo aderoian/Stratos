@@ -37,16 +37,16 @@ template <typename T> class IndexedIterable<T> : public Iterable<T> {
     virtual int getRawIndex(T value) const = 0;
     virtual T   get(int index) const       = 0;
 
-    T   getOrThrow(int index);
-    int getRawIndexOrThrow(T value);
+    T   getOrThrow(int index) const;
+    int getRawIndexOrThrow(T value) const;
 
     virtual int size() const = 0;
 };
-template <typename T> T IndexedIterable<T>::getOrThrow(int index) {
+template <typename T> T IndexedIterable<T>::getOrThrow(int index) const {
     if (index < 0 || index >= size()) throw std::out_of_range(std::format("Index {} out of bounds for size {}", index, size()));
     return get(index);
 }
-template <typename T> int IndexedIterable<T>::getRawIndexOrThrow(T value) {
+template <typename T> int IndexedIterable<T>::getRawIndexOrThrow(T value) const {
     const int i = getRawIndex(value);
     if (i < 0 || i >= size()) throw std::out_of_range(std::format("Tried to get the raw index of a element not present.", value));
     return i;

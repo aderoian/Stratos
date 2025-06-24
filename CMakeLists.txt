@@ -77,6 +77,7 @@ set(HEADERS
         utils/Types.h
         utils/UUID.h
         utils/Validate.h
+        world/format/chunk/Palette.h
 )
 
 # Project
