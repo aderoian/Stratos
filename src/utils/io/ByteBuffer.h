@@ -78,6 +78,7 @@ class ByteBuffer {
     std::vector<uint64_t> readBitSet();
     std::vector<bool>     readFixedBitSet(size_t length);
     ByteVec               readByteArray(size_t length);
+    void                  readFixedLongArray(std::vector<int64_t>& longs);
 
     void writeBoolean(bool value);
     void writeByte(int8_t value);
@@ -94,6 +95,7 @@ class ByteBuffer {
     void writeBitSet(const std::vector<uint64_t>& longs);
     void writeFixedBitSet(const std::vector<bool>& bits, size_t length);
     void writeByteArray(const ByteVec& values);
+    void writeFixedLongArray(const std::vector<int64_t>& longs);
 
     /**
      * @brief Clears the buffer & resets the offset.

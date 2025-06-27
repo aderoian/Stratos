@@ -202,6 +202,10 @@ ByteVec stratos::ByteBuffer::readByteArray(size_t length) {
     }
     return result;
 }
+void stratos::ByteBuffer::readFixedLongArray(std::vector<int64_t>& longs) {
+    for (size_t i = 0; i < longs.size(); ++i)
+        longs[i] = readLong();
+}
 void stratos::ByteBuffer::writeBoolean(const bool value) {
     buffer.push_back(static_cast<unsigned char>(value ? 1 : 0));
 }
@@ -285,6 +289,10 @@ void stratos::ByteBuffer::writeFixedBitSet(const std::vector<bool>& bits, const 
 }
 void stratos::ByteBuffer::writeByteArray(const ByteVec& values) {
     for (const auto& value : values) buffer.push_back(value);
+}
+void stratos::ByteBuffer::writeFixedLongArray(const std::vector<int64_t>& longs) {
+    for (const auto& value : longs)
+        writeLong(value);
 }
 void    stratos::ByteBuffer::setOffset(const size_t newOffset) {
     if (newOffset > buffer.size()) {

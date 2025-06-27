@@ -24,8 +24,8 @@
 #include <stdexcept>
 
 namespace stratos {
-PackedIntegerContainer::PackedIntegerContainer(const int bitsPerEntry, const int size) : PackedIntegerContainer(bitsPerEntry, size, std::vector<int64_t>(0)) {}
-PackedIntegerContainer::PackedIntegerContainer(const int bitsPerEntry, const int size, std::vector<int64_t>&& data) : bitsPerEntry(bitsPerEntry), size(size), elementsPerLong(64 / bitsPerEntry), maxValue((1LL << bitsPerEntry) - 1LL) {
+PackedIntegerArray::PackedIntegerArray(const int bitsPerEntry, const int size) : PackedIntegerArray(bitsPerEntry, size, std::vector<int64_t>(0)) {}
+PackedIntegerArray::PackedIntegerArray(const int bitsPerEntry, const int size, std::vector<int64_t>&& data) : bitsPerEntry(bitsPerEntry), size(size), elementsPerLong(64 / bitsPerEntry), maxValue((1LL << bitsPerEntry) - 1LL) {
     if (data.empty()) { // No data provided, initialize with zeros
         data.resize((size + elementsPerLong - 1) / elementsPerLong, 0LL);
     } else if (const int length = (size + elementsPerLong - 1) / elementsPerLong; data.size() != length) { // Check if the length matches the expected size
@@ -33,8 +33,8 @@ PackedIntegerContainer::PackedIntegerContainer(const int bitsPerEntry, const int
     }
     this->data = std::move(data);
 }
-PackedIntegerContainer::PackedIntegerContainer(const int bitsPerEntry, const int size, const std::vector<int64_t>& data) : PackedIntegerContainer(bitsPerEntry, size, std::vector(data)) {}
-PackedIntegerContainer::PackedIntegerContainer(const int bitsPerEntry, const int size, const std::vector<int>& data) : PackedIntegerContainer(bitsPerEntry, size) {
+PackedIntegerArray::PackedIntegerArray(const int bitsPerEntry, const int size, const std::vector<int64_t>& data) : PackedIntegerArray(bitsPerEntry, size, std::vector(data)) {}
+PackedIntegerArray::PackedIntegerArray(const int bitsPerEntry, const int size, const std::vector<int>& data) : PackedIntegerArray(bitsPerEntry, size) {
     int j;
     int i = 0;
     for (j = 0; j <= size - elementsPerLong; j += elementsPerLong) {
@@ -55,31 +55,31 @@ PackedIntegerContainer::PackedIntegerContainer(const int bitsPerEntry, const int
         this->data[i] = value;
     }
 }
-int PackedIntegerContainer::getBitsPerEntry() const {
+int PackedIntegerArray::getBitsPerEntry() const {
     return bitsPerEntry;
 }
-int PackedIntegerContainer::getSize() const {
+int PackedIntegerArray::getSize() const {
     return size;
 }
-int PackedIntegerContainer::getMaxValue() const {
+int PackedIntegerArray::getMaxValue() const {
     return maxValue;
 }
-const std::vector<int64_t>& PackedIntegerContainer::getData() const {
+const std::vector<int64_t>& PackedIntegerArray::getData() const {
     return data;
 }
-int PackedIntegerContainer::get(const int index) const {
+int PackedIntegerArray::get(const int index) const {
     inclusiveBetween(0LL, size - 1LL, index);
     const int i = index / elementsPerLong;
     return data[i] >> ((index - i * elementsPerLong) * bitsPerEntry) & maxValue;
 }
-void PackedIntegerContainer::set(const int index, const int value) {
+void PackedIntegerArray::set(const int index, const int value) {
     inclusiveBetween(0LL, size - 1LL, index);
     inclusiveBetween(0LL, maxValue, value);
     const int i = index / elementsPerLong;
     const int j = (index - i * elementsPerLong) * bitsPerEntry;
     data[i] = data[i] & (maxValue << j ^ 0xFFFFFFFFFFFFFFFFLL) | (static_cast<int64_t>(value) & maxValue) << j;
 }
-int PackedIntegerContainer::swap(const int index, const int value) {
+int PackedIntegerArray::swap(const int index, const int value) {
     inclusiveBetween(0LL, size - 1LL, index);
     inclusiveBetween(0LL, maxValue, value);
     const int     i       = index / elementsPerLong;
@@ -88,13 +88,13 @@ int PackedIntegerContainer::swap(const int index, const int value) {
     data[i]               = oldLong & (maxValue << j ^ 0xFFFFFFFFFFFFFFFFLL) | (static_cast<int64_t>(value) & maxValue) << j;
     return oldLong >> j & maxValue;
 }
-void PackedIntegerContainer::writeIndices(std::vector<int>& data) const {
+void PackedIntegerArray::writeIndices(std::vector<int>& data) const {
     data.resize(size);
-    int64_t value;
+    int64_t   value;
     const int elements = this->data.size();
-    int j = 0;
-    int k;
-    int l;
+    int       j        = 0;
+    int       k;
+    int       l;
     for (k = 0; k < elements - 1; ++k) {
         value = this->data[k];
         for (l = 0; l < elementsPerLong; ++l) {
@@ -111,5 +111,8 @@ void PackedIntegerContainer::writeIndices(std::vector<int>& data) const {
             value >>= bitsPerEntry;
         }
     }
+}
+std::vector<int64_t>& PackedIntegerArray::getData() {
+    return data;
 }
 } // namespace stratos

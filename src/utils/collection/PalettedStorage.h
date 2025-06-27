@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef PALETTE_H
-#define PALETTE_H
+#ifndef PALETTESTORAGE_H
+#define PALETTESTORAGE_H
 #include <cstdint>
 #include <vector>
 
@@ -27,9 +27,9 @@ namespace stratos {
 /**
  * A container where each value is a raw ID which is held by some palette.
  */
-class PalettedContainer {
+class                               PalettedStorage {
 public:
-    virtual ~PalettedContainer() = default;
+    virtual ~PalettedStorage() = default;
 
     /**
      * Each value is stored in a fixed number of bits, which does determine the maximum allowed value.
@@ -84,17 +84,18 @@ public:
 /**
  * A container that stores integers in a packed format, where an array of integers is packed into an array of longs.
  */
-class PackedIntegerContainer final : public PalettedContainer {
+class PackedIntegerArray final : public PalettedStorage {
 public:
-    PackedIntegerContainer(int bitsPerEntry, int size);
-    PackedIntegerContainer(int bitsPerEntry, int size, std::vector<int64_t>&& data);
-    PackedIntegerContainer(int bitsPerEntry, int size, const std::vector<int64_t>& data);
-    PackedIntegerContainer(int bitsPerEntry, int size, const std::vector<int>& data);
+    PackedIntegerArray(int bitsPerEntry, int size);
+    PackedIntegerArray(int bitsPerEntry, int size, std::vector<int64_t>&& data);
+    PackedIntegerArray(int bitsPerEntry, int size, const std::vector<int64_t>& data);
+    PackedIntegerArray(int bitsPerEntry, int size, const std::vector<int>& data);
 
     [[nodiscard]] int getBitsPerEntry() const override;
     [[nodiscard]] int getSize() const override;
     [[nodiscard]] int getMaxValue() const override;
     [[nodiscard]] const std::vector<int64_t>& getData() const override;
+    [[nodiscoard]] std::vector<int64_t>& getData();
 
     [[nodiscard]] int get(int index) const override;
     void set(int index, int value) override;
@@ -111,6 +112,6 @@ private:
     std::vector<int64_t> data;
 };
 
-} // stratos
+} // namespace stratos
 
-#endif //PALETTE_H
+#endif //PALETTESTORAGE_H
