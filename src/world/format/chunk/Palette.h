@@ -22,6 +22,7 @@
 #include "utils/collection/Iterable.h"
 #include "utils/collection/PalettedStorage.h"
 #include "utils/io/ByteBuffer.h"
+#include "utils/MathUtils.h"
 #include "utils/Predicate.h"
 
 #include <format>
@@ -29,6 +30,7 @@
 #include <stdexcept>
 
 namespace stratos {
+class Biome;
 class BlockState;
 class ByteBuffer;
 
@@ -100,17 +102,38 @@ template <typename T> class IdListPalette<T> : public Palette<T> {
     const utils::IndexedIterable<T>* idList;
 };
 
-template <typename T> SingularPalette<T>* createSingularPalette(const utils::IndexedIterable<T>* idList, const std::vector<T>& entries);
-template <typename T> ArrayPalette<T>*    createArrayPalette(const utils::IndexedIterable<T>* idList, int bits, const std::vector<T>& entries);
-template <typename T> IdListPalette<T>*   createIdListPalette(const utils::IndexedIterable<T>* idList);
+template <typename T> SingularPalette<T>* createSingularPalette(int bits, const utils::IndexedIterable<T>* idList, const std::vector<T>& entries);
+template <typename T> ArrayPalette<T>*    createArrayPalette(int bits, const utils::IndexedIterable<T>* idList, const std::vector<T>& entries);
+template <typename T> IdListPalette<T>*   createIdListPalette(int bits, const utils::IndexedIterable<T>* idList, const std::vector<T>& entries);
 
 template <typename T> class PalettedContainer {
 public:
-    PalettedContainer(const utils::IndexedIterable<T>* idList, Palette<T>* palette, PackedIntegerArray* storage, int edgeBits);
-    PalettedContainer(const utils::IndexedIterable<T>* idList, Palette<T>* palette, int edgeBits, int bits);
+    /**
+     * Tuple container for data storage of a palette and its associated data.
+     */
+    template <typename U> struct Data {
+        Palette<U>* palette;
+        PalettedStorage* storage;
+        void write(ByteBuffer& buffer) const;
+    };
 
-    int getContainerSize() const;
-    int computeIndex(int x, int y, int z) const;
+    template <typename U> struct DataProvider {
+        const Palette<U>* (*paletteFactory)(int, const utils::IndexedIterable<U>*, std::vector<U>&);
+        int bits;
+
+        Data<U> createData(const utils::IndexedIterable<U>* idList, int size) const;
+    };
+
+    template <typename U> struct PaletteProvider {
+        DataProvider<U> (*dataFactory)(int, const utils::IndexedIterable<U>*);
+        int edgeBits; // Number of bits used for each edge of the chunk section (i.e., 4 for 16x16x16 sections)
+
+        int getContainerSize() const;
+        int computeIndex(int x, int y, int z) const;
+    };
+
+    PalettedContainer(const utils::IndexedIterable<T>* idList, PaletteProvider<T> provider, Data<T> data);
+    PalettedContainer(const utils::IndexedIterable<T>* idList, T entry, PaletteProvider<T> provider);
 
     T get(int x, int y, int z) const;
     bool has(Predicate<T> predicate) const;
@@ -123,22 +146,22 @@ public:
     ~PalettedContainer();
 private:
     const utils::IndexedIterable<T>* idList;
-    Palette<T>* palette;
-    PackedIntegerArray* storage;
-    int edgeBits; // Number of bits used for each edge of the chunk section (i.e., 4 for 16x16x16 sections)
+    PaletteProvider<T> provider;
+    Data<T> data;
 
     T get(int index) const;
     void set(int index, T value);
     T swap(int index, T value);
+    Data<T> createData(int bits) const;
 };
 
-template <typename T> SingularPalette<T>* createSingularPalette(const utils::IndexedIterable<T>* idList, const std::vector<T>& entries) {
+template <typename T> SingularPalette<T>* createSingularPalette(int bits, const utils::IndexedIterable<T>* idList, const std::vector<T>& entries) {
     return new SingularPalette<T>(idList, entries);
 }
-template <typename T> ArrayPalette<T>* createArrayPalette(const utils::IndexedIterable<T>* idList, int bits, const std::vector<T>& entries) {
+template <typename T> ArrayPalette<T>* createArrayPalette(int bits, const utils::IndexedIterable<T>* idList, const std::vector<T>& entries) {
     return new ArrayPalette<T>(idList, bits, entries);
 }
-template <typename T> IdListPalette<T>* createIdListPalette(const utils::IndexedIterable<T>* idList) {
+template <typename T> IdListPalette<T>* createIdListPalette(int bits, const utils::IndexedIterable<T>* idList, const std::vector<T>& entries) {
     return new IdListPalette<T>(idList);
 }
 
@@ -150,6 +173,13 @@ template <typename T> SingularPalette<T>::SingularPalette(const utils::IndexedIt
         entry = std::nullopt;
     }
 }
+
+template <typename T> typename PalettedContainer<T>::template DataProvider<T> blockStateDataFactory(int bits, const utils::IndexedIterable<T>* idList);
+template <typename T> typename PalettedContainer<T>::template DataProvider<T> biomeDataFactory(int bits, const utils::IndexedIterable<T>* idList);
+
+constexpr PalettedContainer<BlockState>::PaletteProvider BLOCK_STATE = { blockStateDataFactory<BlockState>, 4 };
+constexpr PalettedContainer<Biome>::PaletteProvider BIOME = { biomeDataFactory<Biome>, 2 };
+
 template <typename T> int SingularPalette<T>::index(T value) {
     return entry.has_value() && *entry == value ? 0 : -1;
 }
@@ -236,54 +266,74 @@ template <typename T> void IdListPalette<T>::write(ByteBuffer& buffer) const {
 template <typename T> int IdListPalette<T>::writeSize() const {
     return 0;
 }
-template <typename T> PalettedContainer<T>::PalettedContainer(const utils::IndexedIterable<T>* idList, Palette<T>* palette, PackedIntegerArray* storage, const int edgeBits)
-    : idList(idList), palette(palette), storage(storage), edgeBits(edgeBits) {}
-template <typename T> PalettedContainer<T>::PalettedContainer(const utils::IndexedIterable<T>* idList, Palette<T>* palette, const int edgeBits, const int bits)
-    : idList(idList), palette(palette), edgeBits(edgeBits) {
-    storage = new PackedIntegerArray(bits, getContainerSize());
-}
-template <typename T> int PalettedContainer<T>::getContainerSize() const {
-    return 1 << edgeBits * 3;
-}
-template <typename T> int PalettedContainer<T>::computeIndex(const int x, const int y, const int z) const {
-    return (y << edgeBits | z) << edgeBits | x;
-}
-template <typename T> T PalettedContainer<T>::get(const int x, const int y, const int z) const {
-    return get(computeIndex(x, y, z));
-}
-template <typename T> bool PalettedContainer<T>::has(Predicate<T> predicate) const {
-    return palette->has(predicate);
-}
-template <typename T> void PalettedContainer<T>::set(const int x, const int y, const int z, T value) {
-    set(computeIndex(x, y, z), value);
-}
-template <typename T> T PalettedContainer<T>::swap(const int x, const int y, const int z, T value) {
-    return swap(computeIndex(x, y, z), value);
-}
-template <typename T> void PalettedContainer<T>::read(ByteBuffer& buffer) {
-    int bits = buffer.readByte();
-    // TODO: Create a provider to choose the correct palette type and initialize palette storage based on the buffer content
-    palette->read(buffer);
-    buffer.readFixedLongArray(storage->getData());
-}
-template <typename T> void PalettedContainer<T>::write(ByteBuffer& buffer) const {
+template <typename T> template <typename U> void PalettedContainer<T>::Data<U>::write(ByteBuffer& buffer) const {
     buffer.writeByte(storage->getBitsPerEntry());
     palette->write(buffer);
     buffer.writeFixedLongArray(storage->getData());
 }
+template <typename T> template <typename U>
+typename PalettedContainer<T>::template Data<U> PalettedContainer<T>::DataProvider<U>::createData(const utils::IndexedIterable<U>* idList, const int size) const {
+    return { paletteFactory(bits, idList, std::vector<U>(0)), new PackedIntegerArray(bits, size) };
+}
+template <typename T> template <typename U> int PalettedContainer<T>::PaletteProvider<U>::getContainerSize() const {
+    return 1 << edgeBits * 3;
+}
+template <typename T> template <typename U> int PalettedContainer<T>::PaletteProvider<U>::computeIndex(const int x, const int y, const int z) const {
+    return (y << edgeBits | z) << edgeBits | x;
+}
+template <typename T> PalettedContainer<T>::PalettedContainer(const utils::IndexedIterable<T>* idList, PaletteProvider<T> provider, Data<T> data)
+    : idList(idList), provider(std::move(provider)), data(data) {}
+template <typename T> PalettedContainer<T>::PalettedContainer(const utils::IndexedIterable<T>* idList, T entry, PaletteProvider<T> provider) : idList(idList), provider(std::move(provider)) {
+    data = createData(0);
+    data.palette->index(entry);
+}
+template <typename T> T PalettedContainer<T>::get(const int x, const int y, const int z) const {
+    return get(provider->computeIndex(x, y, z));
+}
+template <typename T> bool PalettedContainer<T>::has(Predicate<T> predicate) const {
+    return data.palette->has(predicate);
+}
+template <typename T> void PalettedContainer<T>::set(const int x, const int y, const int z, T value) {
+    set(provider->computeIndex(x, y, z), value);
+}
+template <typename T> T PalettedContainer<T>::swap(const int x, const int y, const int z, T value) {
+    return swap(provider->computeIndex(x, y, z), value);
+}
+template <typename T> void PalettedContainer<T>::read(ByteBuffer& buffer) {
+    data = createData(buffer.readByte());
+    data.palette->read(buffer);
+    buffer.readFixedLongArray(data.storage->getData());
+}
+template <typename T> void PalettedContainer<T>::write(ByteBuffer& buffer) const {
+    data.write(buffer);
+}
 template <typename T> PalettedContainer<T>::~PalettedContainer() {
-    delete palette;
-    delete storage;
+    delete data.palette;
+    delete data.storage;
 }
 template <typename T> T PalettedContainer<T>::get(const int index) const {
-    return palette->get(storage->get(index));
+    return data.palette->get(data.storage->get(index));
 }
 template <typename T> void PalettedContainer<T>::set(const int index, T value) {
-    storage->set(index, palette->index(value));
+    data.storage->set(index, data.palette->index(value));
 }
 template <typename T> T PalettedContainer<T>::swap(const int index, T value) {
-    int i = storage->swap(index, palette->index(value));
-    return palette->get(i);
+    int i = data.storage->swap(index, data.palette->index(value));
+    return data.palette->get(i);
+}
+template <typename T> typename PalettedContainer<T>::template Data<T> PalettedContainer<T>::createData(int bits) const {
+    DataProvider<T> provider = data.palette->getDataProvider();
+    return provider.createData(idList, provider.getContainerSize());
+}
+template <typename T> typename PalettedContainer<T>::template DataProvider<T> blockStateDataFactory(int bits, const utils::IndexedIterable<T>* idList) {
+    if (bits == 0) return {createSingularPalette<T>, bits};
+    if (bits <= 8) return {createArrayPalette<T>, bits > 4 ? bits : 4};
+    return {createIdListPalette<T>, utils::ceilLog2(idList->size())};
+}
+template <typename T> typename PalettedContainer<T>::template DataProvider<T> biomeDataFactory(int bits, const utils::IndexedIterable<T>* idList) {
+    if (bits == 0) return {createSingularPalette<T>, bits};
+    if (bits < 4) return {createArrayPalette<T>, bits};
+    return {createIdListPalette<T>, utils::ceilLog2(idList->size())};
 }
 } // namespace stratos
 

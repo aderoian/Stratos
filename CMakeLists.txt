@@ -43,6 +43,7 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        block/BlockState.h
         math/Angle.h
         math/Ints.h
         math/Position.h
@@ -78,6 +79,7 @@ set(HEADERS
         utils/UUID.h
         utils/Validate.h
         world/format/chunk/Palette.h
+        world/format/Biome.h
 )
 
 # Project
