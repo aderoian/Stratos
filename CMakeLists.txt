@@ -39,6 +39,8 @@ set(SOURCES
         utils/io/CompressionUtils.cpp
         utils/io/FileUtils.cpp
         utils/StringUtils.cpp
+        world/format/chunk/Chunk.cpp
+        world/format/io/Region.cpp
 )
 
 set(HEADERS
@@ -78,7 +80,9 @@ set(HEADERS
         utils/Types.h
         utils/UUID.h
         utils/Validate.h
+        world/format/chunk/Chunk.h
         world/format/chunk/Palette.h
+        world/format/io/Region.h
         world/format/Biome.h
 )
 

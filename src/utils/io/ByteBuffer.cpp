@@ -84,6 +84,13 @@ int stratos::ByteBuffer::readInt() {
     const auto b4 = static_cast<int32_t>(buffer[offset++]);
     return b1 << 24 | b2 << 16 | b3 << 8 | b4 & 0xFF;
 }
+int stratos::ByteBuffer::readInt24() {
+    checkRead(3);
+    const auto b1 = static_cast<int32_t>(buffer[offset++]);
+    const auto b2 = static_cast<int32_t>(buffer[offset++]);
+    const auto b3 = static_cast<int32_t>(buffer[offset++]);
+    return b1 << 16 | b2 << 8 | b3 & 0xFF;
+}
 
 int64_t stratos::ByteBuffer::readLong() {
     checkRead(sizeof(int64_t));

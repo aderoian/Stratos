@@ -83,4 +83,19 @@ void writeAllBytes(const Path& path, const ByteVec& data) {
     file.write(reinterpret_cast<const char*>(data.data()), data.size());
     if (!file) throw std::runtime_error("Failed to write to file: " + path.toString());
 }
+ByteVec readBytes(std::fstream& file, const std::streamsize size) {
+    if (!file) throw std::runtime_error("File stream is not open");
+
+    ByteVec buffer(static_cast<size_t>(size));
+    file.read(reinterpret_cast<char*>(buffer.data()), size);
+    if (!file) throw std::runtime_error("Failed to read from file");
+
+    file.seekg(0);
+    return buffer;
+}
+ByteVec readBytes(std::fstream& file, const std::streamsize size, const std::streamoff offset) {
+    if (!file) throw std::runtime_error("File stream is not open");
+    file.seekg(offset);
+    return readBytes(file, size);
+}
 } // namespace stratos

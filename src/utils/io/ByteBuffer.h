@@ -69,6 +69,7 @@ class ByteBuffer {
     short                 readShort();
     uint16_t              readUnsignedShort();
     int                   readInt();
+    int                   readInt24();
     int64_t               readLong();
     float                 readFloat();
     double                readDouble();
