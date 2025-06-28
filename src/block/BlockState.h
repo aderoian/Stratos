@@ -25,7 +25,10 @@ namespace stratos {
  * Represents the state of a block (dynamic properties) in the world.
  */
 class BlockState {
-
+public:
+    bool operator==(const BlockState& other) const {
+        return true;
+    }
 };
 } // namespace stratos
 

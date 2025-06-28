@@ -22,7 +22,10 @@
 
 namespace stratos {
 class Biome {
-
+public:
+    bool operator==(const Biome& other) const {
+        return true;
+    }
 };
 }
 

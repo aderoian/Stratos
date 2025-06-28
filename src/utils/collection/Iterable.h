@@ -24,14 +24,14 @@
 
 namespace stratos::utils {
 
-template <typename T> class Iterable<T> {
+template <typename T> class Iterable {
   public:
     virtual ~Iterable() = default;
     virtual T* begin()  = 0;
     virtual T* end()    = 0;
 };
 
-template <typename T> class IndexedIterable<T> : public Iterable<T> {
+template <typename T> class IndexedIterable : public Iterable<T> {
   public:
     ~IndexedIterable() override            = default;
     virtual int getRawIndex(T value) const = 0;
@@ -48,7 +48,7 @@ template <typename T> T IndexedIterable<T>::getOrThrow(int index) const {
 }
 template <typename T> int IndexedIterable<T>::getRawIndexOrThrow(T value) const {
     const int i = getRawIndex(value);
-    if (i < 0 || i >= size()) throw std::out_of_range(std::format("Tried to get the raw index of a element not present.", value));
+    if (i < 0 || i >= size()) throw std::out_of_range("Tried to get the raw index of a element not present.");
     return i;
 }
 
