@@ -31,6 +31,7 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
+        registry/Registry.cpp
         utils/collection/PalettedStorage.cpp
         utils/config/Config.cpp
         utils/crypto/CryptoUtils.cpp
@@ -65,6 +66,7 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        registry/Registry.h
         utils/collection/Iterable.h
         utils/collection/PalettedStorage.h
         utils/config/Config.h
@@ -155,7 +157,7 @@ target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE cpr::cpr)
 
 # Zlib
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static zlib")
-add_subdirectory(vendor/zlib)
+#add_subdirectory(vendor/zlib)
 target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE zlibstatic)
 target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE vendor/zlib)
 

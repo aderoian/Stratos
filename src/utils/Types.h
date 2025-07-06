@@ -33,13 +33,10 @@ struct Identifier {
 
     Identifier(std::string ns, std::string n) : namespaceName(std::move(ns)), name(std::move(n)) {}
 
-    bool operator==(const Identifier& other) const {
-        return namespaceName == other.namespaceName && name == other.name;
-    }
+    [[nodiscard]] std::string toString() const { return namespaceName + ":" + name; }
 
-    bool operator!=(const Identifier& other) const {
-        return !(*this == other);
-    }
+    bool operator==(const Identifier& other) const { return namespaceName == other.namespaceName && name == other.name; }
+    bool operator!=(const Identifier& other) const { return !(*this == other); }
 };
 
 enum class HandshakeIntent {

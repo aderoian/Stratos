@@ -24,23 +24,24 @@
 
 namespace stratos::utils {
 
-template <typename T> class Iterable {
+template <typename T> class IndexedIterable {
   public:
-    virtual ~Iterable() = default;
-    virtual T* begin()  = 0;
-    virtual T* end()    = 0;
-};
+    using iterator = typename std::vector<T>::iterator;
+    using const_iterator = typename std::vector<T>::const_iterator;
 
-template <typename T> class IndexedIterable : public Iterable<T> {
-  public:
-    ~IndexedIterable() override            = default;
+    virtual ~IndexedIterable() = default;
     virtual int getRawIndex(T value) const = 0;
     virtual T   get(int index) const       = 0;
 
     T   getOrThrow(int index) const;
     int getRawIndexOrThrow(T value) const;
 
-    virtual int size() const = 0;
+    [[nodiscard]] virtual int size() const = 0;
+
+    virtual iterator begin() = 0;
+    virtual const_iterator begin() const = 0;
+    virtual iterator end() = 0;
+    virtual const_iterator end() const = 0;
 };
 template <typename T> T IndexedIterable<T>::getOrThrow(int index) const {
     if (index < 0 || index >= size()) throw std::out_of_range(std::format("Index {} out of bounds for size {}", index, size()));
