@@ -17,6 +17,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 # Source files
 set(SOURCES
         Server.cpp
+        block/Blocks.cpp
         nbt/io/NBTBuffer.cpp
         nbt/CompoundTag.cpp
         nbt/ListTag.cpp
@@ -39,6 +40,7 @@ set(SOURCES
         utils/io/ByteBuffer.cpp
         utils/io/CompressionUtils.cpp
         utils/io/FileUtils.cpp
+        utils/Identifier.cpp
         utils/StringUtils.cpp
         world/format/chunk/Chunk.cpp
         world/format/io/Region.cpp
@@ -46,6 +48,8 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        block/Block.h
+        block/Blocks.h
         block/BlockState.h
         math/Angle.h
         math/Ints.h
@@ -66,6 +70,7 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        registry/Registries.h
         registry/Registry.h
         utils/collection/Iterable.h
         utils/collection/PalettedStorage.h
@@ -75,6 +80,7 @@ set(HEADERS
         utils/io/FileUtils.h
         utils/io/ByteBuffer.h
         utils/io/CompressionUtils.h
+        utils/Identifier.h
         utils/MathUtils.h
         utils/Predicate.h
         utils/StringUtils.h

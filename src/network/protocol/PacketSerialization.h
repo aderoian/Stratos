@@ -22,6 +22,7 @@
 #include "math/Angle.h"
 #include "math/Position.h"
 #include "nbt/io/NBTBuffer.h"
+#include "utils/Identifier.h"
 #include "utils/Types.h"
 
 #include <array>
@@ -30,7 +31,6 @@
 #include <vector>
 
 namespace stratos {
-struct Identifier;
 using ByteVec = std::vector<unsigned char>;
 using UUID = std::array<uint8_t, 16>;
 
@@ -66,7 +66,7 @@ class PacketBuffer final : public nbt::NBTBuffer {
     std::string           readStringUTF16BE();
     // TODO: readTextComponent
     // TODO: readJSONTextComponent
-    Identifier            readIdentifier();
+    stratos::utils::Identifier readIdentifier();
     // TODO: readEntityMetaData
     // TODO: readSlot
     // TODO: readHashedSlot
@@ -88,7 +88,7 @@ class PacketBuffer final : public nbt::NBTBuffer {
     void writeStringUTF16BE(const std::string& value);
     // TODO: writeTextComponent
     // TODO: writeJSONTextComponent
-    void writeIdentifier(const Identifier& identifier);
+    void writeIdentifier(const utils::Identifier& identifier);
     // TODO: writeEntityMetaData
     // TODO: writeSlot
     // TODO: writeHashedSlot
@@ -110,7 +110,7 @@ class PacketBuffer final : public nbt::NBTBuffer {
     void writePrefixedResourcePackHeaderArray(const std::vector<ResourcePackHeader>& headers);
     void writePrefixedRegistryEntryArray(const std::vector<RegistryEntry>& entries);
     void writePrefixedRegistryTagDataArray(const std::vector<RegistryTagData>& data);
-    void writePrefixedIdentifierArray(const std::vector<Identifier>& identifiers);
+    void writePrefixedIdentifierArray(const std::vector<utils::Identifier>& identifiers);
     void writePrefixedReportDetailArray(const std::vector<ReportDetail>& details);
     void writePrefixedServerLinkArray(const std::vector<ServerLink>& serverLinks);
 

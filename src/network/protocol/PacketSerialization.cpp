@@ -60,7 +60,7 @@ std::string stratos::PacketBuffer::readStringUTF16BE() {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     return convert.to_bytes(utf16);
 }
-stratos::Identifier stratos::PacketBuffer::readIdentifier() {
+stratos::utils::Identifier stratos::PacketBuffer::readIdentifier() {
     std::string  rawIdentifier = readString(32767);
     const size_t colonPos      = rawIdentifier.find(':');
     if (colonPos == std::string::npos) throw PacketSerializationException("Identifier: missing namespace separator ':'");
@@ -135,7 +135,7 @@ void stratos::PacketBuffer::writeStringUTF16BE(const std::string& value) {
         buffer.push_back(ch & 0xFF);      // low byte
     }
 }
-void stratos::PacketBuffer::writeIdentifier(const Identifier& identifier) {
+void stratos::PacketBuffer::writeIdentifier(const utils::Identifier& identifier) {
     const std::string fullIdent = identifier.namespaceName + ":" + identifier.name;
     writeString(fullIdent, 32767);
 }
@@ -228,7 +228,7 @@ void stratos::PacketBuffer::writePrefixedRegistryTagDataArray(const std::vector<
         writeRegistryTagData(entry);
     }
 }
-void stratos::PacketBuffer::writePrefixedIdentifierArray(const std::vector<Identifier>& identifiers) {
+void stratos::PacketBuffer::writePrefixedIdentifierArray(const std::vector<utils::Identifier>& identifiers) {
     writeVarInt(static_cast<int>(identifiers.size()));
     for (const auto& identifier : identifiers) writeIdentifier(identifier);
 }

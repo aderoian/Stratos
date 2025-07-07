@@ -244,53 +244,53 @@ void NetworkSession::beginConfiguration() const {
     };
 
 
-    RegistryEntry dimensionTypeEntry{Identifier{"minecraft", "overworld"}, std::make_optional(nbt::writeNetworkNBT(dimensionType))};
-    RegistryEntry plainsBiomeEntry{Identifier{"minecraft", "plains"}, std::make_optional(nbt::writeNetworkNBT(plainsBiome))};
-    RegistryEntry catVariantEntry{Identifier{"minecraft", "cat/all_black"}, std::make_optional(nbt::writeNetworkNBT(catVariant))};
-    RegistryEntry cowVariantEntry{Identifier{"minecraft", "cow/temperate"}, std::make_optional(nbt::writeNetworkNBT(cowVariant))};
-    RegistryEntry chickenVariantEntry{Identifier{"minecraft", "chicken/temperate"}, std::make_optional(nbt::writeNetworkNBT(chickenVariant))};
-    RegistryEntry frogVariantEntry{Identifier{"minecraft", "frog/temperate"}, std::make_optional(nbt::writeNetworkNBT(frogVariant))};
-    RegistryEntry paintingVariantEntry{Identifier{"minecraft", "earth"}, std::make_optional(nbt::writeNetworkNBT(paintingVariant))};
-    RegistryEntry pigVariantEntry{Identifier{"minecraft", "pig/temperate"}, std::make_optional(nbt::writeNetworkNBT(pigVariant))};
-    RegistryEntry wolfVariantEntry{Identifier{"minecraft", "ashen"}, std::make_optional(nbt::writeNetworkNBT(wolfVariant))};
-    RegistryEntry wolfSoundVariantEntry{Identifier{"minecraft", "angry"}, std::make_optional(nbt::writeNetworkNBT(wolfSoundVariant))};
+    RegistryEntry dimensionTypeEntry{utils::Identifier{"minecraft", "overworld"}, std::make_optional(nbt::writeNetworkNBT(dimensionType))};
+    RegistryEntry plainsBiomeEntry{utils::Identifier{"minecraft", "plains"}, std::make_optional(nbt::writeNetworkNBT(plainsBiome))};
+    RegistryEntry catVariantEntry{utils::Identifier{"minecraft", "cat/all_black"}, std::make_optional(nbt::writeNetworkNBT(catVariant))};
+    RegistryEntry cowVariantEntry{utils::Identifier{"minecraft", "cow/temperate"}, std::make_optional(nbt::writeNetworkNBT(cowVariant))};
+    RegistryEntry chickenVariantEntry{utils::Identifier{"minecraft", "chicken/temperate"}, std::make_optional(nbt::writeNetworkNBT(chickenVariant))};
+    RegistryEntry frogVariantEntry{utils::Identifier{"minecraft", "frog/temperate"}, std::make_optional(nbt::writeNetworkNBT(frogVariant))};
+    RegistryEntry paintingVariantEntry{utils::Identifier{"minecraft", "earth"}, std::make_optional(nbt::writeNetworkNBT(paintingVariant))};
+    RegistryEntry pigVariantEntry{utils::Identifier{"minecraft", "pig/temperate"}, std::make_optional(nbt::writeNetworkNBT(pigVariant))};
+    RegistryEntry wolfVariantEntry{utils::Identifier{"minecraft", "ashen"}, std::make_optional(nbt::writeNetworkNBT(wolfVariant))};
+    RegistryEntry wolfSoundVariantEntry{utils::Identifier{"minecraft", "angry"}, std::make_optional(nbt::writeNetworkNBT(wolfSoundVariant))};
 
-    send(RegistryDataPacket(Identifier{"minecraft", "dimension_type"}, std::vector{std::move(dimensionTypeEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "worldgen/biome"}, std::vector{std::move(plainsBiomeEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "cat_variant"}, std::vector{std::move(catVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "cow_variant"}, std::vector{std::move(cowVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "chicken_variant"}, std::vector{std::move(chickenVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "frog_variant"}, std::vector{std::move(frogVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "painting_variant"}, std::vector{std::move(paintingVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "pig_variant"}, std::vector{std::move(pigVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "wolf_variant"}, std::vector{std::move(wolfVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "wolf_sound_variant"}, std::vector{std::move(wolfSoundVariantEntry)}));
-    send(RegistryDataPacket(Identifier{"minecraft", "damage_type"}, std::vector{
-        RegistryEntry{Identifier{"minecraft", "in_fire"}, std::make_optional(nbt::writeNetworkNBT(inFireDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "campfire"}, std::make_optional(nbt::writeNetworkNBT(campfireDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "lightning_bolt"}, std::make_optional(nbt::writeNetworkNBT(lightningDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "on_fire"}, std::make_optional(nbt::writeNetworkNBT(onFireDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "lava"}, std::make_optional(nbt::writeNetworkNBT(lavaDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "hot_floor"}, std::make_optional(nbt::writeNetworkNBT(hotFloorDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "in_wall"}, std::make_optional(nbt::writeNetworkNBT(inWallDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "cramming"}, std::make_optional(nbt::writeNetworkNBT(crammingDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "drown"}, std::make_optional(nbt::writeNetworkNBT(drownDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "starve"}, std::make_optional(nbt::writeNetworkNBT(starveDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "cactus"}, std::make_optional(nbt::writeNetworkNBT(cactusDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "fall"}, std::make_optional(nbt::writeNetworkNBT(fallDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "ender_pearl"}, std::make_optional(nbt::writeNetworkNBT(enderPearlDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "fly_into_wall"}, std::make_optional(nbt::writeNetworkNBT(flyIntoWallDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "out_of_world"}, std::make_optional(nbt::writeNetworkNBT(outOfWorldDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "generic"}, std::make_optional(nbt::writeNetworkNBT(genericDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "magic"}, std::make_optional(nbt::writeNetworkNBT(magicDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "wither"}, std::make_optional(nbt::writeNetworkNBT(witherDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "dragon_breath"}, std::make_optional(nbt::writeNetworkNBT(dragonBreathDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "dry_out"}, std::make_optional(nbt::writeNetworkNBT(dryOutDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "sweet_berry_bush"}, std::make_optional(nbt::writeNetworkNBT(sweetBerryBushDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "freeze"}, std::make_optional(nbt::writeNetworkNBT(freezeDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "stalagmite"}, std::make_optional(nbt::writeNetworkNBT(stalagmiteDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "outside_border"}, std::make_optional(nbt::writeNetworkNBT(outsideBorderDamageEntry))},
-        RegistryEntry{Identifier{"minecraft", "generic_kill"}, std::make_optional(nbt::writeNetworkNBT(genericKillDamageEntry))}
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "dimension_type"}, std::vector{std::move(dimensionTypeEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "worldgen/biome"}, std::vector{std::move(plainsBiomeEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "cat_variant"}, std::vector{std::move(catVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "cow_variant"}, std::vector{std::move(cowVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "chicken_variant"}, std::vector{std::move(chickenVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "frog_variant"}, std::vector{std::move(frogVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "painting_variant"}, std::vector{std::move(paintingVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "pig_variant"}, std::vector{std::move(pigVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "wolf_variant"}, std::vector{std::move(wolfVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "wolf_sound_variant"}, std::vector{std::move(wolfSoundVariantEntry)}));
+    send(RegistryDataPacket(utils::Identifier{"minecraft", "damage_type"}, std::vector{
+        RegistryEntry{utils::Identifier{"minecraft", "in_fire"}, std::make_optional(nbt::writeNetworkNBT(inFireDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "campfire"}, std::make_optional(nbt::writeNetworkNBT(campfireDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "lightning_bolt"}, std::make_optional(nbt::writeNetworkNBT(lightningDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "on_fire"}, std::make_optional(nbt::writeNetworkNBT(onFireDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "lava"}, std::make_optional(nbt::writeNetworkNBT(lavaDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "hot_floor"}, std::make_optional(nbt::writeNetworkNBT(hotFloorDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "in_wall"}, std::make_optional(nbt::writeNetworkNBT(inWallDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "cramming"}, std::make_optional(nbt::writeNetworkNBT(crammingDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "drown"}, std::make_optional(nbt::writeNetworkNBT(drownDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "starve"}, std::make_optional(nbt::writeNetworkNBT(starveDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "cactus"}, std::make_optional(nbt::writeNetworkNBT(cactusDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "fall"}, std::make_optional(nbt::writeNetworkNBT(fallDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "ender_pearl"}, std::make_optional(nbt::writeNetworkNBT(enderPearlDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "fly_into_wall"}, std::make_optional(nbt::writeNetworkNBT(flyIntoWallDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "out_of_world"}, std::make_optional(nbt::writeNetworkNBT(outOfWorldDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "generic"}, std::make_optional(nbt::writeNetworkNBT(genericDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "magic"}, std::make_optional(nbt::writeNetworkNBT(magicDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "wither"}, std::make_optional(nbt::writeNetworkNBT(witherDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "dragon_breath"}, std::make_optional(nbt::writeNetworkNBT(dragonBreathDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "dry_out"}, std::make_optional(nbt::writeNetworkNBT(dryOutDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "sweet_berry_bush"}, std::make_optional(nbt::writeNetworkNBT(sweetBerryBushDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "freeze"}, std::make_optional(nbt::writeNetworkNBT(freezeDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "stalagmite"}, std::make_optional(nbt::writeNetworkNBT(stalagmiteDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "outside_border"}, std::make_optional(nbt::writeNetworkNBT(outsideBorderDamageEntry))},
+        RegistryEntry{utils::Identifier{"minecraft", "generic_kill"}, std::make_optional(nbt::writeNetworkNBT(genericKillDamageEntry))}
     }));
     send(FinishConfiguration());
 }
@@ -301,7 +301,7 @@ void NetworkSession::loginPlayer() {
     send(LoginPlay(
         0,
         false,
-        std::vector{Identifier{"minecraft", "overworld"}},
+        std::vector{utils::Identifier{"minecraft", "overworld"}},
         networkManager->getServer()->getMaxPlayers(),
         12, // TODO: View distance from server.properties
         10, // TODO: Simulation distance from server.properties
@@ -309,7 +309,7 @@ void NetworkSession::loginPlayer() {
         true,
         false,
         0, // TODO: Figure out what Dimension ID is
-        Identifier{"minecraft", "overworld"},
+        utils::Identifier{"minecraft", "overworld"},
         0, // TODO: Hashed seed, should be generated by the server
         1,
         -1, // Previous gamemode, -1 means no previous gamemode

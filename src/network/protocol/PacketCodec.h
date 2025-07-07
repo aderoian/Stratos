@@ -208,7 +208,7 @@ public:
 class LoginCookieResponse final : public ServerboundPacket {
 public:
     constexpr static int ID = 0x04;
-    Identifier cookie;
+    utils::Identifier cookie;
     std::optional<std::vector<uint8_t>> payload; // prefixed optional ByteArray
 
     LoginCookieResponse() : Packet(ID), ServerboundPacket(ID), cookie({"",""}) {}
@@ -266,11 +266,11 @@ class LoginPluginRequest final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x04;
     int messageId; // VarInt
-    Identifier channel;
+    utils::Identifier channel;
     std::vector<uint8_t> data; // ByteArray
 
     LoginPluginRequest() : Packet(ID), ClientboundPacket(ID), messageId(0), channel({"",""}) {}
-    LoginPluginRequest(const int messageId, Identifier channel, std::vector<uint8_t>&& data)
+    LoginPluginRequest(const int messageId, utils::Identifier channel, std::vector<uint8_t>&& data)
         : Packet(ID), ClientboundPacket(ID), messageId(messageId), channel(std::move(channel)), data(std::move(data)) {}
     CLIENTBOUND_PACKET_FOOTER(LoginPluginRequest)
 };
@@ -278,10 +278,10 @@ public:
 class LoginCookieRequest final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x05;
-    Identifier cookie;
+    utils::Identifier cookie;
 
     LoginCookieRequest() : Packet(ID), ClientboundPacket(ID), cookie({"",""}) {}
-    explicit LoginCookieRequest(Identifier  cookie) : Packet(ID), ClientboundPacket(ID), cookie(std::move(cookie)) {}
+    explicit LoginCookieRequest(utils::Identifier  cookie) : Packet(ID), ClientboundPacket(ID), cookie(std::move(cookie)) {}
     CLIENTBOUND_PACKET_FOOTER(LoginCookieRequest)
 };
 
@@ -307,7 +307,7 @@ public:
 class ConfigurationCookieResponse final : public ServerboundPacket {
 public:
     constexpr static int ID = 0x01;
-    Identifier key;
+    utils::Identifier key;
     std::optional<std::vector<uint8_t>> value; // prefixed optional prefixed ByteArray(5120)
 
     ConfigurationCookieResponse() : Packet(ID), ServerboundPacket(ID), key({"",""}), value() {}
@@ -317,7 +317,7 @@ public:
 class ConfigurationServerPluginMessage final : public ServerboundPacket {
 public:
     constexpr static int ID = 0x02;
-    Identifier channel;
+    utils::Identifier channel;
     std::vector<uint8_t> data; // prefixed ByteArray(32767)
 
     ConfigurationServerPluginMessage() : Packet(ID), ServerboundPacket(ID), channel({"",""}), data() {}
@@ -372,21 +372,21 @@ public:
 class ConfigurationCookieRequest final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x00;
-    Identifier key;
+    utils::Identifier key;
 
     ConfigurationCookieRequest() : Packet(ID), ClientboundPacket(ID), key({"",""}) {}
-    explicit ConfigurationCookieRequest(Identifier  key) : Packet(ID), ClientboundPacket(ID), key(std::move(key)) {}
+    explicit ConfigurationCookieRequest(utils::Identifier  key) : Packet(ID), ClientboundPacket(ID), key(std::move(key)) {}
     CLIENTBOUND_PACKET_FOOTER(ConfigurationCookieRequest)
 };
 
 class ConfigurationClientboundPluginMessage final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x01;
-    Identifier channel;
+    utils::Identifier channel;
     std::vector<uint8_t> data; // ByteArray
 
     ConfigurationClientboundPluginMessage() : Packet(ID), ClientboundPacket(ID), channel({"",""}) {}
-    ConfigurationClientboundPluginMessage(Identifier channel, std::vector<uint8_t> data)
+    ConfigurationClientboundPluginMessage(utils::Identifier channel, std::vector<uint8_t> data)
         : Packet(ID), ClientboundPacket(ID), channel(std::move(channel)), data(std::move(data)) {}
     CLIENTBOUND_PACKET_FOOTER(ConfigurationClientboundPluginMessage)
 };
@@ -440,11 +440,11 @@ public:
 class RegistryDataPacket final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x07;
-    Identifier registryKey;
+    utils::Identifier registryKey;
     std::vector<RegistryEntry> entries;
 
     RegistryDataPacket() : Packet(ID), ClientboundPacket(ID), registryKey({"",""}) {}
-    RegistryDataPacket(Identifier registryKey, std::vector<RegistryEntry>&& entries)
+    RegistryDataPacket(utils::Identifier registryKey, std::vector<RegistryEntry>&& entries)
         : Packet(ID), ClientboundPacket(ID), registryKey(std::move(registryKey)), entries(std::move(entries)) {}
     CLIENTBOUND_PACKET_FOOTER(RegistryDataPacket)
 };
@@ -477,11 +477,11 @@ public:
 class ConfigurationStoreCookie final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x0A;
-    Identifier key;
+    utils::Identifier key;
     std::vector<uint8_t> value; // prefixed ByteArray(5120)
 
     ConfigurationStoreCookie() : Packet(ID), ClientboundPacket(ID), key({"",""}), value() {}
-    ConfigurationStoreCookie(Identifier  key, std::vector<uint8_t>&& value) : Packet(ID), ClientboundPacket(ID), key(std::move(key)), value(std::move(value)) {}
+    ConfigurationStoreCookie(utils::Identifier  key, std::vector<uint8_t>&& value) : Packet(ID), ClientboundPacket(ID), key(std::move(key)), value(std::move(value)) {}
     CLIENTBOUND_PACKET_FOOTER(ConfigurationStoreCookie)
 };
 
@@ -499,10 +499,10 @@ public:
 class FeatureFlags final : public ClientboundPacket {
 public:
     constexpr static int ID = 0x0C;
-    std::vector<Identifier> features; // prefixed array
+    std::vector<utils::Identifier> features; // prefixed array
 
     FeatureFlags() : Packet(ID), ClientboundPacket(ID) {}
-    explicit FeatureFlags(std::vector<Identifier>& features) : Packet(ID), ClientboundPacket(ID), features(std::move(features)) {}
+    explicit FeatureFlags(std::vector<utils::Identifier>& features) : Packet(ID), ClientboundPacket(ID), features(std::move(features)) {}
     CLIENTBOUND_PACKET_FOOTER(FeatureFlags)
 };
 
@@ -583,7 +583,7 @@ public:
     constexpr static int ID = 0x2B;
     int entityId; // int
     bool isHardcore;
-    std::vector<Identifier> dimensions; // prefixed array
+    std::vector<utils::Identifier> dimensions; // prefixed array
     int maxPlayers; // VarInt
     int viewDistance; // VarInt
     int simulationDistance; // VarInt
@@ -591,14 +591,14 @@ public:
     bool enableRespawnScreen;
     bool doLimitedCrafting;
     int dimensionType; // VarInt
-    Identifier dimensionName;
+    utils::Identifier dimensionName;
     long hashedSeed;
     uint8_t gamemode;
     int8_t previousGamemode;
     bool debug;
     bool flat;
     bool hasDeathLocation;
-    std::optional<Identifier> deathDimension; // optional identifier
+    std::optional<utils::Identifier> deathDimension; // optional utils::Identifier
     std::optional<math::Position> deathPosition; // optional position
     int portalCooldown; // VarInt
     int seaLevel; // VarInt
@@ -606,11 +606,11 @@ public:
 
     LoginPlay()
         : Packet(ID), ClientboundPacket(ID), entityId(0), isHardcore(false), maxPlayers(0), viewDistance(0), simulationDistance(0), reducedDebugInfo(false),
-          enableRespawnScreen(false), doLimitedCrafting(false), dimensionType(0), dimensionName(Identifier{"", ""}), hashedSeed(0), gamemode(0), previousGamemode(0), debug(false),
+          enableRespawnScreen(false), doLimitedCrafting(false), dimensionType(0), dimensionName(utils::Identifier{"", ""}), hashedSeed(0), gamemode(0), previousGamemode(0), debug(false),
           flat(false), hasDeathLocation(false), portalCooldown(0), seaLevel(0), enforcesSecureChat(false) {}
-    LoginPlay(const int entity_id, const bool is_hardcore, const std::vector<Identifier> dimensions, const int max_players, const int view_distance, const int simulation_distance, const bool reduced_debug_info,
-              bool const enable_respawn_screen, bool const do_limited_crafting, const int dimension_type, const Identifier dimension_name, const long hashed_seed, const uint8_t gamemode, const int8_t previous_gamemode,
-              const bool debug, const bool flat, const bool has_death_location, const std::optional<Identifier> death_dimension, const std::optional<math::Position> death_position, const int portal_cooldown,
+    LoginPlay(const int entity_id, const bool is_hardcore, const std::vector<utils::Identifier> dimensions, const int max_players, const int view_distance, const int simulation_distance, const bool reduced_debug_info,
+              bool const enable_respawn_screen, bool const do_limited_crafting, const int dimension_type, const utils::Identifier dimension_name, const long hashed_seed, const uint8_t gamemode, const int8_t previous_gamemode,
+              const bool debug, const bool flat, const bool has_death_location, const std::optional<utils::Identifier> death_dimension, const std::optional<math::Position> death_position, const int portal_cooldown,
               const int sea_level, const bool enforces_secure_chat)
         : Packet(ID), ClientboundPacket(ID), entityId(entity_id), isHardcore(is_hardcore), dimensions(dimensions), maxPlayers(max_players), viewDistance(view_distance),
           simulationDistance(simulation_distance), reducedDebugInfo(reduced_debug_info), enableRespawnScreen(enable_respawn_screen), doLimitedCrafting(do_limited_crafting),

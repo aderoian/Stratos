@@ -19,6 +19,8 @@
 
 #ifndef TYPES_H
 #define TYPES_H
+#include "Identifier.h"
+
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -26,18 +28,6 @@
 
 namespace stratos {
 using ByteVec = std::vector<uint8_t>;
-
-struct Identifier {
-    std::string namespaceName;
-    std::string name;
-
-    Identifier(std::string ns, std::string n) : namespaceName(std::move(ns)), name(std::move(n)) {}
-
-    [[nodiscard]] std::string toString() const { return namespaceName + ":" + name; }
-
-    bool operator==(const Identifier& other) const { return namespaceName == other.namespaceName && name == other.name; }
-    bool operator!=(const Identifier& other) const { return !(*this == other); }
-};
 
 enum class HandshakeIntent {
     None = 0,
@@ -87,17 +77,17 @@ struct ResourcePackHeader {
 };
 
 struct RegistryEntry {
-    Identifier id;
+    utils::Identifier id;
     std::optional<ByteVec> data; // TODO: replace this with a NBT tag
 };
 
 struct RegistryTag {
-    Identifier tagKey;
+    utils::Identifier tagKey;
     int id;
 };
 
 struct RegistryTagData {
-    Identifier registryKey;
+    utils::Identifier registryKey;
     std::vector<RegistryTag> entries;
 };
 

@@ -19,6 +19,7 @@
 
 #ifndef ITERABLE_H
 #define ITERABLE_H
+#include <vector>
 #include <format>
 #include <stdexcept>
 
@@ -26,8 +27,8 @@ namespace stratos::utils {
 
 template <typename T> class IndexedIterable {
   public:
-    using iterator = typename std::vector<T>::iterator;
-    using const_iterator = typename std::vector<T>::const_iterator;
+    using iterator = typename std::vector<T*>::iterator;
+    using const_iterator = typename std::vector<T*>::const_iterator;
 
     virtual ~IndexedIterable() = default;
     virtual int getRawIndex(T value) const = 0;
