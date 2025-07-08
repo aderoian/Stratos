@@ -17,6 +17,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 # Source files
 set(SOURCES
         Server.cpp
+        block/state/StateProperty.cpp
         block/Blocks.cpp
         nbt/io/NBTBuffer.cpp
         nbt/CompoundTag.cpp
@@ -48,6 +49,7 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        block/state/StateProperty.h
         block/Block.h
         block/Blocks.h
         block/BlockState.h
@@ -80,6 +82,7 @@ set(HEADERS
         utils/io/FileUtils.h
         utils/io/ByteBuffer.h
         utils/io/CompressionUtils.h
+        utils/Hash.h
         utils/Identifier.h
         utils/MathUtils.h
         utils/Predicate.h
@@ -163,7 +166,7 @@ target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE cpr::cpr)
 
 # Zlib
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static zlib")
-#add_subdirectory(vendor/zlib)
+add_subdirectory(vendor/zlib)
 target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE zlibstatic)
 target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE vendor/zlib)
 
@@ -203,7 +206,7 @@ else ()
     endif ()
 endif()
 target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr)
-target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE zlibstatic)
+target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE zlib)
 target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE vendor/zlib)
 
 set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
