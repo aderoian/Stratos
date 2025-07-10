@@ -4,6 +4,7 @@
 !.idea/fileTemplates/
 !.idea/copyright/
 !.idea/scopes/
+!.idea/cmake.xml
 
 # CLion CMake Build
 cmake-build-*/
