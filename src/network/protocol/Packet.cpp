@@ -79,4 +79,11 @@ void stratos::PacketRegistry::setup() {
     REGISTER_CLIENTBOUND(ProtocolState::Configuration, ClientboundKnownPacks);
     REGISTER_CLIENTBOUND(ProtocolState::Configuration, ConfigurationCustomReportDetails);
     REGISTER_CLIENTBOUND(ProtocolState::Configuration, ConfigurationServerLinks);
+
+    // Play Packets
+    REGISTER_CLIENTBOUND(ProtocolState::Play, GameEventPacket);
+    REGISTER_CLIENTBOUND(ProtocolState::Play, SynchronizePlayerPosition);
+    REGISTER_CLIENTBOUND(ProtocolState::Play, LoginPlay);
+    REGISTER_CLIENTBOUND(ProtocolState::Play, SetCenterChunk);
+    REGISTER_CLIENTBOUND(ProtocolState::Play, SetDefaultSpawnPosition);
 }

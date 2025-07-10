@@ -17,23 +17,11 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#include "Chunk.h"
 
-#include <cmath>
+namespace stratos {
 
-namespace stratos::utils {
-
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
+Chunk* Chunk::fromNBT(const nbt::CompoundTag& nbt) {
+    return nullptr;
 }
-
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
-}
-
-} // namespace stratos::utils
-
-#endif //MATH_H
+} // namespace stratos

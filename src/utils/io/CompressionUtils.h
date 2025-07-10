@@ -17,23 +17,21 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#ifndef COMPRESSIONUTILS_H
+#define COMPRESSIONUTILS_H
 
-#include <cmath>
+namespace stratos {
+using ByteVec = std::vector<uint8_t>;
+class ByteBuffer;
 
-namespace stratos::utils {
+// Binary compression
+bool isGzip(const ByteBuffer& buffer);
+bool isZlib(const ByteBuffer& buffer);
+ByteBuffer decompress(const ByteBuffer& buffer);
+ByteVec decompress(const ByteVec& buffer);
+ByteBuffer compress(const ByteBuffer& buffer, bool gzip = false);
+ByteVec compress(const ByteVec& buffer, bool gzip = false);
 
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
-}
+} // namespace stratos
 
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
-}
-
-} // namespace stratos::utils
-
-#endif //MATH_H
+#endif //COMPRESSIONUTILS_H

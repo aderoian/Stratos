@@ -17,23 +17,25 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
-
-#include <cmath>
+#ifndef IDENTIFIER_H
+#define IDENTIFIER_H
+#include <string>
 
 namespace stratos::utils {
+struct Identifier {
+    std::string namespaceName;
+    std::string name;
 
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
-}
+    Identifier(std::string ns, std::string n) : namespaceName(std::move(ns)), name(std::move(n)) {}
 
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
-}
+    [[nodiscard]] std::string toString() const;
 
+    bool operator==(const Identifier& other) const;
+    bool operator!=(const Identifier& other) const;
+};
 } // namespace stratos::utils
 
-#endif //MATH_H
+template <> struct std::hash<stratos::utils::Identifier> {
+    std::size_t operator()(const stratos::utils::Identifier& id) const noexcept { return std::hash<std::string>()(id.namespaceName) ^ std::hash<std::string>()(id.name) << 1; }
+};
+#endif //IDENTIFIER_H

@@ -1,7 +1,6 @@
 # Global
 cmake_minimum_required(VERSION 3.20.0)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Project variables
 set(LOCAL_PROJECT_NAME "Stratos")
@@ -18,6 +17,14 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 # Source files
 set(SOURCES
         Server.cpp
+        block/Blocks.cpp
+        nbt/io/NBTBuffer.cpp
+        nbt/CompoundTag.cpp
+        nbt/ListTag.cpp
+        nbt/NBT.cpp
+        nbt/Value.cpp
+        nbt/StringTag.cpp
+        nbt/Tag.cpp
         network/Network.cpp
         network/session/NetworkClient.cpp
         network/session/SessionAuth.cpp
@@ -25,18 +32,37 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
+        registry/Registry.cpp
+        utils/collection/PalettedStorage.cpp
         utils/config/Config.cpp
         utils/crypto/CryptoUtils.cpp
         utils/hash/MD5.cpp
+        utils/io/ByteBuffer.cpp
+        utils/io/CompressionUtils.cpp
         utils/io/FileUtils.cpp
+        utils/Identifier.cpp
         utils/StringUtils.cpp
+        world/format/chunk/Chunk.cpp
+        world/format/io/Region.cpp
 )
 
 set(HEADERS
         Server.h
+        block/Block.h
+        block/Blocks.h
+        block/BlockState.h
         math/Angle.h
         math/Ints.h
         math/Position.h
+        nbt/io/NBTBuffer.h
+        nbt/ArrayTag.h
+        nbt/CompoundTag.h
+        nbt/ListTag.h
+        nbt/NBT.h
+        nbt/Value.h
+        nbt/PrimitiveTag.h
+        nbt/StringTag.h
+        nbt/Tag.h
         network/Network.h
         network/session/NetworkClient.h
         network/session/SessionAuth.h
@@ -44,15 +70,28 @@ set(HEADERS
         network/protocol/PacketSerialization.h
         network/protocol/Packet.h
         network/protocol/PacketCodec.h
+        registry/Registries.h
+        registry/Registry.h
+        utils/collection/Iterable.h
+        utils/collection/PalettedStorage.h
         utils/config/Config.h
         utils/crypto/CryptoUtils.h
         utils/hash/MD5.h
         utils/io/FileUtils.h
+        utils/io/ByteBuffer.h
+        utils/io/CompressionUtils.h
+        utils/Identifier.h
         utils/MathUtils.h
+        utils/Predicate.h
         utils/StringUtils.h
         utils/TimeUtils.h
         utils/Types.h
         utils/UUID.h
+        utils/Validate.h
+        world/format/chunk/Chunk.h
+        world/format/chunk/Palette.h
+        world/format/io/Region.h
+        world/format/Biome.h
 )
 
 # Project
@@ -75,7 +114,6 @@ target_sources(${LOCAL_PROJECT_NAME} PRIVATE src/Stratos.cpp ${SOURCES} ${HEADER
 
 if (WIN32)
     target_link_libraries(Stratos PRIVATE iphlpapi ws2_32)
-    target_link_options(Stratos PRIVATE -static)
 endif ()
 
 # OpenSSL
@@ -123,6 +161,13 @@ set(CURL_STATICLIB ON)
 add_subdirectory(vendor/cpr)
 target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE cpr::cpr)
 
+# Zlib
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static zlib")
+#add_subdirectory(vendor/zlib)
+target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE zlibstatic)
+target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE vendor/zlib)
+
+
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
 # Testing
@@ -158,9 +203,15 @@ else ()
     endif ()
 endif()
 target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr)
+target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE zlibstatic)
+target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE vendor/zlib)
 
 set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 
 add_test(NAME NetworkSerialization COMMAND "${LOCAL_PROJECT_NAME}Test" --network-serialization)
 add_test(NAME FileUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --file-utils)
 add_test(NAME StringUtils COMMAND "${LOCAL_PROJECT_NAME}Test" --string-utils)
+add_test(NAME ByteBuffer COMMAND "${LOCAL_PROJECT_NAME}Test" --byte-buffer)
+add_test(NAME NBT COMMAND "${LOCAL_PROJECT_NAME}Test" --nbt)
+add_test(NAME Palette COMMAND "${LOCAL_PROJECT_NAME}Test" --palette)
+add_test(NAME Predicate COMMAND "${LOCAL_PROJECT_NAME}Test" --predicate)

@@ -17,23 +17,39 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#ifndef CHUNK_H
+#define CHUNK_H
+#include "Palette.h"
 
-#include <cmath>
-
-namespace stratos::utils {
-
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
+namespace stratos::nbt {
+class CompoundTag;
 }
+namespace stratos {
 
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
-}
+class ChunkSection {
+public:
+private:
+    int y;
+    PalettedContainer<BlockState> blocks;
+    PalettedContainer<Biome> biomes;
+    // TODO: Block light
+    // TODO: Sky light
+};
 
-} // namespace stratos::utils
+class Chunk {
+public:
+    int getHeight() const;
 
-#endif //MATH_H
+    static Chunk* fromNBT(const nbt::CompoundTag& nbt);
+private:
+    int x;
+    int z;
+    int lowY;
+
+    ChunkSection* sections[];
+
+};
+
+} // namespace stratos
+
+#endif //CHUNK_H

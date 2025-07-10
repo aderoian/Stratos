@@ -17,23 +17,16 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#ifndef BIOME_H
+#define BIOME_H
 
-#include <cmath>
-
-namespace stratos::utils {
-
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
+namespace stratos {
+class Biome {
+public:
+    bool operator==(const Biome& other) const {
+        return true;
+    }
+};
 }
 
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
-}
-
-} // namespace stratos::utils
-
-#endif //MATH_H
+#endif //BIOME_H

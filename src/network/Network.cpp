@@ -33,7 +33,7 @@ bool stratos::NetworkManager::start() {
     if (running) throw std::runtime_error("Attempted to start NetworkManager while it is already running");
     running = true;
 
-    encryptionEnabled = true; // TODO: settings from server config
+    encryptionEnabled = false; // TODO: settings from server config
     if (encryptionEnabled) {
         try {
             encryptionKey = std::move(generateEncryptionKey());
@@ -340,6 +340,11 @@ void stratos::WorkerThread::removeConnection(const SocketFd connection) {
 }
 void stratos::WorkerThread::notifySend(const SocketFd& socketFd) {
     sendNotifyQueue.enqueue(socketFd);
+}
+std::shared_ptr<stratos::NetworkConnection> stratos::WorkerThread::getConnection(const SocketFd& socketFd) {
+    if (const auto it = connections.find(socketFd); it != connections.end())
+        return it->second;
+    return nullptr;
 }
 void stratos::WorkerThread::processIncomingConnections() {
 

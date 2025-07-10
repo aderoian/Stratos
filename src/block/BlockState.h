@@ -17,23 +17,19 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#ifndef BLOCKSTATE_H
+#define BLOCKSTATE_H
 
-#include <cmath>
+namespace stratos {
+/**
+ * Represents the state of a block (dynamic properties) in the world.
+ */
+class BlockState {
+public:
+    bool operator==(const BlockState& other) const {
+        return true;
+    }
+};
+} // namespace stratos
 
-namespace stratos::utils {
-
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
-}
-
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
-}
-
-} // namespace stratos::utils
-
-#endif //MATH_H
+#endif //BLOCKSTATE_H

@@ -19,6 +19,8 @@
 
 #ifndef TYPES_H
 #define TYPES_H
+#include "Identifier.h"
+
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -26,21 +28,6 @@
 
 namespace stratos {
 using ByteVec = std::vector<uint8_t>;
-
-struct Identifier {
-    std::string namespaceName;
-    std::string name;
-
-    Identifier(std::string ns, std::string n) : namespaceName(std::move(ns)), name(std::move(n)) {}
-
-    bool operator==(const Identifier& other) const {
-        return namespaceName == other.namespaceName && name == other.name;
-    }
-
-    bool operator!=(const Identifier& other) const {
-        return !(*this == other);
-    }
-};
 
 enum class HandshakeIntent {
     None = 0,
@@ -90,17 +77,17 @@ struct ResourcePackHeader {
 };
 
 struct RegistryEntry {
-    Identifier id;
+    utils::Identifier id;
     std::optional<ByteVec> data; // TODO: replace this with a NBT tag
 };
 
 struct RegistryTag {
-    Identifier tagKey;
+    utils::Identifier tagKey;
     int id;
 };
 
 struct RegistryTagData {
-    Identifier registryKey;
+    utils::Identifier registryKey;
     std::vector<RegistryTag> entries;
 };
 
@@ -128,6 +115,33 @@ struct ServerLink {
     std::string customLabel; // Text Component
     std::string url;
 };
+
+enum class GameEvent {
+    NoRespawnBlockAvailable = 0,
+    BeginRaining = 1,
+    EndRaining = 2,
+    ChangeGameMode = 3,
+    WinGame = 4,
+    DemoEvent = 5,
+    ArrowHitPlayer = 6,
+    RainLevelChange = 7,
+    ThunderLevelChange = 8,
+    PlayPufferfishStingSound = 9,
+    PlayElderGuardianCurseSound = 10,
+    EnableRespawnScreen = 11,
+    LimitedCrafting = 12,
+    StartWaitingForChunks = 13
+};
+
+constexpr int FLAG_RELATIVE_X = 0x0001;
+constexpr int FLAG_RELATIVE_Y = 0x0002;
+constexpr int FLAG_RELATIVE_Z = 0x0004;
+constexpr int FLAG_RELATIVE_YAW = 0x0008;
+constexpr int FLAG_RELATIVE_PITCH = 0x0010;
+constexpr int FLAG_RELATIVE_VELOCITY_X = 0x0020;
+constexpr int FLAG_RELATIVE_VELOCITY_Y = 0x0040;
+constexpr int FLAG_RELATIVE_VELOCITY_Z = 0x0080;
+constexpr int FLAG_ROTATE_VELOCITY = 0x0100;
 
 }
 #endif //TYPES_H

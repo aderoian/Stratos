@@ -17,23 +17,20 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#ifndef REGISTRIES_H
+#define REGISTRIES_H
 
-#include <cmath>
+#include "Registry.h"
 
-namespace stratos::utils {
+namespace stratos {
+namespace block {
+class Block;
+} // namespace block
+namespace registry {
 
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
-}
+inline extern Registry<block::Block> BLOCKS({utils::Identifier("minecraft", "root"), utils::Identifier("minecraft", "block")});
 
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
-}
+} // namespace registry
+} // nammespace stratos
 
-} // namespace stratos::utils
-
-#endif //MATH_H
+#endif //REGISTRIES_H

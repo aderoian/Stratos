@@ -137,6 +137,7 @@ class WorkerThread final : public NetworkThread {
 
     [[nodiscard]] int getId() const { return id; }
     [[nodiscard]] int getConnectionCount() const { return connectionCount; }
+    [[nodiscard]] std::shared_ptr<NetworkConnection> getConnection(const SocketFd& socketFd);
 
   private:
     int id;

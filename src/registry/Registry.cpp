@@ -17,23 +17,17 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#include "Registry.h"
 
-#include <cmath>
+namespace stratos::registry {
 
-namespace stratos::utils {
-
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
+bool RegistryKey::operator==(const RegistryKey& other) const {
+    return registry == other.registry && value == other.value;
 }
-
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
+bool RegistryKey::operator!=(const RegistryKey& other) const {
+    return !(*this == other);
 }
-
-} // namespace stratos::utils
-
-#endif //MATH_H
+std::string RegistryKey::toString() const {
+    return registry.toString() + ":" + value.toString();
+}
+} // namespace stratos::registry

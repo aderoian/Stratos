@@ -256,6 +256,56 @@ void stratos::ConfigurationCustomReportDetails::encrypt(PacketBuffer& buffer) {
 void stratos::ConfigurationServerLinks::encrypt(PacketBuffer& buffer) {
     buffer.writePrefixedServerLinkArray(links);
 }
+void stratos::GameEventPacket::encrypt(PacketBuffer& buffer) {
+    buffer.writeUnsignedByte(static_cast<uint8_t>(event));
+    buffer.writeFloat(data);
+}
+void stratos::SynchronizePlayerPosition::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(teleportId);
+    buffer.writeDouble(x);
+    buffer.writeDouble(y);
+    buffer.writeDouble(z);
+    buffer.writeDouble(velocityX);
+    buffer.writeDouble(velocityY);
+    buffer.writeDouble(velocityZ);
+    buffer.writeFloat(yaw);
+    buffer.writeFloat(pitch);
+    buffer.writeInt(flags);
+}
+void stratos::LoginPlay::encrypt(PacketBuffer& buffer) {
+    buffer.writeInt(entityId);
+    buffer.writeBoolean(isHardcore);
+    buffer.writePrefixedIdentifierArray(dimensions);
+    buffer.writeVarInt(maxPlayers);
+    buffer.writeVarInt(viewDistance);
+    buffer.writeVarInt(simulationDistance);
+    buffer.writeBoolean(reducedDebugInfo);
+    buffer.writeBoolean(enableRespawnScreen);
+    buffer.writeBoolean(doLimitedCrafting);
+    buffer.writeVarInt(dimensionType);
+    buffer.writeIdentifier(dimensionName);
+    buffer.writeLong(hashedSeed);
+    buffer.writeByte(gamemode);
+    buffer.writeByte(previousGamemode);
+    buffer.writeBoolean(debug);
+    buffer.writeBoolean(flat);
+    buffer.writeBoolean(hasDeathLocation);
+    if (hasDeathLocation) {
+        buffer.writeIdentifier(deathDimension.value());
+        buffer.writePosition(deathPosition.value());
+    }
+    buffer.writeVarInt(portalCooldown);
+    buffer.writeVarInt(seaLevel);
+    buffer.writeBoolean(enforcesSecureChat);
+}
+void stratos::SetCenterChunk::encrypt(PacketBuffer& buffer) {
+    buffer.writeVarInt(chunkX);
+    buffer.writeVarInt(chunkZ);
+}
+void stratos::SetDefaultSpawnPosition::encrypt(PacketBuffer& buffer) {
+    buffer.writePosition(location);
+    buffer.writeFloat(angle);
+}
 bool stratos::HandshakePacketHandler::handle(ClientHandshake& packet) {
     switch (packet.intent) {
     case HandshakeIntent::Status:
@@ -304,7 +354,7 @@ bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
         return false;
     }
     connection->clientSecret = std::move(rsaDecrypt(connection->encryptionKey, packet.sharedSecret));
-    connection->encryptionEnabled = true;
+    connection->encryptionEnabled = false;
 
     if (server->isOnlineMode()) {
         authenticate(connection, server->getName(), connection->clientSecret, *connection->encryptionKey);
@@ -317,6 +367,7 @@ bool stratos::LoginPacketHandler::handle(EncryptionResponse& packet) {
 }
 bool stratos::LoginPacketHandler::handle(LoginPluginResponse& packet) { return false; }
 bool stratos::LoginPacketHandler::handle(LoginAcknowledge& packet) {
+    connection->createNetworkSession();
     connection->changeState(Configuration);
     return true;
 }
@@ -331,7 +382,9 @@ bool stratos::ConfigurationPacketHandler::handle(ConfigurationServerPluginMessag
     return PacketHandler::handle(packet);
 }
 bool stratos::ConfigurationPacketHandler::handle(AcknowledgeFinishConfiguration& packet) {
-    return PacketHandler::handle(packet);
+    session->changeState(Play);
+    session->loginPlayer();
+    return true;
 }
 bool stratos::ConfigurationPacketHandler::handle(ConfigurationServerboundKeepAlive& packet) {
     return PacketHandler::handle(packet);

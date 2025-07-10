@@ -17,23 +17,15 @@
  *
  */
 
-#ifndef MATH_H
-#define MATH_H
+#include "StringTag.h"
 
-#include <cmath>
+#include "io/NBTBuffer.h"
 
-namespace stratos::utils {
-
-template <typename T> T round(const T value, const int precision) {
-    const T factor = std::pow(10, precision);
-    return std::round(value * factor) / factor;
+namespace stratos::nbt {
+void StringTag::read(NBTBuffer& buffer) {
+    value = buffer.readModifiedUTF8String();
 }
-
-inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
-    return 32 - __builtin_clz(value - 1);
+void StringTag::write(NBTBuffer& buffer) const {
+    buffer.writeModifiedUTF8String(value);
 }
-
-} // namespace stratos::utils
-
-#endif //MATH_H
+} // namespace stratos::nbt
