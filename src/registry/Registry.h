@@ -45,7 +45,7 @@ template <typename T> class Registry final : public utils::IndexedIterable<T> {
     int getRawIndex(T value) const override;
     T   get(int index) const override;
     T   get(utils::Identifier key) const;
-    T   get(RegistryKey key) const;
+    T   get(const RegistryKey& key) const;
     [[nodiscard]] int size() const override;
 
     void registerEntry(const RegistryKey& key, T* value);
@@ -77,17 +77,17 @@ template <typename T> T Registry<T>::get(int index) const {
 template <typename T> T Registry<T>::get(utils::Identifier key) const {
     return *idToValue[getRawIndex(key)];
 }
-template <typename T> T Registry<T>::get(RegistryKey key) const {
+template <typename T> T Registry<T>::get(const RegistryKey& key) const {
     return *keyToValue[key];
 }
 template <typename T> int Registry<T>::size() const {
     return rawIdToValue.size();
 }
 template <typename T> void Registry<T>::registerEntry(const RegistryKey& key, T* value) {
-    if (key != this->key)
-        throw std::invalid_argument("Registry key mismatch: expected " + this->key.registry.toString() + ", got " + key.registry.toString());
+    if (key.registry != this->key.value)
+        throw std::invalid_argument("Registry key mismatch: expected " + this->key.value.toString() + ", got " + key.registry.toString());
     int id = nextId++;
-    rawIdToValue[id] = value;
+    rawIdToValue.push_back(value);
     idToValue[key.value] = value;
     keyToValue[key] = value;
     valueToRawId[rawIdToValue[id]] = id;
