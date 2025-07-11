@@ -20,16 +20,19 @@
 #ifndef BLOCKSTATE_H
 #define BLOCKSTATE_H
 
-namespace stratos {
+namespace stratos::block {
+
+class Block;
 /**
  * Represents the state of a block (dynamic properties) in the world.
  */
 class BlockState {
 public:
+    BlockState() = default;
     bool operator==(const BlockState& other) const {
         return true;
     }
 };
-} // namespace stratos
+} // namespace stratos::block
 
 #endif //BLOCKSTATE_H

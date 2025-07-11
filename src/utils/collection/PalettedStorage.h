@@ -95,7 +95,7 @@ public:
     [[nodiscard]] int getSize() const override;
     [[nodiscard]] int getMaxValue() const override;
     [[nodiscard]] const std::vector<int64_t>& getData() const override;
-    [[nodiscoard]] std::vector<int64_t>& getData();
+    [[nodiscard]] std::vector<int64_t>& getData();
 
     [[nodiscard]] int get(int index) const override;
     void set(int index, int value) override;

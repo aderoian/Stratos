@@ -174,10 +174,10 @@ template <typename T> SingularPalette<T>::SingularPalette(const utils::IndexedIt
     }
 }
 
-PalettedContainer<BlockState>::DataProvider<BlockState> blockStateDataFactory(int bits, const utils::IndexedIterable<BlockState>* idList);
+PalettedContainer<block::BlockState>::DataProvider<block::BlockState> BlockStateDataFactory(int bits, const utils::IndexedIterable<block::BlockState>* idList);
 PalettedContainer<Biome>::DataProvider<Biome> biomeDataFactory(int bits, const utils::IndexedIterable<Biome>* idList);
 
-constexpr PalettedContainer<BlockState>::PaletteProvider BLOCK_STATE = { blockStateDataFactory, 4 };
+constexpr PalettedContainer<block::BlockState>::PaletteProvider BLOCK_STATE = { BlockStateDataFactory, 4 };
 constexpr PalettedContainer<Biome>::PaletteProvider BIOME = { biomeDataFactory, 2 };
 
 template <typename T> int SingularPalette<T>::index(T value) {
@@ -324,10 +324,10 @@ template <typename T> typename PalettedContainer<T>::template Data<T> PalettedCo
     DataProvider<T> provider = data.palette->getDataProvider();
     return provider.createData(idList, provider.getContainerSize());
 }
-inline PalettedContainer<BlockState>::DataProvider<BlockState> blockStateDataFactory(const int bits, const utils::IndexedIterable<BlockState>* idList) {
-    if (bits == 0) return PalettedContainer<BlockState>::DataProvider {createSingularPalette<BlockState>, bits};
-    if (bits <= 8) return PalettedContainer<BlockState>::DataProvider {createArrayPalette<BlockState>, bits > 4 ? bits : 4};
-    return PalettedContainer<BlockState>::DataProvider {createIdListPalette<BlockState>, utils::ceilLog2(idList->size())};
+inline PalettedContainer<block::BlockState>::DataProvider<block::BlockState> BlockStateDataFactory(const int bits, const utils::IndexedIterable<block::BlockState>* idList) {
+    if (bits == 0) return PalettedContainer<block::BlockState>::DataProvider {createSingularPalette<block::BlockState>, bits};
+    if (bits <= 8) return PalettedContainer<block::BlockState>::DataProvider {createArrayPalette<block::BlockState>, bits > 4 ? bits : 4};
+    return PalettedContainer<block::BlockState>::DataProvider {createIdListPalette<block::BlockState>, utils::ceilLog2(idList->size())};
 }
 inline PalettedContainer<Biome>::DataProvider<Biome> biomeDataFactory(const int bits, const utils::IndexedIterable<Biome>* idList) {
     if (bits == 0) return PalettedContainer<Biome>::DataProvider {createSingularPalette<Biome>, bits};

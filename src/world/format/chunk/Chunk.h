@@ -28,26 +28,31 @@ namespace stratos {
 
 class ChunkSection {
 public:
+    ChunkSection() = default;
+
+    void readNBT(nbt::CompoundTag& nbt);
 private:
     int y;
-    PalettedContainer<BlockState> blocks;
-    PalettedContainer<Biome> biomes;
+    PalettedContainer<block::BlockState>* blocks;
+    PalettedContainer<Biome>* biomes;
     // TODO: Block light
     // TODO: Sky light
+
+
 };
 
 class Chunk {
 public:
+    Chunk() = default;
     int getHeight() const;
 
-    static Chunk* fromNBT(const nbt::CompoundTag& nbt);
+    void readNBT(nbt::CompoundTag& nbt);
 private:
     int x;
     int z;
     int lowY;
 
-    ChunkSection* sections[];
-
+    ChunkSection** sections;
 };
 
 } // namespace stratos
