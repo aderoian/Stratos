@@ -26,6 +26,198 @@ public:
     Block() = default;
     ~Block() = default;
 };
+
+enum class Orientation {
+    DownEast,
+    DownNorth,
+    DownSouth,
+    DownWest,
+    UpEast,
+    UpNorth,
+    UpSouth,
+    UpWest,
+    WestUp,
+    EastUp,
+    NorthUp,
+    SouthUp
+};
+
+enum class BlockFace {
+    Floor,
+    Wall,
+    Ceiling
+};
+
+enum class Attachment {
+    Floor,
+    Ceiling,
+    SingleWall,
+    DoubleWall
+};
+
+enum class WallConnection {
+    None,
+    Low,
+    Tall
+};
+
+enum class WireConnection {
+    Up,
+    Side,
+    None
+};
+
+enum class DoubleBlockHalf {
+    Upper,
+    Lower
+};
+
+enum class BlockHalf {
+    Top,
+    Bottom
+};
+
+enum class RailConnection {
+    NorthSouth,
+    EastWest,
+    AscendingEast,
+    AscendingWest,
+    AscendingNorth,
+    AscendingSouth,
+    SouthEast,
+    SouthWest,
+    NorthWest,
+    NorthEast
+};
+
+enum class BedPart {
+    Head,
+    Foot
+};
+
+enum class ChestType {
+    Single,
+    Left,
+    Right
+};
+
+enum class ComparatorMode {
+    Compare,
+    Subtract
+};
+
+enum class DoorHinge {
+    Left,
+    Right
+};
+
+enum class NoteBlockInstrument {
+    Harp,
+    BassDrum,
+    Snare,
+    Hat,
+    Bass,
+    Flute,
+    Bell,
+    Guitar,
+    Chime,
+    Xylophone,
+    IronXylophone,
+    CowBell,
+    Didgeridoo,
+    Bit,
+    Banjo,
+    Pling,
+    Zombie,
+    Skeleton,
+    Creeper,
+    Dragon,
+    WitherSkeleton,
+    Piglin,
+    CustomHead
+};
+
+enum class PistonType {
+    Default,
+    Sticky
+};
+
+enum class SlabType {
+    Top,
+    Bottom,
+    Double
+};
+
+enum class StairShape {
+    Straight,
+    InnerLeft,
+    InnerRight,
+    OuterLeft,
+    OuterRight
+};
+
+enum class StructureBlockMode {
+    Save,
+    Load,
+    Corner,
+    Data
+};
+
+enum class BambooLeaves {
+    None,
+    Small,
+    Large
+};
+
+enum class Tilt {
+    None,
+    Unstable,
+    Partial,
+    Full
+};
+
+enum class Thickness {
+    TipMerge,
+    Tip,
+    Frustum,
+    Middle,
+    Base
+};
+
+enum class SculkSensorPhase {
+    Inactive,
+    Active,
+    Cooldown
+};
+
+enum class TrialSpawnerState {
+    Inactive,
+    WaitingForPlayers,
+    Active,
+    WaitingForRewardEjection,
+    EjectingReward,
+    Cooldown
+};
+
+enum class VaultState {
+    Inactive,
+    Active,
+    Unlocking,
+    Ejecting
+};
+
+enum class CreakingHeartState {
+    Uprooted,
+    Dormant,
+    Awake
+};
+
+enum class TestBlockMode {
+    Start,
+    Log,
+    Fail,
+    Accept
+};
 } // namespace stratos::block
 
 #endif //BLOCK_H
