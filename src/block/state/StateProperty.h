@@ -29,51 +29,61 @@
 
 namespace stratos::block {
 
-class Property {
-   public:
-     Property(std::string name, std::string type) : name(std::move(name)), type(std::move(type)) {}
-     virtual ~Property() = default;
+class IProperty {
+public:
+    virtual ~IProperty() = default;
+    [[nodiscard]] virtual std::size_t hashCode() const = 0;
+    [[nodiscard]] virtual std::string getName() const = 0;
+    [[nodiscard]] virtual std::any getValuesAsAny() const = 0;
 
-    [[nodiscard]] const std::string& getName() const { return name; }
+    class IValue {
+    public:
+        virtual ~IValue() = default;
+        [[nodiscard]] virtual const IProperty* getProperty() const = 0;
+        [[nodiscard]] virtual std::size_t hashCode() const = 0;
+        [[nodiscard]] virtual std::any getValueAny() const = 0;
+        [[nodiscard]] virtual std::string toString() const = 0;
+    };
+};
 
-     [[nodiscard]] std::size_t hashCode() const;
-     [[nodiscard]] virtual bool testValue(const std::any& value) const = 0;
+template <typename T>
+class Property : public IProperty {
+public:
+    explicit Property(std::string name) : name(std::move(name)) {}
+    ~Property() override = default;
 
-     template <typename T> T& as();
-     template <typename T> const T& as() const;
+    [[nodiscard]] std::string getName() const override { return name; }
 
-    class Value {
+    [[nodiscard]] std::size_t hashCode() const override;
+    [[nodiscard]] virtual bool testValue(const T& value) const = 0;
+    [[nodiscard]] virtual std::vector<T> getValues() const = 0;
+    [[nodiscard]] std::any getValuesAsAny() const override { return getValues(); }
+
+    class Value final : public IValue {
     public:
         explicit Value(const Property* property);
-        virtual ~Value() = default;
-        [[nodiscard]] const Property* getProperty() const { return property; }
-        [[nodiscard]] virtual std::size_t hashCode() const = 0;
-        [[nodiscard]] virtual std::string toString() const;
+        ~Value() override = default;
+        [[nodiscard]] const Property* getProperty() const override { return property; }
+        [[nodiscard]] std::size_t hashCode() const override;
+        [[nodiscard]] T getValue() const;
+        [[nodiscard]] std::any getValueAny() const override { return value; }
+        [[nodiscard]] std::string toString() const override;
     protected:
         const Property* property;
+        T value;
     };
 
-   protected:
-     [[nodiscard]] virtual std::size_t computeHashCode() const;
-   private:
-     std::string name;
-     std::string type;
- };
+protected:
+    [[nodiscard]] virtual std::size_t computeHashCode() const;
+private:
+    std::string name;
+};
 
-class IntProperty final : public Property {
+class IntProperty final : public Property<int> {
 public:
-    [[nodiscard]] bool testValue(const std::any& value) const override;
+    [[nodiscard]] bool testValue(const int& value) const override;
+    [[nodiscard]] std::vector<int> getValues() const override { return values; }
     static IntProperty* create(std::string name, int min, int max);
-
-    class Value final : public Property::Value {
-    public:
-        Value(const IntProperty* property, int value);
-        [[nodiscard]] std::size_t hashCode() const override;
-        [[nodiscard]] int getValue() const;
-        [[nodiscard]] std::string toString() const override;
-    private:
-        int value;
-    };
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
 private:
@@ -84,20 +94,11 @@ private:
     std::vector<int> values;
 };
 
-class BooleanProperty final : public Property {
+class BooleanProperty final : public Property<bool> {
 public:
-    [[nodiscard]] bool testValue(const std::any& value) const override;
+    [[nodiscard]] bool testValue(const bool& value) const override { return true; }
+    [[nodiscard]] std::vector<bool> getValues() const override { return values; }
     static BooleanProperty* create(std::string name);
-
-    class Value final : public Property::Value {
-    public:
-        Value(const BooleanProperty* property, bool value);
-        [[nodiscard]] std::size_t hashCode() const override;
-        [[nodiscard]] bool getValue() const;
-        [[nodiscard]] std::string toString() const override;
-    private:
-        bool value;
-    };
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
 private:
@@ -106,62 +107,51 @@ private:
 };
 
 template <typename T>
-class EnumProperty final : public Property {
+class EnumProperty final : public Property<T> {
 public:
-    [[nodiscard]] bool testValue(const std::any& value) const override;
+    [[nodiscard]] bool testValue(const T& value) const override;
+    [[nodiscard]] std::vector<T> getValues() const override { return values; }
     template <typename... Args>
     static EnumProperty* create(std::string name, Args&&... values);
-
-    class Value final : public Property::Value {
-    public:
-        Value(const EnumProperty* property, const T& value);
-        [[nodiscard]] std::size_t hashCode() const override;
-        [[nodiscard]] T getValue() const;
-        [[nodiscard]] std::string toString() const override;
-    private:
-        T value;
-    };
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
 private:
     template <typename... Args>
-    explicit EnumProperty(std::string name, Args&&... values);
+    explicit EnumProperty(const std::string& name, Args&&... values);
     std::vector<T> values;
 };
-template <typename T> T& Property::as() {
-    static_assert(std::is_base_of_v<Property, T>, "T must be a subclass of Property");
-    return dynamic_cast<T&>(*this);
+template <typename T> std::size_t Property<T>::hashCode() const {
+    return computeHashCode();
 }
-template <typename T> const T& Property::as() const {
-    static_assert(std::is_base_of_v<Property, T>, "T must be a subclass of Property");
-    return dynamic_cast<const T&>(*this);
+template <typename T> Property<T>::Value::Value(const Property* property) : property(property) {}
+template <typename T> std::size_t Property<T>::Value::hashCode() const {
+    return std::hash<int>()(static_cast<int>(value));
 }
-template <typename T> bool EnumProperty<T>::testValue(const std::any& value) const {
-    const T& enumValue = std::any_cast<T>(value);
-    return std::ranges::find(values, enumValue) != values.end();
+template <typename T> T Property<T>::Value::getValue() const {
+    return value;
+}
+template <typename T> std::string Property<T>::Value::toString() const {
+    return property->getName() + "=" + std::to_string(value);
+}
+template <typename T> std::size_t Property<T>::computeHashCode() const {
+    return std::hash<std::string>()(name);
+}
+template <typename T> bool EnumProperty<T>::testValue(const T& value) const {
+    return std::ranges::find(values, value) != values.end();
 }
 template <typename T> template <typename... Args> EnumProperty<T>* EnumProperty<T>::create(std::string name, Args&&... values) {
     static_assert((std::is_convertible_v<Args, T> && ...), "All arguments must be convertible to T");
     if constexpr (sizeof...(values) == 0) throw std::invalid_argument("EnumProperty must have at least one value.");
     return new EnumProperty(std::move(name), std::forward<Args>(values)...);
 }
-template <typename T> EnumProperty<T>::Value::Value(const EnumProperty* property, const T& value) : Value(property) {
-    if (!property->testValue(value)) throw std::invalid_argument("Value is not valid for this EnumProperty.");
-    this->value = value;
-}
-template <typename T> std::size_t EnumProperty<T>::Value::hashCode() const {
-    return std::hash<T>()(value);
-}
-template <typename T> T EnumProperty<T>::Value::getValue() const {
-    return value;
-}
-template <typename T> std::string EnumProperty<T>::Value::toString() const {
-    return property->getName() + "=" + std::to_string(value);
-}
 template <typename T> std::size_t EnumProperty<T>::computeHashCode() const {
-    return Property::computeHashCode() ^ utils::hash(values) << 1;
+    return Property<T>::computeHashCode() ^ utils::hash(values) << 1;
 }
-template <typename T> template <typename... Args> EnumProperty<T>::EnumProperty(std::string name, Args&&... values) : Property(std::move(name), typeid(T).name()), values(std::forward<Args>(values)...) {}
+template <typename T> template <typename... Args> EnumProperty<T>::EnumProperty(const std::string& name, Args&&... values) : Property<T>(name, typeid(T).name()), values(std::forward<Args>(values)...) {}
+
+size_t hashPropertyValue(const std::any& value);
+size_t hashPropertyValue(int value);
+size_t hashPropertyValue(bool value);
 } // namespace stratos::block
 
 #endif //STATEPROPERTY_H
