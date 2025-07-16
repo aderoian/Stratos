@@ -17,6 +17,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
 # Source files
 set(SOURCES
         Server.cpp
+        block/state/BlockState.cpp
+        block/state/StateManager.cpp
+        block/state/StateProperties.cpp
         block/state/StateProperty.cpp
         block/Blocks.cpp
         nbt/io/NBTBuffer.cpp
@@ -49,11 +52,14 @@ set(SOURCES
 
 set(HEADERS
         Server.h
+        block/state/BlockState.h
+        block/state/StateManager.h
+        block/state/StateProperties.h
         block/state/StateProperty.h
         block/Block.h
         block/Blocks.h
-        block/BlockState.h
         math/Angle.h
+        math/Direction.h
         math/Ints.h
         math/Position.h
         nbt/io/NBTBuffer.h
