@@ -61,7 +61,7 @@ extern const BooleanProperty* TRIGGERED;
 extern const BooleanProperty* UNSTABLE;
 extern const BooleanProperty* WATERLOGGED;
 extern const EnumProperty<math::Axis::Type>* HORIZONTAL_AXIS;
-extern const EnumProperty<math::Axis>* AXIS;
+extern const EnumProperty<math::Axis::Type>* AXIS;
 extern const BooleanProperty* UP;
 extern const BooleanProperty* DOWN;
 extern const BooleanProperty* NORTH;

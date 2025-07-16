@@ -32,7 +32,7 @@ IntProperty* IntProperty::create(std::string name, const int min, const int max)
 std::size_t IntProperty::computeHashCode() const {
     return Property::computeHashCode() ^ utils::hash(values) << 1;
 }
-IntProperty::IntProperty(std::string name, const int min, const int max) : Property(std::move(name)), min(min), max(max) {
+IntProperty::IntProperty(std::string name, const int min, const int max) : Property(std::move(name), typeid(int).name()), min(min), max(max) {
     values = std::vector<int>(max - min);
     for (int i = min; i < max; ++i) values[i - min] = i;
 }
@@ -43,7 +43,7 @@ BooleanProperty* BooleanProperty::create(std::string name) {
 std::size_t BooleanProperty::computeHashCode() const {
     return Property::computeHashCode() ^ utils::hash(values) << 1;
 }
-BooleanProperty::BooleanProperty(std::string name) : Property(std::move(name)) {}
+BooleanProperty::BooleanProperty(std::string name) : Property(std::move(name), typeid(bool).name()) {}
 size_t hashPropertyValue(const std::any& value) {
     if (value.type() == typeid(bool)) return hashPropertyValue(std::any_cast<bool>(value));
     return hashPropertyValue(std::any_cast<int>(value));

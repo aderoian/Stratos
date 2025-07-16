@@ -49,7 +49,7 @@ public:
 template <typename T>
 class Property : public IProperty {
 public:
-    explicit Property(std::string name) : name(std::move(name)) {}
+    explicit Property(std::string name, const char* type) : name(std::move(name)), type(type) {}
     ~Property() override = default;
 
     [[nodiscard]] std::string getName() const override { return name; }
@@ -77,6 +77,7 @@ protected:
     [[nodiscard]] virtual std::size_t computeHashCode() const;
 private:
     std::string name;
+    const char* type;
 };
 
 class IntProperty final : public Property<int> {
@@ -111,13 +112,11 @@ class EnumProperty final : public Property<T> {
 public:
     [[nodiscard]] bool testValue(const T& value) const override;
     [[nodiscard]] std::vector<T> getValues() const override { return values; }
-    template <typename... Args>
-    static EnumProperty* create(std::string name, Args&&... values);
+    static EnumProperty* create(const std::string& name, const std::initializer_list<T>& values);
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
 private:
-    template <typename... Args>
-    explicit EnumProperty(const std::string& name, Args&&... values);
+    explicit EnumProperty(const std::string& name, const std::initializer_list<T>& values);
     std::vector<T> values;
 };
 template <typename T> std::size_t Property<T>::hashCode() const {
@@ -139,15 +138,14 @@ template <typename T> std::size_t Property<T>::computeHashCode() const {
 template <typename T> bool EnumProperty<T>::testValue(const T& value) const {
     return std::ranges::find(values, value) != values.end();
 }
-template <typename T> template <typename... Args> EnumProperty<T>* EnumProperty<T>::create(std::string name, Args&&... values) {
-    static_assert((std::is_convertible_v<Args, T> && ...), "All arguments must be convertible to T");
-    if constexpr (sizeof...(values) == 0) throw std::invalid_argument("EnumProperty must have at least one value.");
-    return new EnumProperty(std::move(name), std::forward<Args>(values)...);
+template <typename T> EnumProperty<T>* EnumProperty<T>::create(const std::string& name, const std::initializer_list<T>& values) {
+    if constexpr (sizeof(values) == 0) throw std::invalid_argument("EnumProperty must have at least one value.");
+    return new EnumProperty(std::move(name), values);
 }
 template <typename T> std::size_t EnumProperty<T>::computeHashCode() const {
     return Property<T>::computeHashCode() ^ utils::hash(values) << 1;
 }
-template <typename T> template <typename... Args> EnumProperty<T>::EnumProperty(const std::string& name, Args&&... values) : Property<T>(name, typeid(T).name()), values(std::forward<Args>(values)...) {}
+template <typename T> EnumProperty<T>::EnumProperty(const std::string& name, const std::initializer_list<T>& values) : Property<T>(name, typeid(T).name()), values(values) {}
 
 size_t hashPropertyValue(const std::any& value);
 size_t hashPropertyValue(int value);
