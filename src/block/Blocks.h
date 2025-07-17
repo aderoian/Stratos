@@ -20,17 +20,21 @@
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
+#include "utils/collection/IdList.h"
+
 namespace stratos::utils {
 struct Identifier;
 }
 namespace stratos::block {
 class Block;
+class BlockState;
 Block* registerBlock(const utils::Identifier& id, Block* block);
 
 class Blocks {
 public:
-// AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND
-
+    // AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND
+    static utils::IdList<const BlockState*> STATES;
+    
     static const Block* AIR();
     static const Block* STONE();
     static const Block* GRANITE();

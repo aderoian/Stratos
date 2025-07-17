@@ -175,18 +175,22 @@ def generate_block_registry(output_header, output_source, blocks_dump, block_sta
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
+#include "utils/collection/IdList.h"
+
 namespace stratos::utils {
 struct Identifier;
 }
 namespace stratos::block {
 class Block;
+class BlockState;
 Block* registerBlock(const utils::Identifier& id, Block* block);
 
 class Blocks {
 public:
+    // AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND
+    static utils::IdList<const BlockState*> STATES;
+    
 """)
-        f.write("// AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND\n\n")
-
 
         # Write the block registry entries
         for block in blocks:
@@ -228,15 +232,15 @@ public:
 #include "state/StateProperties.h"
 #include "utils/Identifier.h"
 
-#define REGISTER_BLOCK(codeName, name) \
-    const Block* Blocks::codeName() { \
-        static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block()); \
-        return block; \
+#define REGISTER_BLOCK(codeName, name) \\
+    const Block* Blocks::codeName() { \\
+        static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block()); \\
+        return block; \\
     }
-#define REGISTER_BLOCK_BLOCKSTATES(codeName, name, stateBuilder...) \
-    const Block* Blocks::codeName() { \
-        static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block(BlockStateManager::Builder().add(stateBuilder))); \
-        return block; \
+#define REGISTER_BLOCK_BLOCKSTATES(codeName, name, stateBuilder...) \\
+    const Block* Blocks::codeName() { \\
+        static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block(BlockStateManager::Builder().add(stateBuilder))); \\
+        return block; \\
     }
 
 namespace stratos::block {
@@ -246,9 +250,10 @@ Block* registerBlock(const utils::Identifier& id, Block* block) {
     return block;
 }
 
-""")
-        f.write("// AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND\n\n")
+// AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND
+utils::IdList<const BlockState*> Blocks::STATES;
 
+""")
         i = 0
         for block in blocks:
             no_state = False
@@ -274,7 +279,7 @@ Block* registerBlock(const utils::Identifier& id, Block* block) {
                 if len(parts) != 2:
                     raise ValueError(f"Invalid block format: {block}. Expected format is 'namespace:block_name'.")
                 namespace, block_name = parts[0].strip(), parts[1].strip()
-                f.write(f"    REGISTER_BLOCK({block_name.upper()}, \"{block_name}\")\n")
+                f.write(f"REGISTER_BLOCK({block_name.upper()}, \"{block_name}\")\n")
             else:
                 parts = block_def.split(':', 1)
                 namespace, block_name = parts[0].strip(), parts[1].strip()
@@ -282,7 +287,7 @@ Block* registerBlock(const utils::Identifier& id, Block* block) {
                 state_builder = ', '.join(f"StateProperties::{get_corrected_blockstate_codename(block_name, s)}()" for s in state_names)
                 if len(parts) != 2:
                     raise ValueError(f"Invalid block format: {block_def}. Expected format is 'namespace:block_name'.")
-                f.write(f"    REGISTER_BLOCK_BLOCKSTATES({block_name.upper()}, \"{block_name}\", {state_builder})\n")
+                f.write(f"REGISTER_BLOCK_BLOCKSTATES({block_name.upper()}, \"{block_name}\", {state_builder})\n")
 
         f.write("\nvoid Blocks::registerBlocks() {\n")
         for block in blocks:

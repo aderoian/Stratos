@@ -53,6 +53,8 @@ class BlockStateManager {
 public:
     BlockStateManager(const Block* owner, const std::map<std::string, const IProperty*>& properties);
 
+    [[nodiscard]] const std::vector<const BlockState*>& getStates() const { return states; }
+
     class Builder {
     public:
         Builder() = default;
