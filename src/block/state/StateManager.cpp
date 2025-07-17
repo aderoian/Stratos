@@ -21,6 +21,7 @@
 
 #include "BlockState.h"
 
+#include <iostream>
 #include <numeric>
 #include <ranges>
 
@@ -73,7 +74,7 @@ BlockStateManager::BlockStateManager(const Block* owner, const std::map<std::str
     for (const IProperty* property : this->properties | std::views::values) {
         std::vector<PropertyCombination> newCombinations;
         for (const PropertyCombination& combination : combinations) {
-            for (auto values = std::any_cast<std::vector<std::any>>(property->getValuesAsAny()); const std::any& value : values) {
+            for (auto values = property->getValuesAsAny(); const std::any& value : values) {
                 PropertyPair pair(property, value);
                 PropertyCombination newCombination = combination;
                 newCombination.push_back(pair);
@@ -88,7 +89,7 @@ BlockStateManager::BlockStateManager(const Block* owner, const std::map<std::str
         std::map<const IProperty*, std::any> propertyMap;
         for (const auto& [prop, val] : combination) {
             propertyMap[prop] = val;
-            hash ^= prop->hashCode() ^ hashPropertyValue(val) << 1;
+            hash ^= prop->hashCode() ^ prop->hashValue(val) << 1;
         }
         const auto state = new BlockState(owner, std::move(propertyMap));
         states.push_back(state);

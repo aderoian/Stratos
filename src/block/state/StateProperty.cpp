@@ -24,6 +24,9 @@ bool IntProperty::testValue(const int& value) const {
     const int intValue = std::any_cast<int>(value);
     return intValue >= min && intValue < max;
 }
+size_t IntProperty::hashValue(const std::any& value) const {
+    return std::hash<int>()(std::any_cast<int>(value));
+}
 IntProperty* IntProperty::create(std::string name, const int min, const int max) {
     if (min < 0) throw std::invalid_argument("Minimum value must be non-negative.");
     if (min >= max) throw std::invalid_argument("Minimum value must be less than maximum value.");
@@ -37,6 +40,9 @@ IntProperty::IntProperty(std::string name, const int min, const int max) : Prope
     for (int i = min; i < max; ++i) values[i - min] = i;
 }
 std::vector<bool> BooleanProperty::values = {true, false};
+size_t BooleanProperty::hashValue(const std::any& value) const {
+    return std::hash<bool>()(std::any_cast<bool>(value));
+}
 BooleanProperty* BooleanProperty::create(std::string name) {
     return new BooleanProperty(std::move(name));
 }

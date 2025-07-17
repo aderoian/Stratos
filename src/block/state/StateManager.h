@@ -71,7 +71,7 @@ private:
     std::unordered_map<size_t, const BlockState*> stateMap;
 };
 template <typename... Properties> BlockStateManager::Builder& BlockStateManager::Builder::add(const Properties*... properties) {
-    (add(properties), ...);
+    (add(static_cast<const IProperty*>(properties)), ...);
     return *this;
 }
 

@@ -20,9 +20,11 @@
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
-#include "registry/Registries.h"
-
+namespace stratos::utils {
+struct Identifier;
+}
 namespace stratos::block {
+class Block;
 Block* registerBlock(const utils::Identifier& id, Block* block);
 
 class Blocks {
@@ -1134,6 +1136,7 @@ public:
     static const Block* POTTED_CLOSED_EYEBLOSSOM();
     static const Block* FIREFLY_BUSH();
 
+    static void registerBlocks();
 };
 } // namespace stratos::block
 

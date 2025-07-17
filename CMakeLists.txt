@@ -37,6 +37,7 @@ set(SOURCES
         network/protocol/PacketSerialization.cpp
         network/protocol/Packet.cpp
         network/protocol/PacketCodec.cpp
+        registry/Registries.cpp
         registry/Registry.cpp
         utils/collection/PalettedStorage.cpp
         utils/config/Config.cpp

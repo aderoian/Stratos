@@ -17,22 +17,13 @@
  *
  */
 
-#ifndef REGISTRIES_H
-#define REGISTRIES_H
+#include "Registries.h"
 
-#include "Registry.h"
+#include "block/Block.h"
 
-namespace stratos {
-namespace block {
-class Block;
-} // namespace block
-namespace registry {
-
-class Registries {
-public:
-    static Registry<block::Block>* BLOCKS();
-};
-} // namespace registry
-} // namespace stratos
-
-#endif //REGISTRIES_H
+namespace stratos::registry {
+Registry<block::Block> * Registries::BLOCKS() {
+    static auto * registry = new Registry<block::Block>({utils::Identifier("minecraft", "root"), utils::Identifier("minecraft", "block")});
+    return registry;
+}
+} // namespace stratos::registry

@@ -175,9 +175,11 @@ def generate_block_registry(output_header, output_source, blocks_dump, block_sta
 #ifndef BLOCKS_H
 #define BLOCKS_H
 
-#include "registry/Registries.h"
-
+namespace stratos::utils {
+struct Identifier;
+}
 namespace stratos::block {
+class Block;
 Block* registerBlock(const utils::Identifier& id, Block* block);
 
 class Blocks {
@@ -193,6 +195,8 @@ public:
                 raise ValueError(f"Invalid block format: {block}. Expected format is 'namespace:block_name'.")
             namespace, block_name = parts[0].strip(), parts[1].strip()
             f.write(f"    static const Block* {block_name.upper()}();\n")
+
+        f.write("\n    static void registerBlocks();")
         f.write("\n};\n} // namespace stratos::block\n\n#endif // BLOCKS_H\n")
 
     # Open the output source file for writing
@@ -220,7 +224,9 @@ public:
 #include "Blocks.h"
 
 #include "Block.h"
+#include "registry/Registries.h"
 #include "state/StateProperties.h"
+#include "utils/Identifier.h"
 
 #define REGISTER_BLOCK(codeName, name) \
     const Block* Blocks::codeName() { \
@@ -236,7 +242,7 @@ public:
 namespace stratos::block {
 
 Block* registerBlock(const utils::Identifier& id, Block* block) {
-    registry::BLOCKS.registerEntry({{"minecraft", "block"}, id}, block);
+    registry::Registries::BLOCKS()->registerEntry({{"minecraft", "block"}, id}, block);
     return block;
 }
 
@@ -277,6 +283,13 @@ Block* registerBlock(const utils::Identifier& id, Block* block) {
                 if len(parts) != 2:
                     raise ValueError(f"Invalid block format: {block_def}. Expected format is 'namespace:block_name'.")
                 f.write(f"    REGISTER_BLOCK_BLOCKSTATES({block_name.upper()}, \"{block_name}\", {state_builder})\n")
+
+        f.write("\nvoid Blocks::registerBlocks() {\n")
+        for block in blocks:
+            parts = block.split(':', 1)
+            namespace, name = parts[0].strip(), parts[1].strip()
+            f.write(f"    {name.upper()}();\n")
+        f.write("}\n\n")
         f.write("} // namespace stratos::block\n")
 
 generate_block_registry(args.output_header, args.output_source, args.blocks, args.block_states)

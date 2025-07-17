@@ -34,7 +34,8 @@ public:
     virtual ~IProperty() = default;
     [[nodiscard]] virtual std::size_t hashCode() const = 0;
     [[nodiscard]] virtual std::string getName() const = 0;
-    [[nodiscard]] virtual std::any getValuesAsAny() const = 0;
+    [[nodiscard]] virtual std::vector<std::any> getValuesAsAny() const = 0;
+    [[nodiscard]] virtual size_t hashValue(const std::any& value) const = 0;
 
     class IValue {
     public:
@@ -57,7 +58,7 @@ public:
     [[nodiscard]] std::size_t hashCode() const override;
     [[nodiscard]] virtual bool testValue(const T& value) const = 0;
     [[nodiscard]] virtual std::vector<T> getValues() const = 0;
-    [[nodiscard]] std::any getValuesAsAny() const override { return getValues(); }
+    [[nodiscard]] std::vector<std::any> getValuesAsAny() const override;
 
     class Value final : public IValue {
     public:
@@ -84,6 +85,7 @@ class IntProperty final : public Property<int> {
 public:
     [[nodiscard]] bool testValue(const int& value) const override;
     [[nodiscard]] std::vector<int> getValues() const override { return values; }
+    [[nodiscard]] size_t hashValue(const std::any& value) const override;
     static IntProperty* create(std::string name, int min, int max);
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
@@ -99,6 +101,7 @@ class BooleanProperty final : public Property<bool> {
 public:
     [[nodiscard]] bool testValue(const bool& value) const override { return true; }
     [[nodiscard]] std::vector<bool> getValues() const override { return values; }
+    [[nodiscard]] size_t hashValue(const std::any& value) const override;
     static BooleanProperty* create(std::string name);
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
@@ -112,6 +115,7 @@ class EnumProperty final : public Property<T> {
 public:
     [[nodiscard]] bool testValue(const T& value) const override;
     [[nodiscard]] std::vector<T> getValues() const override { return values; }
+    [[nodiscard]] size_t hashValue(const std::any& value) const override;
     static EnumProperty* create(const std::string& name, const std::initializer_list<T>& values);
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
@@ -121,6 +125,13 @@ private:
 };
 template <typename T> std::size_t Property<T>::hashCode() const {
     return computeHashCode();
+}
+template <typename T> std::vector<std::any> Property<T>::getValuesAsAny() const {
+    std::vector<std::any> values;
+    values.reserve(values.size());
+    for (T value : getValues())
+        values.emplace_back(std::move(value));
+    return values;
 }
 template <typename T> Property<T>::Value::Value(const Property* property) : property(property) {}
 template <typename T> std::size_t Property<T>::Value::hashCode() const {
@@ -137,6 +148,9 @@ template <typename T> std::size_t Property<T>::computeHashCode() const {
 }
 template <typename T> bool EnumProperty<T>::testValue(const T& value) const {
     return std::ranges::find(values, value) != values.end();
+}
+template <typename T> size_t           EnumProperty<T>::hashValue(const std::any& value) const {
+    return std::hash<int>()(static_cast<int>(std::any_cast<T>(value)));
 }
 template <typename T> EnumProperty<T>* EnumProperty<T>::create(const std::string& name, const std::initializer_list<T>& values) {
     if constexpr (sizeof(values) == 0) throw std::invalid_argument("EnumProperty must have at least one value.");
