@@ -51,17 +51,16 @@ private:
 
 class BlockStateManager {
 public:
-    BlockStateManager(const Block* owner, std::map<std::string, const IProperty*>&& properties);
+    BlockStateManager(const Block* owner, const std::map<std::string, const IProperty*>& properties);
 
     class Builder {
     public:
-        explicit Builder(const Block* owner);
+        Builder() = default;
         template <typename... Properties> Builder& add(const Properties*... properties);
         Builder& add(const IProperty* property);
-        BlockStateManager* build();
+        BlockStateManager* build(const Block* owner) const;
 
     private:
-        const Block* owner;
         std::map<std::string, const IProperty*> properties;
     };
 

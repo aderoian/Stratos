@@ -64,7 +64,7 @@ void PropertyMap::set(const IProperty& property, IProperty::IValue* value) {
     if (const auto it = values.find(&property); it != values.end()) delete it->second;
     values[&property] = value;
 }
-BlockStateManager::BlockStateManager(const Block* owner, std::map<std::string, const IProperty*>&& properties) : owner(owner), properties(std::move(properties)), stateMap() {
+BlockStateManager::BlockStateManager(const Block* owner, const std::map<std::string, const IProperty*>& properties) : owner(owner), properties(properties) {
     using PropertyPair = std::pair<const IProperty*, std::any>;
     using PropertyCombination = std::vector<PropertyPair>;
 
@@ -95,12 +95,11 @@ BlockStateManager::BlockStateManager(const Block* owner, std::map<std::string, c
         stateMap[hash] = state;
     }
 }
-BlockStateManager::Builder::Builder(const Block* owner) : owner(owner) {}
 BlockStateManager::Builder& BlockStateManager::Builder::add(const IProperty* property) {
     properties[property->getName()] = property;
     return *this;
 }
-BlockStateManager* BlockStateManager::Builder::build() {
-    return new BlockStateManager(owner, std::move(properties));
+BlockStateManager* BlockStateManager::Builder::build(const Block* owner) const {
+    return new BlockStateManager(owner, properties);
 }
 } // namespace stratos::block

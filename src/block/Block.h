@@ -19,12 +19,19 @@
 
 #ifndef BLOCK_H
 #define BLOCK_H
+#include "state/StateManager.h"
 
 namespace stratos::block {
+class BlockStateManager;
 class Block {
 public:
-    Block() = default;
+    explicit Block();
+    explicit Block(const BlockStateManager::Builder& stateBuilder);
     ~Block() = default;
+
+    [[nodiscard]] const BlockStateManager* getStateManager() const;
+private:
+    BlockStateManager* stateManager;
 };
 
 enum class Orientation {
