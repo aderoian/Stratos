@@ -21,6 +21,7 @@ set(SOURCES
         block/state/StateManager.cpp
         block/state/StateProperties.cpp
         block/state/StateProperty.cpp
+        block/Block.cpp
         block/Blocks.cpp
         nbt/io/NBTBuffer.cpp
         nbt/CompoundTag.cpp

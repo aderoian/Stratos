@@ -19,125 +19,143 @@
 
 #include "StateProperties.h"
 
+#define BOOLEAN_PROP(codeName, name) \
+    const BooleanProperty* StateProperties::codeName() { \
+        static const auto* prop = BooleanProperty::create(#name); \
+        return prop; \
+    }
+#define INT_PROP(codeName, name, min, max) \
+    const IntProperty* StateProperties::codeName() { \
+        static const auto* prop = IntProperty::create(#name, min, max); \
+        return prop; \
+    }
+#define ENUM_PROP(codeName, name, enumType, values...) \
+    const EnumProperty<enumType>* StateProperties::codeName() { \
+        static const auto* prop = EnumProperty<enumType>::create(#name, {values}); \
+        return prop; \
+    }
+
 namespace stratos::block {
-const BooleanProperty* StateProperties::ATTACHED = BooleanProperty::create("attached");
-const BooleanProperty* StateProperties::BERRIES = BooleanProperty::create("berries");
-const BooleanProperty* StateProperties::BLOOM = BooleanProperty::create("bloom");
-const BooleanProperty* StateProperties::BOTTOM = BooleanProperty::create("bottom");
-const BooleanProperty* StateProperties::CAN_SUMMON = BooleanProperty::create("can_summon");
-const BooleanProperty* StateProperties::CONDITIONAL = BooleanProperty::create("conditional");
-const BooleanProperty* StateProperties::DISARMED = BooleanProperty::create("disarmed");
-const BooleanProperty* StateProperties::DRAG = BooleanProperty::create("drag");
-const BooleanProperty* StateProperties::ENABLED = BooleanProperty::create("enabled");
-const BooleanProperty* StateProperties::EXTENDED = BooleanProperty::create("extended");
-const BooleanProperty* StateProperties::EYE = BooleanProperty::create("eye");
-const BooleanProperty* StateProperties::FALLING = BooleanProperty::create("falling");
-const BooleanProperty* StateProperties::HANGING = BooleanProperty::create("hanging");
-const BooleanProperty* StateProperties::HAS_BOTTLE_0 = BooleanProperty::create("has_bottle_0");
-const BooleanProperty* StateProperties::HAS_BOTTLE_1 = BooleanProperty::create("has_bottle_1");
-const BooleanProperty* StateProperties::HAS_BOTTLE_2 = BooleanProperty::create("has_bottle_2");
-const BooleanProperty* StateProperties::HAS_RECORD = BooleanProperty::create("has_record");
-const BooleanProperty* StateProperties::HAS_BOOK = BooleanProperty::create("has_book");
-const BooleanProperty* StateProperties::INVERTED = BooleanProperty::create("inverted");
-const BooleanProperty* StateProperties::IN_WALL = BooleanProperty::create("in_wall");
-const BooleanProperty* StateProperties::LIT = BooleanProperty::create("lit");
-const BooleanProperty* StateProperties::LOCKED = BooleanProperty::create("locked");
-const BooleanProperty* StateProperties::NATURAL = BooleanProperty::create("natural");
-const BooleanProperty* StateProperties::OCCUPIED = BooleanProperty::create("occupied");
-const BooleanProperty* StateProperties::OPEN = BooleanProperty::create("open");
-const BooleanProperty* StateProperties::PERSISTENT = BooleanProperty::create("persistent");
-const BooleanProperty* StateProperties::POWERED = BooleanProperty::create("powered");
-const BooleanProperty* StateProperties::SHORT = BooleanProperty::create("short");
-const BooleanProperty* StateProperties::SHRIEKING = BooleanProperty::create("shrieking");
-const BooleanProperty* StateProperties::SIGNAL_FIRE = BooleanProperty::create("signal_fire");
-const BooleanProperty* StateProperties::SNOWY = BooleanProperty::create("snowy");
-const BooleanProperty* StateProperties::TIP = BooleanProperty::create("tip");
-const BooleanProperty* StateProperties::TRIGGERED = BooleanProperty::create("triggered");
-const BooleanProperty* StateProperties::UNSTABLE = BooleanProperty::create("unstable");
-const BooleanProperty* StateProperties::WATERLOGGED = BooleanProperty::create("waterlogged");
-const EnumProperty<math::Axis::Type>* StateProperties::HORIZONTAL_AXIS = EnumProperty<math::Axis::Type>::create("axis", {math::Axis::Type::X, math::Axis::Type::Z});
-const EnumProperty<math::Axis::Type>* StateProperties::AXIS = EnumProperty<math::Axis::Type>::create("axis", {math::Axis::Type::X, math::Axis::Type::Y, math::Axis::Type::Z});
-const BooleanProperty* StateProperties::UP = BooleanProperty::create("up");
-const BooleanProperty* StateProperties::DOWN = BooleanProperty::create("down");
-const BooleanProperty* StateProperties::NORTH = BooleanProperty::create("north");
-const BooleanProperty* StateProperties::EAST = BooleanProperty::create("east");
-const BooleanProperty* StateProperties::SOUTH = BooleanProperty::create("south");
-const BooleanProperty* StateProperties::WEST = BooleanProperty::create("west");
-const EnumProperty<math::Direction::Type>* StateProperties::FACING = EnumProperty<math::Direction::Type>::create("facing", {math::Direction::Type::North, math::Direction::Type::East, math::Direction::Type::South, math::Direction::Type::West, math::Direction::Type::Up, math::Direction::Type::Down});
-const EnumProperty<math::Direction::Type>* StateProperties::FACING_HOPPER = EnumProperty<math::Direction::Type>::create("facing", {math::Direction::Type::Down, math::Direction::Type::North, math::Direction::Type::South, math::Direction::Type::West, math::Direction::Type::East});
-const EnumProperty<math::Direction::Type>* StateProperties::FACING_HORIZONTAL = EnumProperty<math::Direction::Type>::create("facing", {math::Direction::Type::North, math::Direction::Type::East, math::Direction::Type::South, math::Direction::Type::West});
-const IntProperty* StateProperties::FLOWER_AMOUNT = IntProperty::create("flower_amount", 1, 4);
-const IntProperty* StateProperties::SEGMENT_AMOUNT = IntProperty::create("flower_amount", 1, 4);
-const EnumProperty<Orientation>* StateProperties::ORIENTATION = EnumProperty<Orientation>::create("orientation", {Orientation::DownEast, Orientation::DownNorth, Orientation::DownSouth, Orientation::DownWest, Orientation::UpEast, Orientation::UpNorth, Orientation::UpSouth, Orientation::UpWest, Orientation::WestUp, Orientation::EastUp, Orientation::NorthUp, Orientation::SouthUp});
-const EnumProperty<BlockFace>* StateProperties::BLOCK_FACE = EnumProperty<BlockFace>::create("block_face", {BlockFace::Floor, BlockFace::Wall, BlockFace::Ceiling});
-const EnumProperty<Attachment>* StateProperties::ATTACHMENT = EnumProperty<Attachment>::create("attachment", {Attachment::Floor, Attachment::Ceiling, Attachment::SingleWall, Attachment::DoubleWall});
-const EnumProperty<WallConnection>* StateProperties::EAST_WALL_SHAPE = EnumProperty<WallConnection>::create("east", {WallConnection::None, WallConnection::Low, WallConnection::Tall});
-const EnumProperty<WallConnection>* StateProperties::NORTH_WALL_SHAPE = EnumProperty<WallConnection>::create("north", {WallConnection::None, WallConnection::Low, WallConnection::Tall});
-const EnumProperty<WallConnection>* StateProperties::SOUTH_WALL_SHAPE = EnumProperty<WallConnection>::create("south", {WallConnection::None, WallConnection::Low, WallConnection::Tall});
-const EnumProperty<WallConnection>* StateProperties::WEST_WALL_SHAPE = EnumProperty<WallConnection>::create("west", {WallConnection::None, WallConnection::Low, WallConnection::Tall});
-const EnumProperty<WireConnection>* StateProperties::EAST_WIRE_CONNECTION = EnumProperty<WireConnection>::create("east", {WireConnection::Up, WireConnection::Side, WireConnection::None});
-const EnumProperty<WireConnection>* StateProperties::NORTH_WIRE_CONNECTION = EnumProperty<WireConnection>::create("north", {WireConnection::Up, WireConnection::Side, WireConnection::None});
-const EnumProperty<WireConnection>* StateProperties::SOUTH_WIRE_CONNECTION = EnumProperty<WireConnection>::create("south", {WireConnection::Up, WireConnection::Side, WireConnection::None});
-const EnumProperty<WireConnection>* StateProperties::WEST_WIRE_CONNECTION = EnumProperty<WireConnection>::create("west", {WireConnection::Up, WireConnection::Side, WireConnection::None});
-const EnumProperty<DoubleBlockHalf>* StateProperties::DOUBLE_BLOCK_HALF = EnumProperty<DoubleBlockHalf>::create("half", {DoubleBlockHalf::Upper, DoubleBlockHalf::Lower});
-const EnumProperty<BlockHalf>* StateProperties::BLOCK_HALF = EnumProperty<BlockHalf>::create("half", {BlockHalf::Top, BlockHalf::Bottom});
-const EnumProperty<RailConnection>* StateProperties::RAIL_SHAPE = EnumProperty<RailConnection>::create("shape", {RailConnection::NorthSouth, RailConnection::EastWest, RailConnection::AscendingNorth, RailConnection::AscendingSouth, RailConnection::AscendingEast, RailConnection::AscendingWest, RailConnection::SouthEast, RailConnection::SouthWest, RailConnection::NorthEast, RailConnection::NorthWest});
-const EnumProperty<RailConnection>* StateProperties::STRAIGHT_RAIL_SHAPE = EnumProperty<RailConnection>::create("shape", {RailConnection::NorthSouth, RailConnection::EastWest, RailConnection::AscendingNorth, RailConnection::AscendingSouth, RailConnection::AscendingEast, RailConnection::AscendingWest});
-const IntProperty* StateProperties::AGE_1 = IntProperty::create("age", 0, 1);
-const IntProperty* StateProperties::AGE_2 = IntProperty::create("age", 0, 2);
-const IntProperty* StateProperties::AGE_3 = IntProperty::create("age", 0, 3);
-const IntProperty* StateProperties::AGE_4 = IntProperty::create("age", 0, 4);
-const IntProperty* StateProperties::AGE_5 = IntProperty::create("age", 0, 5);
-const IntProperty* StateProperties::AGE_7 = IntProperty::create("age", 0, 7);
-const IntProperty* StateProperties::AGE_15 = IntProperty::create("age", 0, 15);
-const IntProperty* StateProperties::AGE_25 = IntProperty::create("age", 0, 25);
-const IntProperty* StateProperties::BITES = IntProperty::create("bites", 0, 6);
-const IntProperty* StateProperties::CANDLES = IntProperty::create("candles", 1, 4);
-const IntProperty* StateProperties::DELAY = IntProperty::create("delay", 1, 4);
-const IntProperty* StateProperties::DISTANCE_1_7 = IntProperty::create("distance", 1, 7);
-const IntProperty* StateProperties::EGGS = IntProperty::create("eggs", 1, 4);
-const IntProperty* StateProperties::HATCH = IntProperty::create("hatch", 0, 2);
-const IntProperty* StateProperties::LAYERS = IntProperty::create("layers", 1, 8);
-const IntProperty* StateProperties::LEVEL_3 = IntProperty::create("level", 1, 3);
-const IntProperty* StateProperties::LEVEL_8 = IntProperty::create("level", 0, 8);
-const IntProperty* StateProperties::LEVEL_1_8 = IntProperty::create("level", 1, 8);
-const IntProperty* StateProperties::HONEY_LEVEL = IntProperty::create("honey_level", 0, 5);
-const IntProperty* StateProperties::LEVEL_15 = IntProperty::create("level", 0, 15);
-const IntProperty* StateProperties::MOISTURE = IntProperty::create("moisture", 0, 7);
-const IntProperty* StateProperties::NOTE = IntProperty::create("note", 0, 24);
-const IntProperty* StateProperties::PICKLES = IntProperty::create("pickles", 1, 4);
-const IntProperty* StateProperties::POWER = IntProperty::create("power", 0, 15);
-const IntProperty* StateProperties::STAGE = IntProperty::create("stage", 0, 1);
-const IntProperty* StateProperties::DISTANCE_0_7 = IntProperty::create("distance", 0, 7);
-const IntProperty* StateProperties::CHARGES = IntProperty::create("charges", 0, 4);
-const IntProperty* StateProperties::ROTATION = IntProperty::create("rotation", 0, 15);
-const EnumProperty<BedPart>* StateProperties::BED_PART = EnumProperty<BedPart>::create("part", {BedPart::Head, BedPart::Foot});
-const EnumProperty<ChestType>* StateProperties::CHEST_TYPE = EnumProperty<ChestType>::create("type", {ChestType::Single, ChestType::Left, ChestType::Right});
-const EnumProperty<ComparatorMode>* StateProperties::COMPARATOR_MODE = EnumProperty<ComparatorMode>::create("mode", {ComparatorMode::Compare, ComparatorMode::Subtract});
-const EnumProperty<DoorHinge>* StateProperties::DOOR_HINGE = EnumProperty<DoorHinge>::create("hinge", {DoorHinge::Left, DoorHinge::Right});
-const EnumProperty<NoteBlockInstrument>* StateProperties::INSTRUMENT = EnumProperty<NoteBlockInstrument>::create("instrument", {NoteBlockInstrument::Harp, NoteBlockInstrument::BassDrum, NoteBlockInstrument::Snare, NoteBlockInstrument::Hat, NoteBlockInstrument::Bass, NoteBlockInstrument::Flute, NoteBlockInstrument::Bell, NoteBlockInstrument::Guitar, NoteBlockInstrument::Chime, NoteBlockInstrument::Xylophone, NoteBlockInstrument::IronXylophone, NoteBlockInstrument::CowBell, NoteBlockInstrument::Didgeridoo, NoteBlockInstrument::Bit, NoteBlockInstrument::Banjo, NoteBlockInstrument::Pling, NoteBlockInstrument::Zombie, NoteBlockInstrument::Skeleton, NoteBlockInstrument::Creeper, NoteBlockInstrument::Dragon, NoteBlockInstrument::WitherSkeleton, NoteBlockInstrument::Piglin, NoteBlockInstrument::CustomHead});
-const EnumProperty<PistonType>* StateProperties::PISTON_TYPE = EnumProperty<PistonType>::create("type", {PistonType::Default, PistonType::Sticky});
-const EnumProperty<SlabType>* StateProperties::SLAB_TYPE = EnumProperty<SlabType>::create("type", {SlabType::Top, SlabType::Bottom, SlabType::Double});
-const EnumProperty<StairShape>* StateProperties::STAIR_SHAPE = EnumProperty<StairShape>::create("shape", {StairShape::Straight, StairShape::InnerLeft, StairShape::InnerRight, StairShape::OuterLeft, StairShape::OuterRight});
-const EnumProperty<StructureBlockMode>* StateProperties::STRUCTURE_BLOCK_MODE = EnumProperty<StructureBlockMode>::create("mode", {StructureBlockMode::Save, StructureBlockMode::Load, StructureBlockMode::Corner, StructureBlockMode::Data});
-const EnumProperty<BambooLeaves>* StateProperties::BAMBOO_LEAVES = EnumProperty<BambooLeaves>::create("leaves", {BambooLeaves::None, BambooLeaves::Small, BambooLeaves::Large});
-const EnumProperty<Tilt>* StateProperties::TILT = EnumProperty<Tilt>::create("tilt", {Tilt::None, Tilt::Unstable, Tilt::Partial, Tilt::Full});
-const EnumProperty<math::Direction::Type>* StateProperties::VERTICAL_DIRECTION = EnumProperty<math::Direction::Type>::create("vertical_direction", {math::Direction::Type::Up, math::Direction::Type::Down});
-const EnumProperty<Thickness>* StateProperties::THICKNESS = EnumProperty<Thickness>::create("thickness", {Thickness::TipMerge, Thickness::Tip, Thickness::Frustum, Thickness::Middle, Thickness::Base});
-const EnumProperty<SculkSensorPhase>* StateProperties::SCULK_SENSOR_PHASE = EnumProperty<SculkSensorPhase>::create("phase", {SculkSensorPhase::Inactive, SculkSensorPhase::Active, SculkSensorPhase::Cooldown});
-const BooleanProperty* StateProperties::SLOT_0_OCCUPIED = BooleanProperty::create("slot_0_occupied");
-const BooleanProperty* StateProperties::SLOT_1_OCCUPIED = BooleanProperty::create("slot_1_occupied");
-const BooleanProperty* StateProperties::SLOT_2_OCCUPIED = BooleanProperty::create("slot_2_occupied");
-const BooleanProperty* StateProperties::SLOT_3_OCCUPIED = BooleanProperty::create("slot_3_occupied");
-const BooleanProperty* StateProperties::SLOT_4_OCCUPIED = BooleanProperty::create("slot_4_occupied");
-const BooleanProperty* StateProperties::SLOT_5_OCCUPIED = BooleanProperty::create("slot_5_occupied");
-const IntProperty* StateProperties::DUSTED = IntProperty::create("dusted", 0, 3);
-const BooleanProperty* StateProperties::CRACKED = BooleanProperty::create("cracked");
-const BooleanProperty* StateProperties::CRAFTING = BooleanProperty::create("crafting");
-const EnumProperty<TrialSpawnerState>* StateProperties::TRIAL_SPAWNER_STATE = EnumProperty<TrialSpawnerState>::create("trial_spawner_state", {TrialSpawnerState::Inactive, TrialSpawnerState::WaitingForPlayers, TrialSpawnerState::Active, TrialSpawnerState::WaitingForRewardEjection, TrialSpawnerState::EjectingReward, TrialSpawnerState::Cooldown});
-const EnumProperty<VaultState>* StateProperties::VAULT_STATE = EnumProperty<VaultState>::create("vault_state", {VaultState::Inactive, VaultState::Active, VaultState::Unlocking, VaultState::Ejecting});
-const EnumProperty<CreakingHeartState>* StateProperties::CREAKING_HEART_STATE = EnumProperty<CreakingHeartState>::create("creaking_heart_state", {CreakingHeartState::Uprooted, CreakingHeartState::Dormant, CreakingHeartState::Awake});
-const BooleanProperty* StateProperties::OMINOUS = BooleanProperty::create("ominous");
-const EnumProperty<TestBlockMode>* StateProperties::TEST_BLOCK_MODE = EnumProperty<TestBlockMode>::create("mode", {TestBlockMode::Start, TestBlockMode::Log, TestBlockMode::Fail, TestBlockMode::Accept});
-const BooleanProperty* StateProperties::MAP = BooleanProperty::create("map");
-} // nnamespace stratos::block;
+
+BOOLEAN_PROP(ATTACHED, attached)
+BOOLEAN_PROP(BERRIES, berries)
+BOOLEAN_PROP(BLOOM, bloom)
+BOOLEAN_PROP(BOTTOM, bottom)
+BOOLEAN_PROP(CAN_SUMMON, can_summon)
+BOOLEAN_PROP(CONDITIONAL, conditional)
+BOOLEAN_PROP(DISARMED, disarmed)
+BOOLEAN_PROP(DRAG, drag)
+BOOLEAN_PROP(ENABLED, enabled)
+BOOLEAN_PROP(EXTENDED, extended)
+BOOLEAN_PROP(EYE, eye)
+BOOLEAN_PROP(FALLING, falling)
+BOOLEAN_PROP(HANGING, hanging)
+BOOLEAN_PROP(HAS_BOTTLE_0, has_bottle_0)
+BOOLEAN_PROP(HAS_BOTTLE_1, has_bottle_1)
+BOOLEAN_PROP(HAS_BOTTLE_2, has_bottle_2)
+BOOLEAN_PROP(HAS_RECORD, has_record)
+BOOLEAN_PROP(HAS_BOOK, has_book)
+BOOLEAN_PROP(INVERTED, inverted)
+BOOLEAN_PROP(IN_WALL, in_wall)
+BOOLEAN_PROP(LIT, lit)
+BOOLEAN_PROP(LOCKED, locked)
+BOOLEAN_PROP(NATURAL, natural)
+BOOLEAN_PROP(OCCUPIED, occupied)
+BOOLEAN_PROP(OPEN, open)
+BOOLEAN_PROP(PERSISTENT, persistent)
+BOOLEAN_PROP(POWERED, powered)
+BOOLEAN_PROP(SHORT, short)
+BOOLEAN_PROP(SHRIEKING, shrieking)
+BOOLEAN_PROP(SIGNAL_FIRE, signal_fire)
+BOOLEAN_PROP(SNOWY, snowy)
+BOOLEAN_PROP(TIP, tip)
+BOOLEAN_PROP(TRIGGERED, triggered)
+BOOLEAN_PROP(UNSTABLE, unstable)
+BOOLEAN_PROP(WATERLOGGED, waterlogged)
+ENUM_PROP(HORIZONTAL_AXIS, horizontal_axis, math::Axis::Type, math::Axis::Type::X, math::Axis::Type::Z)
+ENUM_PROP(AXIS, axis, math::Axis::Type, math::Axis::Type::X, math::Axis::Type::Y, math::Axis::Type::Z)
+BOOLEAN_PROP(UP, up)
+BOOLEAN_PROP(DOWN, down)
+BOOLEAN_PROP(NORTH, north)
+BOOLEAN_PROP(EAST, east)
+BOOLEAN_PROP(SOUTH, south)
+BOOLEAN_PROP(WEST, west)
+ENUM_PROP(FACING, facing, math::Direction::Type, math::Direction::Type::North, math::Direction::Type::East, math::Direction::Type::South, math::Direction::Type::West, math::Direction::Type::Up, math::Direction::Type::Down)
+ENUM_PROP(FACING_HOPPER, facing_hopper, math::Direction::Type, math::Direction::Type::Down, math::Direction::Type::North, math::Direction::Type::South, math::Direction::Type::West, math::Direction::Type::East)
+ENUM_PROP(FACING_HORIZONTAL, facing_horizontal, math::Direction::Type, math::Direction::Type::North, math::Direction::Type::East, math::Direction::Type::South, math::Direction::Type::West)
+INT_PROP(FLOWER_AMOUNT, flower_amount, 1, 4)
+INT_PROP(SEGMENT_AMOUNT, segment_amount, 1, 4)
+ENUM_PROP(ORIENTATION, orientation, Orientation, Orientation::DownEast, Orientation::DownNorth, Orientation::DownSouth, Orientation::DownWest, Orientation::UpEast, Orientation::UpNorth, Orientation::UpSouth, Orientation::UpWest, Orientation::WestUp, Orientation::EastUp, Orientation::NorthUp, Orientation::SouthUp)
+ENUM_PROP(BLOCK_FACE, block_face, BlockFace, BlockFace::Floor, BlockFace::Wall, BlockFace::Ceiling)
+ENUM_PROP(ATTACHMENT, attachment, Attachment, Attachment::Floor, Attachment::Ceiling, Attachment::SingleWall, Attachment::DoubleWall)
+ENUM_PROP(EAST_WALL_SHAPE, east, WallConnection, WallConnection::None, WallConnection::Low, WallConnection::Tall)
+ENUM_PROP(NORTH_WALL_SHAPE, north, WallConnection, WallConnection::None, WallConnection::Low, WallConnection::Tall)
+ENUM_PROP(SOUTH_WALL_SHAPE, south, WallConnection, WallConnection::None, WallConnection::Low, WallConnection::Tall)
+ENUM_PROP(WEST_WALL_SHAPE, west, WallConnection, WallConnection::None, WallConnection::Low, WallConnection::Tall)
+ENUM_PROP(EAST_WIRE_CONNECTION, east, WireConnection, WireConnection::Up, WireConnection::Side, WireConnection::None)
+ENUM_PROP(NORTH_WIRE_CONNECTION, north, WireConnection, WireConnection::Up, WireConnection::Side, WireConnection::None)
+ENUM_PROP(SOUTH_WIRE_CONNECTION, south, WireConnection, WireConnection::Up, WireConnection::Side, WireConnection::None)
+ENUM_PROP(WEST_WIRE_CONNECTION, west, WireConnection, WireConnection::Up, WireConnection::Side, WireConnection::None)
+ENUM_PROP(DOUBLE_BLOCK_HALF, half, DoubleBlockHalf, DoubleBlockHalf::Upper, DoubleBlockHalf::Lower)
+ENUM_PROP(BLOCK_HALF, half, BlockHalf, BlockHalf::Top, BlockHalf::Bottom)
+ENUM_PROP(RAIL_SHAPE, shape, RailConnection, RailConnection::NorthSouth, RailConnection::EastWest, RailConnection::AscendingNorth, RailConnection::AscendingSouth, RailConnection::AscendingEast, RailConnection::AscendingWest, RailConnection::SouthEast, RailConnection::SouthWest, RailConnection::NorthEast, RailConnection::NorthWest)
+ENUM_PROP(STRAIGHT_RAIL_SHAPE, shape, RailConnection, RailConnection::NorthSouth, RailConnection::EastWest, RailConnection::AscendingNorth, RailConnection::AscendingSouth, RailConnection::AscendingEast, RailConnection::AscendingWest)
+INT_PROP(AGE_1, age, 0, 1)
+INT_PROP(AGE_2, age, 0, 2)
+INT_PROP(AGE_3, age, 0, 3)
+INT_PROP(AGE_4, age, 0, 4)
+INT_PROP(AGE_5, age, 0, 5)
+INT_PROP(AGE_7, age, 0, 7)
+INT_PROP(AGE_15, age, 0, 15)
+INT_PROP(AGE_25, age, 0, 25)
+INT_PROP(BITES, bites, 0, 6)
+INT_PROP(CANDLES, candles, 1, 4)
+INT_PROP(DELAY, delay, 1, 4)
+INT_PROP(DISTANCE_1_7, distance, 1, 7)
+INT_PROP(EGGS, eggs, 1, 4)
+INT_PROP(HATCH, hatch, 0, 2)
+INT_PROP(LAYERS, layers, 1, 8)
+INT_PROP(LEVEL_3, level, 1, 3)
+INT_PROP(LEVEL_8, level, 0, 8)
+INT_PROP(LEVEL_1_8, level, 1, 8)
+INT_PROP(HONEY_LEVEL, honey_level, 0, 5)
+INT_PROP(LEVEL_15, level, 0, 15)
+INT_PROP(MOISTURE, moisture, 0, 7)
+INT_PROP(NOTE, note, 0, 24)
+INT_PROP(PICKLES, pickles, 1, 4)
+INT_PROP(POWER, power, 0, 15)
+INT_PROP(STAGE, stage, 0, 1)
+INT_PROP(DISTANCE_0_7, distance, 0, 7)
+INT_PROP(CHARGES, charges, 0, 4)
+INT_PROP(ROTATION, rotation, 0, 15)
+ENUM_PROP(BED_PART, part, BedPart, BedPart::Head, BedPart::Foot)
+ENUM_PROP(CHEST_TYPE, type, ChestType, ChestType::Single, ChestType::Left, ChestType::Right)
+ENUM_PROP(COMPARATOR_MODE, mode, ComparatorMode, ComparatorMode::Compare, ComparatorMode::Subtract)
+ENUM_PROP(DOOR_HINGE, hinge, DoorHinge, DoorHinge::Left, DoorHinge::Right)
+ENUM_PROP(INSTRUMENT, instrument, NoteBlockInstrument, NoteBlockInstrument::Harp, NoteBlockInstrument::BassDrum, NoteBlockInstrument::Snare, NoteBlockInstrument::Hat, NoteBlockInstrument::Bass, NoteBlockInstrument::Flute, NoteBlockInstrument::Bell, NoteBlockInstrument::Guitar, NoteBlockInstrument::Chime, NoteBlockInstrument::Xylophone, NoteBlockInstrument::IronXylophone, NoteBlockInstrument::CowBell, NoteBlockInstrument::Didgeridoo, NoteBlockInstrument::Bit, NoteBlockInstrument::Banjo, NoteBlockInstrument::Pling, NoteBlockInstrument::Zombie, NoteBlockInstrument::Skeleton, NoteBlockInstrument::Creeper, NoteBlockInstrument::Dragon, NoteBlockInstrument::WitherSkeleton, NoteBlockInstrument::Piglin, NoteBlockInstrument::CustomHead)
+ENUM_PROP(PISTON_TYPE, type, PistonType, PistonType::Default, PistonType::Sticky)
+ENUM_PROP(SLAB_TYPE, type, SlabType, SlabType::Top, SlabType::Bottom, SlabType::Double)
+ENUM_PROP(STAIR_SHAPE, shape, StairShape, StairShape::Straight, StairShape::InnerLeft, StairShape::InnerRight, StairShape::OuterLeft, StairShape::OuterRight)
+ENUM_PROP(STRUCTURE_BLOCK_MODE, mode, StructureBlockMode, StructureBlockMode::Save, StructureBlockMode::Load, StructureBlockMode::Corner, StructureBlockMode::Data)
+ENUM_PROP(BAMBOO_LEAVES, leaves, BambooLeaves, BambooLeaves::None, BambooLeaves::Small, BambooLeaves::Large)
+ENUM_PROP(TILT, tilt, Tilt, Tilt::None, Tilt::Unstable, Tilt::Partial, Tilt::Full)
+ENUM_PROP(VERTICAL_DIRECTION, vertical_direction, math::Direction::Type, math::Direction::Type::Up, math::Direction::Type::Down)
+ENUM_PROP(THICKNESS, thickness, Thickness, Thickness::TipMerge, Thickness::Tip, Thickness::Frustum, Thickness::Middle, Thickness::Base)
+ENUM_PROP(SCULK_SENSOR_PHASE, phase, SculkSensorPhase, SculkSensorPhase::Inactive, SculkSensorPhase::Active, SculkSensorPhase::Cooldown)
+BOOLEAN_PROP(SLOT_0_OCCUPIED, slot_0_occupied)
+BOOLEAN_PROP(SLOT_1_OCCUPIED, slot_1_occupied)
+BOOLEAN_PROP(SLOT_2_OCCUPIED, slot_2_occupied)
+BOOLEAN_PROP(SLOT_3_OCCUPIED, slot_3_occupied)
+BOOLEAN_PROP(SLOT_4_OCCUPIED, slot_4_occupied)
+BOOLEAN_PROP(SLOT_5_OCCUPIED, slot_5_occupied)
+INT_PROP(DUSTED, dusted, 0, 3)
+BOOLEAN_PROP(CRACKED, cracked)
+BOOLEAN_PROP(CRAFTING, crafting)
+ENUM_PROP(TRIAL_SPAWNER_STATE, trial_spawner_state, TrialSpawnerState, TrialSpawnerState::Inactive, TrialSpawnerState::WaitingForPlayers, TrialSpawnerState::Active, TrialSpawnerState::WaitingForRewardEjection, TrialSpawnerState::EjectingReward, TrialSpawnerState::Cooldown)
+ENUM_PROP(VAULT_STATE, vault_state, VaultState, VaultState::Inactive, VaultState::Active, VaultState::Unlocking, VaultState::Ejecting)
+ENUM_PROP(CREAKING_HEART_STATE, creaking_heart_state, CreakingHeartState, CreakingHeartState::Uprooted, CreakingHeartState::Dormant, CreakingHeartState::Awake)
+BOOLEAN_PROP(OMINOUS, ominous)
+ENUM_PROP(TEST_BLOCK_MODE, test_block_mode, TestBlockMode, TestBlockMode::Start, TestBlockMode::Log, TestBlockMode::Fail, TestBlockMode::Accept)
+BOOLEAN_PROP(MAP, map)
+
+} // namespace stratos::block

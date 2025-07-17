@@ -20,6 +20,9 @@
 #include "Blocks.h"
 #include "Block.h"
 
+#define REGISTER_BLOCK(codeName, name)     const Block* Blocks::codeName() {         static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block());         return block;     }
+#define REGISTER_BLOCK_BLOCKSTATES(codeName, name, stateBuilder...)     const Block* Blocks::codeName() {         static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block(BlockStateManager::Builder()stateBuilder));         return block;     }
+
 namespace stratos::block {
 
 Block* registerBlock(const utils::Identifier& id, Block* block) {
@@ -29,1108 +32,1108 @@ Block* registerBlock(const utils::Identifier& id, Block* block) {
 
 // AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND
 
-const Block* Blocks::AIR = registerBlock(utils::Identifier("minecraft", "air"), new Block());
-const Block* Blocks::STONE = registerBlock(utils::Identifier("minecraft", "stone"), new Block());
-const Block* Blocks::GRANITE = registerBlock(utils::Identifier("minecraft", "granite"), new Block());
-const Block* Blocks::POLISHED_GRANITE = registerBlock(utils::Identifier("minecraft", "polished_granite"), new Block());
-const Block* Blocks::DIORITE = registerBlock(utils::Identifier("minecraft", "diorite"), new Block());
-const Block* Blocks::POLISHED_DIORITE = registerBlock(utils::Identifier("minecraft", "polished_diorite"), new Block());
-const Block* Blocks::ANDESITE = registerBlock(utils::Identifier("minecraft", "andesite"), new Block());
-const Block* Blocks::POLISHED_ANDESITE = registerBlock(utils::Identifier("minecraft", "polished_andesite"), new Block());
-const Block* Blocks::GRASS_BLOCK = registerBlock(utils::Identifier("minecraft", "grass_block"), new Block());
-const Block* Blocks::DIRT = registerBlock(utils::Identifier("minecraft", "dirt"), new Block());
-const Block* Blocks::COARSE_DIRT = registerBlock(utils::Identifier("minecraft", "coarse_dirt"), new Block());
-const Block* Blocks::PODZOL = registerBlock(utils::Identifier("minecraft", "podzol"), new Block());
-const Block* Blocks::COBBLESTONE = registerBlock(utils::Identifier("minecraft", "cobblestone"), new Block());
-const Block* Blocks::OAK_PLANKS = registerBlock(utils::Identifier("minecraft", "oak_planks"), new Block());
-const Block* Blocks::SPRUCE_PLANKS = registerBlock(utils::Identifier("minecraft", "spruce_planks"), new Block());
-const Block* Blocks::BIRCH_PLANKS = registerBlock(utils::Identifier("minecraft", "birch_planks"), new Block());
-const Block* Blocks::JUNGLE_PLANKS = registerBlock(utils::Identifier("minecraft", "jungle_planks"), new Block());
-const Block* Blocks::ACACIA_PLANKS = registerBlock(utils::Identifier("minecraft", "acacia_planks"), new Block());
-const Block* Blocks::CHERRY_PLANKS = registerBlock(utils::Identifier("minecraft", "cherry_planks"), new Block());
-const Block* Blocks::DARK_OAK_PLANKS = registerBlock(utils::Identifier("minecraft", "dark_oak_planks"), new Block());
-const Block* Blocks::PALE_OAK_WOOD = registerBlock(utils::Identifier("minecraft", "pale_oak_wood"), new Block());
-const Block* Blocks::PALE_OAK_PLANKS = registerBlock(utils::Identifier("minecraft", "pale_oak_planks"), new Block());
-const Block* Blocks::MANGROVE_PLANKS = registerBlock(utils::Identifier("minecraft", "mangrove_planks"), new Block());
-const Block* Blocks::BAMBOO_PLANKS = registerBlock(utils::Identifier("minecraft", "bamboo_planks"), new Block());
-const Block* Blocks::BAMBOO_MOSAIC = registerBlock(utils::Identifier("minecraft", "bamboo_mosaic"), new Block());
-const Block* Blocks::OAK_SAPLING = registerBlock(utils::Identifier("minecraft", "oak_sapling"), new Block());
-const Block* Blocks::SPRUCE_SAPLING = registerBlock(utils::Identifier("minecraft", "spruce_sapling"), new Block());
-const Block* Blocks::BIRCH_SAPLING = registerBlock(utils::Identifier("minecraft", "birch_sapling"), new Block());
-const Block* Blocks::JUNGLE_SAPLING = registerBlock(utils::Identifier("minecraft", "jungle_sapling"), new Block());
-const Block* Blocks::ACACIA_SAPLING = registerBlock(utils::Identifier("minecraft", "acacia_sapling"), new Block());
-const Block* Blocks::CHERRY_SAPLING = registerBlock(utils::Identifier("minecraft", "cherry_sapling"), new Block());
-const Block* Blocks::DARK_OAK_SAPLING = registerBlock(utils::Identifier("minecraft", "dark_oak_sapling"), new Block());
-const Block* Blocks::PALE_OAK_SAPLING = registerBlock(utils::Identifier("minecraft", "pale_oak_sapling"), new Block());
-const Block* Blocks::MANGROVE_PROPAGULE = registerBlock(utils::Identifier("minecraft", "mangrove_propagule"), new Block());
-const Block* Blocks::BEDROCK = registerBlock(utils::Identifier("minecraft", "bedrock"), new Block());
-const Block* Blocks::WATER = registerBlock(utils::Identifier("minecraft", "water"), new Block());
-const Block* Blocks::LAVA = registerBlock(utils::Identifier("minecraft", "lava"), new Block());
-const Block* Blocks::SAND = registerBlock(utils::Identifier("minecraft", "sand"), new Block());
-const Block* Blocks::SUSPICIOUS_SAND = registerBlock(utils::Identifier("minecraft", "suspicious_sand"), new Block());
-const Block* Blocks::RED_SAND = registerBlock(utils::Identifier("minecraft", "red_sand"), new Block());
-const Block* Blocks::GRAVEL = registerBlock(utils::Identifier("minecraft", "gravel"), new Block());
-const Block* Blocks::SUSPICIOUS_GRAVEL = registerBlock(utils::Identifier("minecraft", "suspicious_gravel"), new Block());
-const Block* Blocks::GOLD_ORE = registerBlock(utils::Identifier("minecraft", "gold_ore"), new Block());
-const Block* Blocks::DEEPSLATE_GOLD_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_gold_ore"), new Block());
-const Block* Blocks::IRON_ORE = registerBlock(utils::Identifier("minecraft", "iron_ore"), new Block());
-const Block* Blocks::DEEPSLATE_IRON_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_iron_ore"), new Block());
-const Block* Blocks::COAL_ORE = registerBlock(utils::Identifier("minecraft", "coal_ore"), new Block());
-const Block* Blocks::DEEPSLATE_COAL_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_coal_ore"), new Block());
-const Block* Blocks::NETHER_GOLD_ORE = registerBlock(utils::Identifier("minecraft", "nether_gold_ore"), new Block());
-const Block* Blocks::OAK_LOG = registerBlock(utils::Identifier("minecraft", "oak_log"), new Block());
-const Block* Blocks::SPRUCE_LOG = registerBlock(utils::Identifier("minecraft", "spruce_log"), new Block());
-const Block* Blocks::BIRCH_LOG = registerBlock(utils::Identifier("minecraft", "birch_log"), new Block());
-const Block* Blocks::JUNGLE_LOG = registerBlock(utils::Identifier("minecraft", "jungle_log"), new Block());
-const Block* Blocks::ACACIA_LOG = registerBlock(utils::Identifier("minecraft", "acacia_log"), new Block());
-const Block* Blocks::CHERRY_LOG = registerBlock(utils::Identifier("minecraft", "cherry_log"), new Block());
-const Block* Blocks::DARK_OAK_LOG = registerBlock(utils::Identifier("minecraft", "dark_oak_log"), new Block());
-const Block* Blocks::PALE_OAK_LOG = registerBlock(utils::Identifier("minecraft", "pale_oak_log"), new Block());
-const Block* Blocks::MANGROVE_LOG = registerBlock(utils::Identifier("minecraft", "mangrove_log"), new Block());
-const Block* Blocks::MANGROVE_ROOTS = registerBlock(utils::Identifier("minecraft", "mangrove_roots"), new Block());
-const Block* Blocks::MUDDY_MANGROVE_ROOTS = registerBlock(utils::Identifier("minecraft", "muddy_mangrove_roots"), new Block());
-const Block* Blocks::BAMBOO_BLOCK = registerBlock(utils::Identifier("minecraft", "bamboo_block"), new Block());
-const Block* Blocks::STRIPPED_SPRUCE_LOG = registerBlock(utils::Identifier("minecraft", "stripped_spruce_log"), new Block());
-const Block* Blocks::STRIPPED_BIRCH_LOG = registerBlock(utils::Identifier("minecraft", "stripped_birch_log"), new Block());
-const Block* Blocks::STRIPPED_JUNGLE_LOG = registerBlock(utils::Identifier("minecraft", "stripped_jungle_log"), new Block());
-const Block* Blocks::STRIPPED_ACACIA_LOG = registerBlock(utils::Identifier("minecraft", "stripped_acacia_log"), new Block());
-const Block* Blocks::STRIPPED_CHERRY_LOG = registerBlock(utils::Identifier("minecraft", "stripped_cherry_log"), new Block());
-const Block* Blocks::STRIPPED_DARK_OAK_LOG = registerBlock(utils::Identifier("minecraft", "stripped_dark_oak_log"), new Block());
-const Block* Blocks::STRIPPED_PALE_OAK_LOG = registerBlock(utils::Identifier("minecraft", "stripped_pale_oak_log"), new Block());
-const Block* Blocks::STRIPPED_OAK_LOG = registerBlock(utils::Identifier("minecraft", "stripped_oak_log"), new Block());
-const Block* Blocks::STRIPPED_MANGROVE_LOG = registerBlock(utils::Identifier("minecraft", "stripped_mangrove_log"), new Block());
-const Block* Blocks::STRIPPED_BAMBOO_BLOCK = registerBlock(utils::Identifier("minecraft", "stripped_bamboo_block"), new Block());
-const Block* Blocks::OAK_WOOD = registerBlock(utils::Identifier("minecraft", "oak_wood"), new Block());
-const Block* Blocks::SPRUCE_WOOD = registerBlock(utils::Identifier("minecraft", "spruce_wood"), new Block());
-const Block* Blocks::BIRCH_WOOD = registerBlock(utils::Identifier("minecraft", "birch_wood"), new Block());
-const Block* Blocks::JUNGLE_WOOD = registerBlock(utils::Identifier("minecraft", "jungle_wood"), new Block());
-const Block* Blocks::ACACIA_WOOD = registerBlock(utils::Identifier("minecraft", "acacia_wood"), new Block());
-const Block* Blocks::CHERRY_WOOD = registerBlock(utils::Identifier("minecraft", "cherry_wood"), new Block());
-const Block* Blocks::DARK_OAK_WOOD = registerBlock(utils::Identifier("minecraft", "dark_oak_wood"), new Block());
-const Block* Blocks::MANGROVE_WOOD = registerBlock(utils::Identifier("minecraft", "mangrove_wood"), new Block());
-const Block* Blocks::STRIPPED_OAK_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_oak_wood"), new Block());
-const Block* Blocks::STRIPPED_SPRUCE_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_spruce_wood"), new Block());
-const Block* Blocks::STRIPPED_BIRCH_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_birch_wood"), new Block());
-const Block* Blocks::STRIPPED_JUNGLE_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_jungle_wood"), new Block());
-const Block* Blocks::STRIPPED_ACACIA_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_acacia_wood"), new Block());
-const Block* Blocks::STRIPPED_CHERRY_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_cherry_wood"), new Block());
-const Block* Blocks::STRIPPED_DARK_OAK_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_dark_oak_wood"), new Block());
-const Block* Blocks::STRIPPED_PALE_OAK_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_pale_oak_wood"), new Block());
-const Block* Blocks::STRIPPED_MANGROVE_WOOD = registerBlock(utils::Identifier("minecraft", "stripped_mangrove_wood"), new Block());
-const Block* Blocks::OAK_LEAVES = registerBlock(utils::Identifier("minecraft", "oak_leaves"), new Block());
-const Block* Blocks::SPRUCE_LEAVES = registerBlock(utils::Identifier("minecraft", "spruce_leaves"), new Block());
-const Block* Blocks::BIRCH_LEAVES = registerBlock(utils::Identifier("minecraft", "birch_leaves"), new Block());
-const Block* Blocks::JUNGLE_LEAVES = registerBlock(utils::Identifier("minecraft", "jungle_leaves"), new Block());
-const Block* Blocks::ACACIA_LEAVES = registerBlock(utils::Identifier("minecraft", "acacia_leaves"), new Block());
-const Block* Blocks::CHERRY_LEAVES = registerBlock(utils::Identifier("minecraft", "cherry_leaves"), new Block());
-const Block* Blocks::DARK_OAK_LEAVES = registerBlock(utils::Identifier("minecraft", "dark_oak_leaves"), new Block());
-const Block* Blocks::PALE_OAK_LEAVES = registerBlock(utils::Identifier("minecraft", "pale_oak_leaves"), new Block());
-const Block* Blocks::MANGROVE_LEAVES = registerBlock(utils::Identifier("minecraft", "mangrove_leaves"), new Block());
-const Block* Blocks::AZALEA_LEAVES = registerBlock(utils::Identifier("minecraft", "azalea_leaves"), new Block());
-const Block* Blocks::FLOWERING_AZALEA_LEAVES = registerBlock(utils::Identifier("minecraft", "flowering_azalea_leaves"), new Block());
-const Block* Blocks::SPONGE = registerBlock(utils::Identifier("minecraft", "sponge"), new Block());
-const Block* Blocks::WET_SPONGE = registerBlock(utils::Identifier("minecraft", "wet_sponge"), new Block());
-const Block* Blocks::GLASS = registerBlock(utils::Identifier("minecraft", "glass"), new Block());
-const Block* Blocks::LAPIS_ORE = registerBlock(utils::Identifier("minecraft", "lapis_ore"), new Block());
-const Block* Blocks::DEEPSLATE_LAPIS_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_lapis_ore"), new Block());
-const Block* Blocks::LAPIS_BLOCK = registerBlock(utils::Identifier("minecraft", "lapis_block"), new Block());
-const Block* Blocks::DISPENSER = registerBlock(utils::Identifier("minecraft", "dispenser"), new Block());
-const Block* Blocks::SANDSTONE = registerBlock(utils::Identifier("minecraft", "sandstone"), new Block());
-const Block* Blocks::CHISELED_SANDSTONE = registerBlock(utils::Identifier("minecraft", "chiseled_sandstone"), new Block());
-const Block* Blocks::CUT_SANDSTONE = registerBlock(utils::Identifier("minecraft", "cut_sandstone"), new Block());
-const Block* Blocks::NOTE_BLOCK = registerBlock(utils::Identifier("minecraft", "note_block"), new Block());
-const Block* Blocks::WHITE_BED = registerBlock(utils::Identifier("minecraft", "white_bed"), new Block());
-const Block* Blocks::ORANGE_BED = registerBlock(utils::Identifier("minecraft", "orange_bed"), new Block());
-const Block* Blocks::MAGENTA_BED = registerBlock(utils::Identifier("minecraft", "magenta_bed"), new Block());
-const Block* Blocks::LIGHT_BLUE_BED = registerBlock(utils::Identifier("minecraft", "light_blue_bed"), new Block());
-const Block* Blocks::YELLOW_BED = registerBlock(utils::Identifier("minecraft", "yellow_bed"), new Block());
-const Block* Blocks::LIME_BED = registerBlock(utils::Identifier("minecraft", "lime_bed"), new Block());
-const Block* Blocks::PINK_BED = registerBlock(utils::Identifier("minecraft", "pink_bed"), new Block());
-const Block* Blocks::GRAY_BED = registerBlock(utils::Identifier("minecraft", "gray_bed"), new Block());
-const Block* Blocks::LIGHT_GRAY_BED = registerBlock(utils::Identifier("minecraft", "light_gray_bed"), new Block());
-const Block* Blocks::CYAN_BED = registerBlock(utils::Identifier("minecraft", "cyan_bed"), new Block());
-const Block* Blocks::PURPLE_BED = registerBlock(utils::Identifier("minecraft", "purple_bed"), new Block());
-const Block* Blocks::BLUE_BED = registerBlock(utils::Identifier("minecraft", "blue_bed"), new Block());
-const Block* Blocks::BROWN_BED = registerBlock(utils::Identifier("minecraft", "brown_bed"), new Block());
-const Block* Blocks::GREEN_BED = registerBlock(utils::Identifier("minecraft", "green_bed"), new Block());
-const Block* Blocks::RED_BED = registerBlock(utils::Identifier("minecraft", "red_bed"), new Block());
-const Block* Blocks::BLACK_BED = registerBlock(utils::Identifier("minecraft", "black_bed"), new Block());
-const Block* Blocks::POWERED_RAIL = registerBlock(utils::Identifier("minecraft", "powered_rail"), new Block());
-const Block* Blocks::DETECTOR_RAIL = registerBlock(utils::Identifier("minecraft", "detector_rail"), new Block());
-const Block* Blocks::STICKY_PISTON = registerBlock(utils::Identifier("minecraft", "sticky_piston"), new Block());
-const Block* Blocks::COBWEB = registerBlock(utils::Identifier("minecraft", "cobweb"), new Block());
-const Block* Blocks::SHORT_GRASS = registerBlock(utils::Identifier("minecraft", "short_grass"), new Block());
-const Block* Blocks::FERN = registerBlock(utils::Identifier("minecraft", "fern"), new Block());
-const Block* Blocks::DEAD_BUSH = registerBlock(utils::Identifier("minecraft", "dead_bush"), new Block());
-const Block* Blocks::BUSH = registerBlock(utils::Identifier("minecraft", "bush"), new Block());
-const Block* Blocks::SHORT_DRY_GRASS = registerBlock(utils::Identifier("minecraft", "short_dry_grass"), new Block());
-const Block* Blocks::TALL_DRY_GRASS = registerBlock(utils::Identifier("minecraft", "tall_dry_grass"), new Block());
-const Block* Blocks::SEAGRASS = registerBlock(utils::Identifier("minecraft", "seagrass"), new Block());
-const Block* Blocks::TALL_SEAGRASS = registerBlock(utils::Identifier("minecraft", "tall_seagrass"), new Block());
-const Block* Blocks::PISTON = registerBlock(utils::Identifier("minecraft", "piston"), new Block());
-const Block* Blocks::PISTON_HEAD = registerBlock(utils::Identifier("minecraft", "piston_head"), new Block());
-const Block* Blocks::WHITE_WOOL = registerBlock(utils::Identifier("minecraft", "white_wool"), new Block());
-const Block* Blocks::ORANGE_WOOL = registerBlock(utils::Identifier("minecraft", "orange_wool"), new Block());
-const Block* Blocks::MAGENTA_WOOL = registerBlock(utils::Identifier("minecraft", "magenta_wool"), new Block());
-const Block* Blocks::LIGHT_BLUE_WOOL = registerBlock(utils::Identifier("minecraft", "light_blue_wool"), new Block());
-const Block* Blocks::YELLOW_WOOL = registerBlock(utils::Identifier("minecraft", "yellow_wool"), new Block());
-const Block* Blocks::LIME_WOOL = registerBlock(utils::Identifier("minecraft", "lime_wool"), new Block());
-const Block* Blocks::PINK_WOOL = registerBlock(utils::Identifier("minecraft", "pink_wool"), new Block());
-const Block* Blocks::GRAY_WOOL = registerBlock(utils::Identifier("minecraft", "gray_wool"), new Block());
-const Block* Blocks::LIGHT_GRAY_WOOL = registerBlock(utils::Identifier("minecraft", "light_gray_wool"), new Block());
-const Block* Blocks::CYAN_WOOL = registerBlock(utils::Identifier("minecraft", "cyan_wool"), new Block());
-const Block* Blocks::PURPLE_WOOL = registerBlock(utils::Identifier("minecraft", "purple_wool"), new Block());
-const Block* Blocks::BLUE_WOOL = registerBlock(utils::Identifier("minecraft", "blue_wool"), new Block());
-const Block* Blocks::BROWN_WOOL = registerBlock(utils::Identifier("minecraft", "brown_wool"), new Block());
-const Block* Blocks::GREEN_WOOL = registerBlock(utils::Identifier("minecraft", "green_wool"), new Block());
-const Block* Blocks::RED_WOOL = registerBlock(utils::Identifier("minecraft", "red_wool"), new Block());
-const Block* Blocks::BLACK_WOOL = registerBlock(utils::Identifier("minecraft", "black_wool"), new Block());
-const Block* Blocks::MOVING_PISTON = registerBlock(utils::Identifier("minecraft", "moving_piston"), new Block());
-const Block* Blocks::DANDELION = registerBlock(utils::Identifier("minecraft", "dandelion"), new Block());
-const Block* Blocks::TORCHFLOWER = registerBlock(utils::Identifier("minecraft", "torchflower"), new Block());
-const Block* Blocks::POPPY = registerBlock(utils::Identifier("minecraft", "poppy"), new Block());
-const Block* Blocks::BLUE_ORCHID = registerBlock(utils::Identifier("minecraft", "blue_orchid"), new Block());
-const Block* Blocks::ALLIUM = registerBlock(utils::Identifier("minecraft", "allium"), new Block());
-const Block* Blocks::AZURE_BLUET = registerBlock(utils::Identifier("minecraft", "azure_bluet"), new Block());
-const Block* Blocks::RED_TULIP = registerBlock(utils::Identifier("minecraft", "red_tulip"), new Block());
-const Block* Blocks::ORANGE_TULIP = registerBlock(utils::Identifier("minecraft", "orange_tulip"), new Block());
-const Block* Blocks::WHITE_TULIP = registerBlock(utils::Identifier("minecraft", "white_tulip"), new Block());
-const Block* Blocks::PINK_TULIP = registerBlock(utils::Identifier("minecraft", "pink_tulip"), new Block());
-const Block* Blocks::OXEYE_DAISY = registerBlock(utils::Identifier("minecraft", "oxeye_daisy"), new Block());
-const Block* Blocks::CORNFLOWER = registerBlock(utils::Identifier("minecraft", "cornflower"), new Block());
-const Block* Blocks::WITHER_ROSE = registerBlock(utils::Identifier("minecraft", "wither_rose"), new Block());
-const Block* Blocks::LILY_OF_THE_VALLEY = registerBlock(utils::Identifier("minecraft", "lily_of_the_valley"), new Block());
-const Block* Blocks::BROWN_MUSHROOM = registerBlock(utils::Identifier("minecraft", "brown_mushroom"), new Block());
-const Block* Blocks::RED_MUSHROOM = registerBlock(utils::Identifier("minecraft", "red_mushroom"), new Block());
-const Block* Blocks::GOLD_BLOCK = registerBlock(utils::Identifier("minecraft", "gold_block"), new Block());
-const Block* Blocks::IRON_BLOCK = registerBlock(utils::Identifier("minecraft", "iron_block"), new Block());
-const Block* Blocks::BRICKS = registerBlock(utils::Identifier("minecraft", "bricks"), new Block());
-const Block* Blocks::TNT = registerBlock(utils::Identifier("minecraft", "tnt"), new Block());
-const Block* Blocks::BOOKSHELF = registerBlock(utils::Identifier("minecraft", "bookshelf"), new Block());
-const Block* Blocks::CHISELED_BOOKSHELF = registerBlock(utils::Identifier("minecraft", "chiseled_bookshelf"), new Block());
-const Block* Blocks::MOSSY_COBBLESTONE = registerBlock(utils::Identifier("minecraft", "mossy_cobblestone"), new Block());
-const Block* Blocks::OBSIDIAN = registerBlock(utils::Identifier("minecraft", "obsidian"), new Block());
-const Block* Blocks::TORCH = registerBlock(utils::Identifier("minecraft", "torch"), new Block());
-const Block* Blocks::WALL_TORCH = registerBlock(utils::Identifier("minecraft", "wall_torch"), new Block());
-const Block* Blocks::FIRE = registerBlock(utils::Identifier("minecraft", "fire"), new Block());
-const Block* Blocks::SOUL_FIRE = registerBlock(utils::Identifier("minecraft", "soul_fire"), new Block());
-const Block* Blocks::SPAWNER = registerBlock(utils::Identifier("minecraft", "spawner"), new Block());
-const Block* Blocks::CREAKING_HEART = registerBlock(utils::Identifier("minecraft", "creaking_heart"), new Block());
-const Block* Blocks::OAK_STAIRS = registerBlock(utils::Identifier("minecraft", "oak_stairs"), new Block());
-const Block* Blocks::CHEST = registerBlock(utils::Identifier("minecraft", "chest"), new Block());
-const Block* Blocks::REDSTONE_WIRE = registerBlock(utils::Identifier("minecraft", "redstone_wire"), new Block());
-const Block* Blocks::DIAMOND_ORE = registerBlock(utils::Identifier("minecraft", "diamond_ore"), new Block());
-const Block* Blocks::DEEPSLATE_DIAMOND_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_diamond_ore"), new Block());
-const Block* Blocks::DIAMOND_BLOCK = registerBlock(utils::Identifier("minecraft", "diamond_block"), new Block());
-const Block* Blocks::CRAFTING_TABLE = registerBlock(utils::Identifier("minecraft", "crafting_table"), new Block());
-const Block* Blocks::WHEAT = registerBlock(utils::Identifier("minecraft", "wheat"), new Block());
-const Block* Blocks::FARMLAND = registerBlock(utils::Identifier("minecraft", "farmland"), new Block());
-const Block* Blocks::FURNACE = registerBlock(utils::Identifier("minecraft", "furnace"), new Block());
-const Block* Blocks::OAK_SIGN = registerBlock(utils::Identifier("minecraft", "oak_sign"), new Block());
-const Block* Blocks::SPRUCE_SIGN = registerBlock(utils::Identifier("minecraft", "spruce_sign"), new Block());
-const Block* Blocks::BIRCH_SIGN = registerBlock(utils::Identifier("minecraft", "birch_sign"), new Block());
-const Block* Blocks::ACACIA_SIGN = registerBlock(utils::Identifier("minecraft", "acacia_sign"), new Block());
-const Block* Blocks::CHERRY_SIGN = registerBlock(utils::Identifier("minecraft", "cherry_sign"), new Block());
-const Block* Blocks::JUNGLE_SIGN = registerBlock(utils::Identifier("minecraft", "jungle_sign"), new Block());
-const Block* Blocks::DARK_OAK_SIGN = registerBlock(utils::Identifier("minecraft", "dark_oak_sign"), new Block());
-const Block* Blocks::PALE_OAK_SIGN = registerBlock(utils::Identifier("minecraft", "pale_oak_sign"), new Block());
-const Block* Blocks::MANGROVE_SIGN = registerBlock(utils::Identifier("minecraft", "mangrove_sign"), new Block());
-const Block* Blocks::BAMBOO_SIGN = registerBlock(utils::Identifier("minecraft", "bamboo_sign"), new Block());
-const Block* Blocks::OAK_DOOR = registerBlock(utils::Identifier("minecraft", "oak_door"), new Block());
-const Block* Blocks::LADDER = registerBlock(utils::Identifier("minecraft", "ladder"), new Block());
-const Block* Blocks::RAIL = registerBlock(utils::Identifier("minecraft", "rail"), new Block());
-const Block* Blocks::COBBLESTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "cobblestone_stairs"), new Block());
-const Block* Blocks::OAK_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "oak_wall_sign"), new Block());
-const Block* Blocks::SPRUCE_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "spruce_wall_sign"), new Block());
-const Block* Blocks::BIRCH_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "birch_wall_sign"), new Block());
-const Block* Blocks::ACACIA_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "acacia_wall_sign"), new Block());
-const Block* Blocks::CHERRY_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "cherry_wall_sign"), new Block());
-const Block* Blocks::JUNGLE_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "jungle_wall_sign"), new Block());
-const Block* Blocks::DARK_OAK_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "dark_oak_wall_sign"), new Block());
-const Block* Blocks::PALE_OAK_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "pale_oak_wall_sign"), new Block());
-const Block* Blocks::MANGROVE_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "mangrove_wall_sign"), new Block());
-const Block* Blocks::BAMBOO_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "bamboo_wall_sign"), new Block());
-const Block* Blocks::OAK_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "oak_hanging_sign"), new Block());
-const Block* Blocks::SPRUCE_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "spruce_hanging_sign"), new Block());
-const Block* Blocks::BIRCH_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "birch_hanging_sign"), new Block());
-const Block* Blocks::ACACIA_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "acacia_hanging_sign"), new Block());
-const Block* Blocks::CHERRY_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "cherry_hanging_sign"), new Block());
-const Block* Blocks::JUNGLE_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "jungle_hanging_sign"), new Block());
-const Block* Blocks::DARK_OAK_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "dark_oak_hanging_sign"), new Block());
-const Block* Blocks::PALE_OAK_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "pale_oak_hanging_sign"), new Block());
-const Block* Blocks::CRIMSON_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "crimson_hanging_sign"), new Block());
-const Block* Blocks::WARPED_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "warped_hanging_sign"), new Block());
-const Block* Blocks::MANGROVE_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "mangrove_hanging_sign"), new Block());
-const Block* Blocks::BAMBOO_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "bamboo_hanging_sign"), new Block());
-const Block* Blocks::OAK_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "oak_wall_hanging_sign"), new Block());
-const Block* Blocks::SPRUCE_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "spruce_wall_hanging_sign"), new Block());
-const Block* Blocks::BIRCH_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "birch_wall_hanging_sign"), new Block());
-const Block* Blocks::ACACIA_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "acacia_wall_hanging_sign"), new Block());
-const Block* Blocks::CHERRY_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "cherry_wall_hanging_sign"), new Block());
-const Block* Blocks::JUNGLE_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "jungle_wall_hanging_sign"), new Block());
-const Block* Blocks::DARK_OAK_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "dark_oak_wall_hanging_sign"), new Block());
-const Block* Blocks::PALE_OAK_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "pale_oak_wall_hanging_sign"), new Block());
-const Block* Blocks::MANGROVE_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "mangrove_wall_hanging_sign"), new Block());
-const Block* Blocks::CRIMSON_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "crimson_wall_hanging_sign"), new Block());
-const Block* Blocks::WARPED_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "warped_wall_hanging_sign"), new Block());
-const Block* Blocks::BAMBOO_WALL_HANGING_SIGN = registerBlock(utils::Identifier("minecraft", "bamboo_wall_hanging_sign"), new Block());
-const Block* Blocks::LEVER = registerBlock(utils::Identifier("minecraft", "lever"), new Block());
-const Block* Blocks::STONE_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "stone_pressure_plate"), new Block());
-const Block* Blocks::IRON_DOOR = registerBlock(utils::Identifier("minecraft", "iron_door"), new Block());
-const Block* Blocks::OAK_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "oak_pressure_plate"), new Block());
-const Block* Blocks::SPRUCE_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "spruce_pressure_plate"), new Block());
-const Block* Blocks::BIRCH_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "birch_pressure_plate"), new Block());
-const Block* Blocks::JUNGLE_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "jungle_pressure_plate"), new Block());
-const Block* Blocks::ACACIA_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "acacia_pressure_plate"), new Block());
-const Block* Blocks::CHERRY_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "cherry_pressure_plate"), new Block());
-const Block* Blocks::DARK_OAK_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "dark_oak_pressure_plate"), new Block());
-const Block* Blocks::PALE_OAK_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "pale_oak_pressure_plate"), new Block());
-const Block* Blocks::MANGROVE_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "mangrove_pressure_plate"), new Block());
-const Block* Blocks::BAMBOO_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "bamboo_pressure_plate"), new Block());
-const Block* Blocks::REDSTONE_ORE = registerBlock(utils::Identifier("minecraft", "redstone_ore"), new Block());
-const Block* Blocks::DEEPSLATE_REDSTONE_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_redstone_ore"), new Block());
-const Block* Blocks::REDSTONE_TORCH = registerBlock(utils::Identifier("minecraft", "redstone_torch"), new Block());
-const Block* Blocks::REDSTONE_WALL_TORCH = registerBlock(utils::Identifier("minecraft", "redstone_wall_torch"), new Block());
-const Block* Blocks::STONE_BUTTON = registerBlock(utils::Identifier("minecraft", "stone_button"), new Block());
-const Block* Blocks::SNOW = registerBlock(utils::Identifier("minecraft", "snow"), new Block());
-const Block* Blocks::ICE = registerBlock(utils::Identifier("minecraft", "ice"), new Block());
-const Block* Blocks::SNOW_BLOCK = registerBlock(utils::Identifier("minecraft", "snow_block"), new Block());
-const Block* Blocks::CACTUS = registerBlock(utils::Identifier("minecraft", "cactus"), new Block());
-const Block* Blocks::CACTUS_FLOWER = registerBlock(utils::Identifier("minecraft", "cactus_flower"), new Block());
-const Block* Blocks::CLAY = registerBlock(utils::Identifier("minecraft", "clay"), new Block());
-const Block* Blocks::SUGAR_CANE = registerBlock(utils::Identifier("minecraft", "sugar_cane"), new Block());
-const Block* Blocks::JUKEBOX = registerBlock(utils::Identifier("minecraft", "jukebox"), new Block());
-const Block* Blocks::OAK_FENCE = registerBlock(utils::Identifier("minecraft", "oak_fence"), new Block());
-const Block* Blocks::NETHERRACK = registerBlock(utils::Identifier("minecraft", "netherrack"), new Block());
-const Block* Blocks::SOUL_SAND = registerBlock(utils::Identifier("minecraft", "soul_sand"), new Block());
-const Block* Blocks::SOUL_SOIL = registerBlock(utils::Identifier("minecraft", "soul_soil"), new Block());
-const Block* Blocks::BASALT = registerBlock(utils::Identifier("minecraft", "basalt"), new Block());
-const Block* Blocks::POLISHED_BASALT = registerBlock(utils::Identifier("minecraft", "polished_basalt"), new Block());
-const Block* Blocks::SOUL_TORCH = registerBlock(utils::Identifier("minecraft", "soul_torch"), new Block());
-const Block* Blocks::SOUL_WALL_TORCH = registerBlock(utils::Identifier("minecraft", "soul_wall_torch"), new Block());
-const Block* Blocks::GLOWSTONE = registerBlock(utils::Identifier("minecraft", "glowstone"), new Block());
-const Block* Blocks::NETHER_PORTAL = registerBlock(utils::Identifier("minecraft", "nether_portal"), new Block());
-const Block* Blocks::CARVED_PUMPKIN = registerBlock(utils::Identifier("minecraft", "carved_pumpkin"), new Block());
-const Block* Blocks::JACK_O_LANTERN = registerBlock(utils::Identifier("minecraft", "jack_o_lantern"), new Block());
-const Block* Blocks::CAKE = registerBlock(utils::Identifier("minecraft", "cake"), new Block());
-const Block* Blocks::REPEATER = registerBlock(utils::Identifier("minecraft", "repeater"), new Block());
-const Block* Blocks::WHITE_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "white_stained_glass"), new Block());
-const Block* Blocks::ORANGE_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "orange_stained_glass"), new Block());
-const Block* Blocks::MAGENTA_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "magenta_stained_glass"), new Block());
-const Block* Blocks::LIGHT_BLUE_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "light_blue_stained_glass"), new Block());
-const Block* Blocks::YELLOW_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "yellow_stained_glass"), new Block());
-const Block* Blocks::LIME_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "lime_stained_glass"), new Block());
-const Block* Blocks::PINK_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "pink_stained_glass"), new Block());
-const Block* Blocks::GRAY_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "gray_stained_glass"), new Block());
-const Block* Blocks::LIGHT_GRAY_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "light_gray_stained_glass"), new Block());
-const Block* Blocks::CYAN_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "cyan_stained_glass"), new Block());
-const Block* Blocks::PURPLE_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "purple_stained_glass"), new Block());
-const Block* Blocks::BLUE_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "blue_stained_glass"), new Block());
-const Block* Blocks::BROWN_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "brown_stained_glass"), new Block());
-const Block* Blocks::GREEN_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "green_stained_glass"), new Block());
-const Block* Blocks::RED_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "red_stained_glass"), new Block());
-const Block* Blocks::BLACK_STAINED_GLASS = registerBlock(utils::Identifier("minecraft", "black_stained_glass"), new Block());
-const Block* Blocks::OAK_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "oak_trapdoor"), new Block());
-const Block* Blocks::SPRUCE_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "spruce_trapdoor"), new Block());
-const Block* Blocks::BIRCH_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "birch_trapdoor"), new Block());
-const Block* Blocks::JUNGLE_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "jungle_trapdoor"), new Block());
-const Block* Blocks::ACACIA_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "acacia_trapdoor"), new Block());
-const Block* Blocks::CHERRY_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "cherry_trapdoor"), new Block());
-const Block* Blocks::DARK_OAK_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "dark_oak_trapdoor"), new Block());
-const Block* Blocks::PALE_OAK_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "pale_oak_trapdoor"), new Block());
-const Block* Blocks::MANGROVE_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "mangrove_trapdoor"), new Block());
-const Block* Blocks::BAMBOO_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "bamboo_trapdoor"), new Block());
-const Block* Blocks::STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "stone_bricks"), new Block());
-const Block* Blocks::MOSSY_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "mossy_stone_bricks"), new Block());
-const Block* Blocks::CRACKED_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "cracked_stone_bricks"), new Block());
-const Block* Blocks::CHISELED_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "chiseled_stone_bricks"), new Block());
-const Block* Blocks::PACKED_MUD = registerBlock(utils::Identifier("minecraft", "packed_mud"), new Block());
-const Block* Blocks::MUD_BRICKS = registerBlock(utils::Identifier("minecraft", "mud_bricks"), new Block());
-const Block* Blocks::INFESTED_STONE = registerBlock(utils::Identifier("minecraft", "infested_stone"), new Block());
-const Block* Blocks::INFESTED_COBBLESTONE = registerBlock(utils::Identifier("minecraft", "infested_cobblestone"), new Block());
-const Block* Blocks::INFESTED_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "infested_stone_bricks"), new Block());
-const Block* Blocks::INFESTED_MOSSY_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "infested_mossy_stone_bricks"), new Block());
-const Block* Blocks::INFESTED_CRACKED_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "infested_cracked_stone_bricks"), new Block());
-const Block* Blocks::INFESTED_CHISELED_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "infested_chiseled_stone_bricks"), new Block());
-const Block* Blocks::BROWN_MUSHROOM_BLOCK = registerBlock(utils::Identifier("minecraft", "brown_mushroom_block"), new Block());
-const Block* Blocks::RED_MUSHROOM_BLOCK = registerBlock(utils::Identifier("minecraft", "red_mushroom_block"), new Block());
-const Block* Blocks::MUSHROOM_STEM = registerBlock(utils::Identifier("minecraft", "mushroom_stem"), new Block());
-const Block* Blocks::IRON_BARS = registerBlock(utils::Identifier("minecraft", "iron_bars"), new Block());
-const Block* Blocks::CHAIN = registerBlock(utils::Identifier("minecraft", "chain"), new Block());
-const Block* Blocks::GLASS_PANE = registerBlock(utils::Identifier("minecraft", "glass_pane"), new Block());
-const Block* Blocks::PUMPKIN = registerBlock(utils::Identifier("minecraft", "pumpkin"), new Block());
-const Block* Blocks::MELON = registerBlock(utils::Identifier("minecraft", "melon"), new Block());
-const Block* Blocks::ATTACHED_PUMPKIN_STEM = registerBlock(utils::Identifier("minecraft", "attached_pumpkin_stem"), new Block());
-const Block* Blocks::ATTACHED_MELON_STEM = registerBlock(utils::Identifier("minecraft", "attached_melon_stem"), new Block());
-const Block* Blocks::PUMPKIN_STEM = registerBlock(utils::Identifier("minecraft", "pumpkin_stem"), new Block());
-const Block* Blocks::MELON_STEM = registerBlock(utils::Identifier("minecraft", "melon_stem"), new Block());
-const Block* Blocks::VINE = registerBlock(utils::Identifier("minecraft", "vine"), new Block());
-const Block* Blocks::GLOW_LICHEN = registerBlock(utils::Identifier("minecraft", "glow_lichen"), new Block());
-const Block* Blocks::RESIN_CLUMP = registerBlock(utils::Identifier("minecraft", "resin_clump"), new Block());
-const Block* Blocks::OAK_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "oak_fence_gate"), new Block());
-const Block* Blocks::BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "brick_stairs"), new Block());
-const Block* Blocks::STONE_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "stone_brick_stairs"), new Block());
-const Block* Blocks::MUD_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "mud_brick_stairs"), new Block());
-const Block* Blocks::MYCELIUM = registerBlock(utils::Identifier("minecraft", "mycelium"), new Block());
-const Block* Blocks::LILY_PAD = registerBlock(utils::Identifier("minecraft", "lily_pad"), new Block());
-const Block* Blocks::RESIN_BLOCK = registerBlock(utils::Identifier("minecraft", "resin_block"), new Block());
-const Block* Blocks::RESIN_BRICKS = registerBlock(utils::Identifier("minecraft", "resin_bricks"), new Block());
-const Block* Blocks::RESIN_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "resin_brick_stairs"), new Block());
-const Block* Blocks::RESIN_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "resin_brick_slab"), new Block());
-const Block* Blocks::RESIN_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "resin_brick_wall"), new Block());
-const Block* Blocks::CHISELED_RESIN_BRICKS = registerBlock(utils::Identifier("minecraft", "chiseled_resin_bricks"), new Block());
-const Block* Blocks::NETHER_BRICKS = registerBlock(utils::Identifier("minecraft", "nether_bricks"), new Block());
-const Block* Blocks::NETHER_BRICK_FENCE = registerBlock(utils::Identifier("minecraft", "nether_brick_fence"), new Block());
-const Block* Blocks::NETHER_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "nether_brick_stairs"), new Block());
-const Block* Blocks::NETHER_WART = registerBlock(utils::Identifier("minecraft", "nether_wart"), new Block());
-const Block* Blocks::ENCHANTING_TABLE = registerBlock(utils::Identifier("minecraft", "enchanting_table"), new Block());
-const Block* Blocks::BREWING_STAND = registerBlock(utils::Identifier("minecraft", "brewing_stand"), new Block());
-const Block* Blocks::CAULDRON = registerBlock(utils::Identifier("minecraft", "cauldron"), new Block());
-const Block* Blocks::WATER_CAULDRON = registerBlock(utils::Identifier("minecraft", "water_cauldron"), new Block());
-const Block* Blocks::LAVA_CAULDRON = registerBlock(utils::Identifier("minecraft", "lava_cauldron"), new Block());
-const Block* Blocks::POWDER_SNOW_CAULDRON = registerBlock(utils::Identifier("minecraft", "powder_snow_cauldron"), new Block());
-const Block* Blocks::END_PORTAL = registerBlock(utils::Identifier("minecraft", "end_portal"), new Block());
-const Block* Blocks::END_PORTAL_FRAME = registerBlock(utils::Identifier("minecraft", "end_portal_frame"), new Block());
-const Block* Blocks::END_STONE = registerBlock(utils::Identifier("minecraft", "end_stone"), new Block());
-const Block* Blocks::DRAGON_EGG = registerBlock(utils::Identifier("minecraft", "dragon_egg"), new Block());
-const Block* Blocks::REDSTONE_LAMP = registerBlock(utils::Identifier("minecraft", "redstone_lamp"), new Block());
-const Block* Blocks::COCOA = registerBlock(utils::Identifier("minecraft", "cocoa"), new Block());
-const Block* Blocks::SANDSTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "sandstone_stairs"), new Block());
-const Block* Blocks::EMERALD_ORE = registerBlock(utils::Identifier("minecraft", "emerald_ore"), new Block());
-const Block* Blocks::DEEPSLATE_EMERALD_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_emerald_ore"), new Block());
-const Block* Blocks::ENDER_CHEST = registerBlock(utils::Identifier("minecraft", "ender_chest"), new Block());
-const Block* Blocks::TRIPWIRE_HOOK = registerBlock(utils::Identifier("minecraft", "tripwire_hook"), new Block());
-const Block* Blocks::TRIPWIRE = registerBlock(utils::Identifier("minecraft", "tripwire"), new Block());
-const Block* Blocks::EMERALD_BLOCK = registerBlock(utils::Identifier("minecraft", "emerald_block"), new Block());
-const Block* Blocks::SPRUCE_STAIRS = registerBlock(utils::Identifier("minecraft", "spruce_stairs"), new Block());
-const Block* Blocks::BIRCH_STAIRS = registerBlock(utils::Identifier("minecraft", "birch_stairs"), new Block());
-const Block* Blocks::JUNGLE_STAIRS = registerBlock(utils::Identifier("minecraft", "jungle_stairs"), new Block());
-const Block* Blocks::COMMAND_BLOCK = registerBlock(utils::Identifier("minecraft", "command_block"), new Block());
-const Block* Blocks::BEACON = registerBlock(utils::Identifier("minecraft", "beacon"), new Block());
-const Block* Blocks::COBBLESTONE_WALL = registerBlock(utils::Identifier("minecraft", "cobblestone_wall"), new Block());
-const Block* Blocks::MOSSY_COBBLESTONE_WALL = registerBlock(utils::Identifier("minecraft", "mossy_cobblestone_wall"), new Block());
-const Block* Blocks::FLOWER_POT = registerBlock(utils::Identifier("minecraft", "flower_pot"), new Block());
-const Block* Blocks::POTTED_TORCHFLOWER = registerBlock(utils::Identifier("minecraft", "potted_torchflower"), new Block());
-const Block* Blocks::POTTED_OAK_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_oak_sapling"), new Block());
-const Block* Blocks::POTTED_SPRUCE_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_spruce_sapling"), new Block());
-const Block* Blocks::POTTED_BIRCH_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_birch_sapling"), new Block());
-const Block* Blocks::POTTED_JUNGLE_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_jungle_sapling"), new Block());
-const Block* Blocks::POTTED_ACACIA_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_acacia_sapling"), new Block());
-const Block* Blocks::POTTED_CHERRY_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_cherry_sapling"), new Block());
-const Block* Blocks::POTTED_DARK_OAK_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_dark_oak_sapling"), new Block());
-const Block* Blocks::POTTED_PALE_OAK_SAPLING = registerBlock(utils::Identifier("minecraft", "potted_pale_oak_sapling"), new Block());
-const Block* Blocks::POTTED_MANGROVE_PROPAGULE = registerBlock(utils::Identifier("minecraft", "potted_mangrove_propagule"), new Block());
-const Block* Blocks::POTTED_FERN = registerBlock(utils::Identifier("minecraft", "potted_fern"), new Block());
-const Block* Blocks::POTTED_DANDELION = registerBlock(utils::Identifier("minecraft", "potted_dandelion"), new Block());
-const Block* Blocks::POTTED_POPPY = registerBlock(utils::Identifier("minecraft", "potted_poppy"), new Block());
-const Block* Blocks::POTTED_BLUE_ORCHID = registerBlock(utils::Identifier("minecraft", "potted_blue_orchid"), new Block());
-const Block* Blocks::POTTED_ALLIUM = registerBlock(utils::Identifier("minecraft", "potted_allium"), new Block());
-const Block* Blocks::POTTED_AZURE_BLUET = registerBlock(utils::Identifier("minecraft", "potted_azure_bluet"), new Block());
-const Block* Blocks::POTTED_RED_TULIP = registerBlock(utils::Identifier("minecraft", "potted_red_tulip"), new Block());
-const Block* Blocks::POTTED_ORANGE_TULIP = registerBlock(utils::Identifier("minecraft", "potted_orange_tulip"), new Block());
-const Block* Blocks::POTTED_WHITE_TULIP = registerBlock(utils::Identifier("minecraft", "potted_white_tulip"), new Block());
-const Block* Blocks::POTTED_PINK_TULIP = registerBlock(utils::Identifier("minecraft", "potted_pink_tulip"), new Block());
-const Block* Blocks::POTTED_OXEYE_DAISY = registerBlock(utils::Identifier("minecraft", "potted_oxeye_daisy"), new Block());
-const Block* Blocks::POTTED_CORNFLOWER = registerBlock(utils::Identifier("minecraft", "potted_cornflower"), new Block());
-const Block* Blocks::POTTED_LILY_OF_THE_VALLEY = registerBlock(utils::Identifier("minecraft", "potted_lily_of_the_valley"), new Block());
-const Block* Blocks::POTTED_WITHER_ROSE = registerBlock(utils::Identifier("minecraft", "potted_wither_rose"), new Block());
-const Block* Blocks::POTTED_RED_MUSHROOM = registerBlock(utils::Identifier("minecraft", "potted_red_mushroom"), new Block());
-const Block* Blocks::POTTED_BROWN_MUSHROOM = registerBlock(utils::Identifier("minecraft", "potted_brown_mushroom"), new Block());
-const Block* Blocks::POTTED_DEAD_BUSH = registerBlock(utils::Identifier("minecraft", "potted_dead_bush"), new Block());
-const Block* Blocks::POTTED_CACTUS = registerBlock(utils::Identifier("minecraft", "potted_cactus"), new Block());
-const Block* Blocks::CARROTS = registerBlock(utils::Identifier("minecraft", "carrots"), new Block());
-const Block* Blocks::POTATOES = registerBlock(utils::Identifier("minecraft", "potatoes"), new Block());
-const Block* Blocks::OAK_BUTTON = registerBlock(utils::Identifier("minecraft", "oak_button"), new Block());
-const Block* Blocks::SPRUCE_BUTTON = registerBlock(utils::Identifier("minecraft", "spruce_button"), new Block());
-const Block* Blocks::BIRCH_BUTTON = registerBlock(utils::Identifier("minecraft", "birch_button"), new Block());
-const Block* Blocks::JUNGLE_BUTTON = registerBlock(utils::Identifier("minecraft", "jungle_button"), new Block());
-const Block* Blocks::ACACIA_BUTTON = registerBlock(utils::Identifier("minecraft", "acacia_button"), new Block());
-const Block* Blocks::CHERRY_BUTTON = registerBlock(utils::Identifier("minecraft", "cherry_button"), new Block());
-const Block* Blocks::DARK_OAK_BUTTON = registerBlock(utils::Identifier("minecraft", "dark_oak_button"), new Block());
-const Block* Blocks::PALE_OAK_BUTTON = registerBlock(utils::Identifier("minecraft", "pale_oak_button"), new Block());
-const Block* Blocks::MANGROVE_BUTTON = registerBlock(utils::Identifier("minecraft", "mangrove_button"), new Block());
-const Block* Blocks::BAMBOO_BUTTON = registerBlock(utils::Identifier("minecraft", "bamboo_button"), new Block());
-const Block* Blocks::SKELETON_SKULL = registerBlock(utils::Identifier("minecraft", "skeleton_skull"), new Block());
-const Block* Blocks::SKELETON_WALL_SKULL = registerBlock(utils::Identifier("minecraft", "skeleton_wall_skull"), new Block());
-const Block* Blocks::WITHER_SKELETON_SKULL = registerBlock(utils::Identifier("minecraft", "wither_skeleton_skull"), new Block());
-const Block* Blocks::WITHER_SKELETON_WALL_SKULL = registerBlock(utils::Identifier("minecraft", "wither_skeleton_wall_skull"), new Block());
-const Block* Blocks::ZOMBIE_HEAD = registerBlock(utils::Identifier("minecraft", "zombie_head"), new Block());
-const Block* Blocks::ZOMBIE_WALL_HEAD = registerBlock(utils::Identifier("minecraft", "zombie_wall_head"), new Block());
-const Block* Blocks::PLAYER_HEAD = registerBlock(utils::Identifier("minecraft", "player_head"), new Block());
-const Block* Blocks::PLAYER_WALL_HEAD = registerBlock(utils::Identifier("minecraft", "player_wall_head"), new Block());
-const Block* Blocks::CREEPER_HEAD = registerBlock(utils::Identifier("minecraft", "creeper_head"), new Block());
-const Block* Blocks::CREEPER_WALL_HEAD = registerBlock(utils::Identifier("minecraft", "creeper_wall_head"), new Block());
-const Block* Blocks::DRAGON_HEAD = registerBlock(utils::Identifier("minecraft", "dragon_head"), new Block());
-const Block* Blocks::DRAGON_WALL_HEAD = registerBlock(utils::Identifier("minecraft", "dragon_wall_head"), new Block());
-const Block* Blocks::PIGLIN_HEAD = registerBlock(utils::Identifier("minecraft", "piglin_head"), new Block());
-const Block* Blocks::PIGLIN_WALL_HEAD = registerBlock(utils::Identifier("minecraft", "piglin_wall_head"), new Block());
-const Block* Blocks::ANVIL = registerBlock(utils::Identifier("minecraft", "anvil"), new Block());
-const Block* Blocks::CHIPPED_ANVIL = registerBlock(utils::Identifier("minecraft", "chipped_anvil"), new Block());
-const Block* Blocks::DAMAGED_ANVIL = registerBlock(utils::Identifier("minecraft", "damaged_anvil"), new Block());
-const Block* Blocks::TRAPPED_CHEST = registerBlock(utils::Identifier("minecraft", "trapped_chest"), new Block());
-const Block* Blocks::LIGHT_WEIGHTED_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "light_weighted_pressure_plate"), new Block());
-const Block* Blocks::HEAVY_WEIGHTED_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "heavy_weighted_pressure_plate"), new Block());
-const Block* Blocks::COMPARATOR = registerBlock(utils::Identifier("minecraft", "comparator"), new Block());
-const Block* Blocks::DAYLIGHT_DETECTOR = registerBlock(utils::Identifier("minecraft", "daylight_detector"), new Block());
-const Block* Blocks::REDSTONE_BLOCK = registerBlock(utils::Identifier("minecraft", "redstone_block"), new Block());
-const Block* Blocks::NETHER_QUARTZ_ORE = registerBlock(utils::Identifier("minecraft", "nether_quartz_ore"), new Block());
-const Block* Blocks::HOPPER = registerBlock(utils::Identifier("minecraft", "hopper"), new Block());
-const Block* Blocks::QUARTZ_BLOCK = registerBlock(utils::Identifier("minecraft", "quartz_block"), new Block());
-const Block* Blocks::CHISELED_QUARTZ_BLOCK = registerBlock(utils::Identifier("minecraft", "chiseled_quartz_block"), new Block());
-const Block* Blocks::QUARTZ_PILLAR = registerBlock(utils::Identifier("minecraft", "quartz_pillar"), new Block());
-const Block* Blocks::QUARTZ_STAIRS = registerBlock(utils::Identifier("minecraft", "quartz_stairs"), new Block());
-const Block* Blocks::ACTIVATOR_RAIL = registerBlock(utils::Identifier("minecraft", "activator_rail"), new Block());
-const Block* Blocks::DROPPER = registerBlock(utils::Identifier("minecraft", "dropper"), new Block());
-const Block* Blocks::WHITE_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "white_terracotta"), new Block());
-const Block* Blocks::ORANGE_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "orange_terracotta"), new Block());
-const Block* Blocks::MAGENTA_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "magenta_terracotta"), new Block());
-const Block* Blocks::LIGHT_BLUE_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "light_blue_terracotta"), new Block());
-const Block* Blocks::YELLOW_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "yellow_terracotta"), new Block());
-const Block* Blocks::LIME_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "lime_terracotta"), new Block());
-const Block* Blocks::PINK_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "pink_terracotta"), new Block());
-const Block* Blocks::GRAY_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "gray_terracotta"), new Block());
-const Block* Blocks::LIGHT_GRAY_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "light_gray_terracotta"), new Block());
-const Block* Blocks::CYAN_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "cyan_terracotta"), new Block());
-const Block* Blocks::PURPLE_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "purple_terracotta"), new Block());
-const Block* Blocks::BLUE_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "blue_terracotta"), new Block());
-const Block* Blocks::BROWN_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "brown_terracotta"), new Block());
-const Block* Blocks::GREEN_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "green_terracotta"), new Block());
-const Block* Blocks::RED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "red_terracotta"), new Block());
-const Block* Blocks::BLACK_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "black_terracotta"), new Block());
-const Block* Blocks::WHITE_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "white_stained_glass_pane"), new Block());
-const Block* Blocks::ORANGE_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "orange_stained_glass_pane"), new Block());
-const Block* Blocks::MAGENTA_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "magenta_stained_glass_pane"), new Block());
-const Block* Blocks::LIGHT_BLUE_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "light_blue_stained_glass_pane"), new Block());
-const Block* Blocks::YELLOW_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "yellow_stained_glass_pane"), new Block());
-const Block* Blocks::LIME_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "lime_stained_glass_pane"), new Block());
-const Block* Blocks::PINK_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "pink_stained_glass_pane"), new Block());
-const Block* Blocks::GRAY_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "gray_stained_glass_pane"), new Block());
-const Block* Blocks::LIGHT_GRAY_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "light_gray_stained_glass_pane"), new Block());
-const Block* Blocks::CYAN_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "cyan_stained_glass_pane"), new Block());
-const Block* Blocks::PURPLE_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "purple_stained_glass_pane"), new Block());
-const Block* Blocks::BLUE_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "blue_stained_glass_pane"), new Block());
-const Block* Blocks::BROWN_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "brown_stained_glass_pane"), new Block());
-const Block* Blocks::GREEN_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "green_stained_glass_pane"), new Block());
-const Block* Blocks::RED_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "red_stained_glass_pane"), new Block());
-const Block* Blocks::BLACK_STAINED_GLASS_PANE = registerBlock(utils::Identifier("minecraft", "black_stained_glass_pane"), new Block());
-const Block* Blocks::ACACIA_STAIRS = registerBlock(utils::Identifier("minecraft", "acacia_stairs"), new Block());
-const Block* Blocks::CHERRY_STAIRS = registerBlock(utils::Identifier("minecraft", "cherry_stairs"), new Block());
-const Block* Blocks::DARK_OAK_STAIRS = registerBlock(utils::Identifier("minecraft", "dark_oak_stairs"), new Block());
-const Block* Blocks::PALE_OAK_STAIRS = registerBlock(utils::Identifier("minecraft", "pale_oak_stairs"), new Block());
-const Block* Blocks::MANGROVE_STAIRS = registerBlock(utils::Identifier("minecraft", "mangrove_stairs"), new Block());
-const Block* Blocks::BAMBOO_STAIRS = registerBlock(utils::Identifier("minecraft", "bamboo_stairs"), new Block());
-const Block* Blocks::BAMBOO_MOSAIC_STAIRS = registerBlock(utils::Identifier("minecraft", "bamboo_mosaic_stairs"), new Block());
-const Block* Blocks::SLIME_BLOCK = registerBlock(utils::Identifier("minecraft", "slime_block"), new Block());
-const Block* Blocks::BARRIER = registerBlock(utils::Identifier("minecraft", "barrier"), new Block());
-const Block* Blocks::LIGHT = registerBlock(utils::Identifier("minecraft", "light"), new Block());
-const Block* Blocks::IRON_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "iron_trapdoor"), new Block());
-const Block* Blocks::PRISMARINE = registerBlock(utils::Identifier("minecraft", "prismarine"), new Block());
-const Block* Blocks::PRISMARINE_BRICKS = registerBlock(utils::Identifier("minecraft", "prismarine_bricks"), new Block());
-const Block* Blocks::DARK_PRISMARINE = registerBlock(utils::Identifier("minecraft", "dark_prismarine"), new Block());
-const Block* Blocks::PRISMARINE_STAIRS = registerBlock(utils::Identifier("minecraft", "prismarine_stairs"), new Block());
-const Block* Blocks::PRISMARINE_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "prismarine_brick_stairs"), new Block());
-const Block* Blocks::DARK_PRISMARINE_STAIRS = registerBlock(utils::Identifier("minecraft", "dark_prismarine_stairs"), new Block());
-const Block* Blocks::PRISMARINE_SLAB = registerBlock(utils::Identifier("minecraft", "prismarine_slab"), new Block());
-const Block* Blocks::PRISMARINE_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "prismarine_brick_slab"), new Block());
-const Block* Blocks::DARK_PRISMARINE_SLAB = registerBlock(utils::Identifier("minecraft", "dark_prismarine_slab"), new Block());
-const Block* Blocks::SEA_LANTERN = registerBlock(utils::Identifier("minecraft", "sea_lantern"), new Block());
-const Block* Blocks::HAY_BLOCK = registerBlock(utils::Identifier("minecraft", "hay_block"), new Block());
-const Block* Blocks::WHITE_CARPET = registerBlock(utils::Identifier("minecraft", "white_carpet"), new Block());
-const Block* Blocks::ORANGE_CARPET = registerBlock(utils::Identifier("minecraft", "orange_carpet"), new Block());
-const Block* Blocks::MAGENTA_CARPET = registerBlock(utils::Identifier("minecraft", "magenta_carpet"), new Block());
-const Block* Blocks::LIGHT_BLUE_CARPET = registerBlock(utils::Identifier("minecraft", "light_blue_carpet"), new Block());
-const Block* Blocks::YELLOW_CARPET = registerBlock(utils::Identifier("minecraft", "yellow_carpet"), new Block());
-const Block* Blocks::LIME_CARPET = registerBlock(utils::Identifier("minecraft", "lime_carpet"), new Block());
-const Block* Blocks::PINK_CARPET = registerBlock(utils::Identifier("minecraft", "pink_carpet"), new Block());
-const Block* Blocks::GRAY_CARPET = registerBlock(utils::Identifier("minecraft", "gray_carpet"), new Block());
-const Block* Blocks::LIGHT_GRAY_CARPET = registerBlock(utils::Identifier("minecraft", "light_gray_carpet"), new Block());
-const Block* Blocks::CYAN_CARPET = registerBlock(utils::Identifier("minecraft", "cyan_carpet"), new Block());
-const Block* Blocks::PURPLE_CARPET = registerBlock(utils::Identifier("minecraft", "purple_carpet"), new Block());
-const Block* Blocks::BLUE_CARPET = registerBlock(utils::Identifier("minecraft", "blue_carpet"), new Block());
-const Block* Blocks::BROWN_CARPET = registerBlock(utils::Identifier("minecraft", "brown_carpet"), new Block());
-const Block* Blocks::GREEN_CARPET = registerBlock(utils::Identifier("minecraft", "green_carpet"), new Block());
-const Block* Blocks::RED_CARPET = registerBlock(utils::Identifier("minecraft", "red_carpet"), new Block());
-const Block* Blocks::BLACK_CARPET = registerBlock(utils::Identifier("minecraft", "black_carpet"), new Block());
-const Block* Blocks::TERRACOTTA = registerBlock(utils::Identifier("minecraft", "terracotta"), new Block());
-const Block* Blocks::COAL_BLOCK = registerBlock(utils::Identifier("minecraft", "coal_block"), new Block());
-const Block* Blocks::PACKED_ICE = registerBlock(utils::Identifier("minecraft", "packed_ice"), new Block());
-const Block* Blocks::SUNFLOWER = registerBlock(utils::Identifier("minecraft", "sunflower"), new Block());
-const Block* Blocks::LILAC = registerBlock(utils::Identifier("minecraft", "lilac"), new Block());
-const Block* Blocks::ROSE_BUSH = registerBlock(utils::Identifier("minecraft", "rose_bush"), new Block());
-const Block* Blocks::PEONY = registerBlock(utils::Identifier("minecraft", "peony"), new Block());
-const Block* Blocks::TALL_GRASS = registerBlock(utils::Identifier("minecraft", "tall_grass"), new Block());
-const Block* Blocks::LARGE_FERN = registerBlock(utils::Identifier("minecraft", "large_fern"), new Block());
-const Block* Blocks::WHITE_BANNER = registerBlock(utils::Identifier("minecraft", "white_banner"), new Block());
-const Block* Blocks::ORANGE_BANNER = registerBlock(utils::Identifier("minecraft", "orange_banner"), new Block());
-const Block* Blocks::MAGENTA_BANNER = registerBlock(utils::Identifier("minecraft", "magenta_banner"), new Block());
-const Block* Blocks::LIGHT_BLUE_BANNER = registerBlock(utils::Identifier("minecraft", "light_blue_banner"), new Block());
-const Block* Blocks::YELLOW_BANNER = registerBlock(utils::Identifier("minecraft", "yellow_banner"), new Block());
-const Block* Blocks::LIME_BANNER = registerBlock(utils::Identifier("minecraft", "lime_banner"), new Block());
-const Block* Blocks::PINK_BANNER = registerBlock(utils::Identifier("minecraft", "pink_banner"), new Block());
-const Block* Blocks::GRAY_BANNER = registerBlock(utils::Identifier("minecraft", "gray_banner"), new Block());
-const Block* Blocks::LIGHT_GRAY_BANNER = registerBlock(utils::Identifier("minecraft", "light_gray_banner"), new Block());
-const Block* Blocks::CYAN_BANNER = registerBlock(utils::Identifier("minecraft", "cyan_banner"), new Block());
-const Block* Blocks::PURPLE_BANNER = registerBlock(utils::Identifier("minecraft", "purple_banner"), new Block());
-const Block* Blocks::BLUE_BANNER = registerBlock(utils::Identifier("minecraft", "blue_banner"), new Block());
-const Block* Blocks::BROWN_BANNER = registerBlock(utils::Identifier("minecraft", "brown_banner"), new Block());
-const Block* Blocks::GREEN_BANNER = registerBlock(utils::Identifier("minecraft", "green_banner"), new Block());
-const Block* Blocks::RED_BANNER = registerBlock(utils::Identifier("minecraft", "red_banner"), new Block());
-const Block* Blocks::BLACK_BANNER = registerBlock(utils::Identifier("minecraft", "black_banner"), new Block());
-const Block* Blocks::WHITE_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "white_wall_banner"), new Block());
-const Block* Blocks::ORANGE_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "orange_wall_banner"), new Block());
-const Block* Blocks::MAGENTA_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "magenta_wall_banner"), new Block());
-const Block* Blocks::LIGHT_BLUE_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "light_blue_wall_banner"), new Block());
-const Block* Blocks::YELLOW_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "yellow_wall_banner"), new Block());
-const Block* Blocks::LIME_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "lime_wall_banner"), new Block());
-const Block* Blocks::PINK_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "pink_wall_banner"), new Block());
-const Block* Blocks::GRAY_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "gray_wall_banner"), new Block());
-const Block* Blocks::LIGHT_GRAY_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "light_gray_wall_banner"), new Block());
-const Block* Blocks::CYAN_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "cyan_wall_banner"), new Block());
-const Block* Blocks::PURPLE_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "purple_wall_banner"), new Block());
-const Block* Blocks::BLUE_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "blue_wall_banner"), new Block());
-const Block* Blocks::BROWN_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "brown_wall_banner"), new Block());
-const Block* Blocks::GREEN_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "green_wall_banner"), new Block());
-const Block* Blocks::RED_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "red_wall_banner"), new Block());
-const Block* Blocks::BLACK_WALL_BANNER = registerBlock(utils::Identifier("minecraft", "black_wall_banner"), new Block());
-const Block* Blocks::RED_SANDSTONE = registerBlock(utils::Identifier("minecraft", "red_sandstone"), new Block());
-const Block* Blocks::CHISELED_RED_SANDSTONE = registerBlock(utils::Identifier("minecraft", "chiseled_red_sandstone"), new Block());
-const Block* Blocks::CUT_RED_SANDSTONE = registerBlock(utils::Identifier("minecraft", "cut_red_sandstone"), new Block());
-const Block* Blocks::RED_SANDSTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "red_sandstone_stairs"), new Block());
-const Block* Blocks::OAK_SLAB = registerBlock(utils::Identifier("minecraft", "oak_slab"), new Block());
-const Block* Blocks::SPRUCE_SLAB = registerBlock(utils::Identifier("minecraft", "spruce_slab"), new Block());
-const Block* Blocks::BIRCH_SLAB = registerBlock(utils::Identifier("minecraft", "birch_slab"), new Block());
-const Block* Blocks::JUNGLE_SLAB = registerBlock(utils::Identifier("minecraft", "jungle_slab"), new Block());
-const Block* Blocks::ACACIA_SLAB = registerBlock(utils::Identifier("minecraft", "acacia_slab"), new Block());
-const Block* Blocks::CHERRY_SLAB = registerBlock(utils::Identifier("minecraft", "cherry_slab"), new Block());
-const Block* Blocks::DARK_OAK_SLAB = registerBlock(utils::Identifier("minecraft", "dark_oak_slab"), new Block());
-const Block* Blocks::PALE_OAK_SLAB = registerBlock(utils::Identifier("minecraft", "pale_oak_slab"), new Block());
-const Block* Blocks::MANGROVE_SLAB = registerBlock(utils::Identifier("minecraft", "mangrove_slab"), new Block());
-const Block* Blocks::BAMBOO_SLAB = registerBlock(utils::Identifier("minecraft", "bamboo_slab"), new Block());
-const Block* Blocks::BAMBOO_MOSAIC_SLAB = registerBlock(utils::Identifier("minecraft", "bamboo_mosaic_slab"), new Block());
-const Block* Blocks::STONE_SLAB = registerBlock(utils::Identifier("minecraft", "stone_slab"), new Block());
-const Block* Blocks::SMOOTH_STONE_SLAB = registerBlock(utils::Identifier("minecraft", "smooth_stone_slab"), new Block());
-const Block* Blocks::SANDSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "sandstone_slab"), new Block());
-const Block* Blocks::CUT_SANDSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "cut_sandstone_slab"), new Block());
-const Block* Blocks::PETRIFIED_OAK_SLAB = registerBlock(utils::Identifier("minecraft", "petrified_oak_slab"), new Block());
-const Block* Blocks::COBBLESTONE_SLAB = registerBlock(utils::Identifier("minecraft", "cobblestone_slab"), new Block());
-const Block* Blocks::BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "brick_slab"), new Block());
-const Block* Blocks::STONE_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "stone_brick_slab"), new Block());
-const Block* Blocks::MUD_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "mud_brick_slab"), new Block());
-const Block* Blocks::NETHER_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "nether_brick_slab"), new Block());
-const Block* Blocks::QUARTZ_SLAB = registerBlock(utils::Identifier("minecraft", "quartz_slab"), new Block());
-const Block* Blocks::RED_SANDSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "red_sandstone_slab"), new Block());
-const Block* Blocks::CUT_RED_SANDSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "cut_red_sandstone_slab"), new Block());
-const Block* Blocks::PURPUR_SLAB = registerBlock(utils::Identifier("minecraft", "purpur_slab"), new Block());
-const Block* Blocks::SMOOTH_STONE = registerBlock(utils::Identifier("minecraft", "smooth_stone"), new Block());
-const Block* Blocks::SMOOTH_SANDSTONE = registerBlock(utils::Identifier("minecraft", "smooth_sandstone"), new Block());
-const Block* Blocks::SMOOTH_QUARTZ = registerBlock(utils::Identifier("minecraft", "smooth_quartz"), new Block());
-const Block* Blocks::SMOOTH_RED_SANDSTONE = registerBlock(utils::Identifier("minecraft", "smooth_red_sandstone"), new Block());
-const Block* Blocks::SPRUCE_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "spruce_fence_gate"), new Block());
-const Block* Blocks::BIRCH_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "birch_fence_gate"), new Block());
-const Block* Blocks::JUNGLE_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "jungle_fence_gate"), new Block());
-const Block* Blocks::ACACIA_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "acacia_fence_gate"), new Block());
-const Block* Blocks::CHERRY_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "cherry_fence_gate"), new Block());
-const Block* Blocks::DARK_OAK_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "dark_oak_fence_gate"), new Block());
-const Block* Blocks::PALE_OAK_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "pale_oak_fence_gate"), new Block());
-const Block* Blocks::MANGROVE_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "mangrove_fence_gate"), new Block());
-const Block* Blocks::BAMBOO_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "bamboo_fence_gate"), new Block());
-const Block* Blocks::SPRUCE_FENCE = registerBlock(utils::Identifier("minecraft", "spruce_fence"), new Block());
-const Block* Blocks::BIRCH_FENCE = registerBlock(utils::Identifier("minecraft", "birch_fence"), new Block());
-const Block* Blocks::JUNGLE_FENCE = registerBlock(utils::Identifier("minecraft", "jungle_fence"), new Block());
-const Block* Blocks::ACACIA_FENCE = registerBlock(utils::Identifier("minecraft", "acacia_fence"), new Block());
-const Block* Blocks::CHERRY_FENCE = registerBlock(utils::Identifier("minecraft", "cherry_fence"), new Block());
-const Block* Blocks::DARK_OAK_FENCE = registerBlock(utils::Identifier("minecraft", "dark_oak_fence"), new Block());
-const Block* Blocks::PALE_OAK_FENCE = registerBlock(utils::Identifier("minecraft", "pale_oak_fence"), new Block());
-const Block* Blocks::MANGROVE_FENCE = registerBlock(utils::Identifier("minecraft", "mangrove_fence"), new Block());
-const Block* Blocks::BAMBOO_FENCE = registerBlock(utils::Identifier("minecraft", "bamboo_fence"), new Block());
-const Block* Blocks::SPRUCE_DOOR = registerBlock(utils::Identifier("minecraft", "spruce_door"), new Block());
-const Block* Blocks::BIRCH_DOOR = registerBlock(utils::Identifier("minecraft", "birch_door"), new Block());
-const Block* Blocks::JUNGLE_DOOR = registerBlock(utils::Identifier("minecraft", "jungle_door"), new Block());
-const Block* Blocks::ACACIA_DOOR = registerBlock(utils::Identifier("minecraft", "acacia_door"), new Block());
-const Block* Blocks::CHERRY_DOOR = registerBlock(utils::Identifier("minecraft", "cherry_door"), new Block());
-const Block* Blocks::DARK_OAK_DOOR = registerBlock(utils::Identifier("minecraft", "dark_oak_door"), new Block());
-const Block* Blocks::PALE_OAK_DOOR = registerBlock(utils::Identifier("minecraft", "pale_oak_door"), new Block());
-const Block* Blocks::MANGROVE_DOOR = registerBlock(utils::Identifier("minecraft", "mangrove_door"), new Block());
-const Block* Blocks::BAMBOO_DOOR = registerBlock(utils::Identifier("minecraft", "bamboo_door"), new Block());
-const Block* Blocks::END_ROD = registerBlock(utils::Identifier("minecraft", "end_rod"), new Block());
-const Block* Blocks::CHORUS_PLANT = registerBlock(utils::Identifier("minecraft", "chorus_plant"), new Block());
-const Block* Blocks::CHORUS_FLOWER = registerBlock(utils::Identifier("minecraft", "chorus_flower"), new Block());
-const Block* Blocks::PURPUR_BLOCK = registerBlock(utils::Identifier("minecraft", "purpur_block"), new Block());
-const Block* Blocks::PURPUR_PILLAR = registerBlock(utils::Identifier("minecraft", "purpur_pillar"), new Block());
-const Block* Blocks::PURPUR_STAIRS = registerBlock(utils::Identifier("minecraft", "purpur_stairs"), new Block());
-const Block* Blocks::END_STONE_BRICKS = registerBlock(utils::Identifier("minecraft", "end_stone_bricks"), new Block());
-const Block* Blocks::TORCHFLOWER_CROP = registerBlock(utils::Identifier("minecraft", "torchflower_crop"), new Block());
-const Block* Blocks::PITCHER_CROP = registerBlock(utils::Identifier("minecraft", "pitcher_crop"), new Block());
-const Block* Blocks::PITCHER_PLANT = registerBlock(utils::Identifier("minecraft", "pitcher_plant"), new Block());
-const Block* Blocks::BEETROOTS = registerBlock(utils::Identifier("minecraft", "beetroots"), new Block());
-const Block* Blocks::DIRT_PATH = registerBlock(utils::Identifier("minecraft", "dirt_path"), new Block());
-const Block* Blocks::END_GATEWAY = registerBlock(utils::Identifier("minecraft", "end_gateway"), new Block());
-const Block* Blocks::REPEATING_COMMAND_BLOCK = registerBlock(utils::Identifier("minecraft", "repeating_command_block"), new Block());
-const Block* Blocks::CHAIN_COMMAND_BLOCK = registerBlock(utils::Identifier("minecraft", "chain_command_block"), new Block());
-const Block* Blocks::FROSTED_ICE = registerBlock(utils::Identifier("minecraft", "frosted_ice"), new Block());
-const Block* Blocks::MAGMA_BLOCK = registerBlock(utils::Identifier("minecraft", "magma_block"), new Block());
-const Block* Blocks::NETHER_WART_BLOCK = registerBlock(utils::Identifier("minecraft", "nether_wart_block"), new Block());
-const Block* Blocks::RED_NETHER_BRICKS = registerBlock(utils::Identifier("minecraft", "red_nether_bricks"), new Block());
-const Block* Blocks::BONE_BLOCK = registerBlock(utils::Identifier("minecraft", "bone_block"), new Block());
-const Block* Blocks::STRUCTURE_VOID = registerBlock(utils::Identifier("minecraft", "structure_void"), new Block());
-const Block* Blocks::OBSERVER = registerBlock(utils::Identifier("minecraft", "observer"), new Block());
-const Block* Blocks::SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "shulker_box"), new Block());
-const Block* Blocks::WHITE_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "white_shulker_box"), new Block());
-const Block* Blocks::ORANGE_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "orange_shulker_box"), new Block());
-const Block* Blocks::MAGENTA_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "magenta_shulker_box"), new Block());
-const Block* Blocks::LIGHT_BLUE_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "light_blue_shulker_box"), new Block());
-const Block* Blocks::YELLOW_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "yellow_shulker_box"), new Block());
-const Block* Blocks::LIME_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "lime_shulker_box"), new Block());
-const Block* Blocks::PINK_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "pink_shulker_box"), new Block());
-const Block* Blocks::GRAY_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "gray_shulker_box"), new Block());
-const Block* Blocks::LIGHT_GRAY_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "light_gray_shulker_box"), new Block());
-const Block* Blocks::CYAN_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "cyan_shulker_box"), new Block());
-const Block* Blocks::PURPLE_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "purple_shulker_box"), new Block());
-const Block* Blocks::BLUE_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "blue_shulker_box"), new Block());
-const Block* Blocks::BROWN_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "brown_shulker_box"), new Block());
-const Block* Blocks::GREEN_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "green_shulker_box"), new Block());
-const Block* Blocks::RED_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "red_shulker_box"), new Block());
-const Block* Blocks::BLACK_SHULKER_BOX = registerBlock(utils::Identifier("minecraft", "black_shulker_box"), new Block());
-const Block* Blocks::WHITE_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "white_glazed_terracotta"), new Block());
-const Block* Blocks::ORANGE_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "orange_glazed_terracotta"), new Block());
-const Block* Blocks::MAGENTA_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "magenta_glazed_terracotta"), new Block());
-const Block* Blocks::LIGHT_BLUE_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "light_blue_glazed_terracotta"), new Block());
-const Block* Blocks::YELLOW_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "yellow_glazed_terracotta"), new Block());
-const Block* Blocks::LIME_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "lime_glazed_terracotta"), new Block());
-const Block* Blocks::PINK_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "pink_glazed_terracotta"), new Block());
-const Block* Blocks::GRAY_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "gray_glazed_terracotta"), new Block());
-const Block* Blocks::LIGHT_GRAY_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "light_gray_glazed_terracotta"), new Block());
-const Block* Blocks::CYAN_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "cyan_glazed_terracotta"), new Block());
-const Block* Blocks::PURPLE_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "purple_glazed_terracotta"), new Block());
-const Block* Blocks::BLUE_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "blue_glazed_terracotta"), new Block());
-const Block* Blocks::BROWN_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "brown_glazed_terracotta"), new Block());
-const Block* Blocks::GREEN_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "green_glazed_terracotta"), new Block());
-const Block* Blocks::RED_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "red_glazed_terracotta"), new Block());
-const Block* Blocks::BLACK_GLAZED_TERRACOTTA = registerBlock(utils::Identifier("minecraft", "black_glazed_terracotta"), new Block());
-const Block* Blocks::WHITE_CONCRETE = registerBlock(utils::Identifier("minecraft", "white_concrete"), new Block());
-const Block* Blocks::ORANGE_CONCRETE = registerBlock(utils::Identifier("minecraft", "orange_concrete"), new Block());
-const Block* Blocks::MAGENTA_CONCRETE = registerBlock(utils::Identifier("minecraft", "magenta_concrete"), new Block());
-const Block* Blocks::LIGHT_BLUE_CONCRETE = registerBlock(utils::Identifier("minecraft", "light_blue_concrete"), new Block());
-const Block* Blocks::YELLOW_CONCRETE = registerBlock(utils::Identifier("minecraft", "yellow_concrete"), new Block());
-const Block* Blocks::LIME_CONCRETE = registerBlock(utils::Identifier("minecraft", "lime_concrete"), new Block());
-const Block* Blocks::PINK_CONCRETE = registerBlock(utils::Identifier("minecraft", "pink_concrete"), new Block());
-const Block* Blocks::GRAY_CONCRETE = registerBlock(utils::Identifier("minecraft", "gray_concrete"), new Block());
-const Block* Blocks::LIGHT_GRAY_CONCRETE = registerBlock(utils::Identifier("minecraft", "light_gray_concrete"), new Block());
-const Block* Blocks::CYAN_CONCRETE = registerBlock(utils::Identifier("minecraft", "cyan_concrete"), new Block());
-const Block* Blocks::PURPLE_CONCRETE = registerBlock(utils::Identifier("minecraft", "purple_concrete"), new Block());
-const Block* Blocks::BLUE_CONCRETE = registerBlock(utils::Identifier("minecraft", "blue_concrete"), new Block());
-const Block* Blocks::BROWN_CONCRETE = registerBlock(utils::Identifier("minecraft", "brown_concrete"), new Block());
-const Block* Blocks::GREEN_CONCRETE = registerBlock(utils::Identifier("minecraft", "green_concrete"), new Block());
-const Block* Blocks::RED_CONCRETE = registerBlock(utils::Identifier("minecraft", "red_concrete"), new Block());
-const Block* Blocks::BLACK_CONCRETE = registerBlock(utils::Identifier("minecraft", "black_concrete"), new Block());
-const Block* Blocks::WHITE_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "white_concrete_powder"), new Block());
-const Block* Blocks::ORANGE_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "orange_concrete_powder"), new Block());
-const Block* Blocks::MAGENTA_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "magenta_concrete_powder"), new Block());
-const Block* Blocks::LIGHT_BLUE_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "light_blue_concrete_powder"), new Block());
-const Block* Blocks::YELLOW_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "yellow_concrete_powder"), new Block());
-const Block* Blocks::LIME_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "lime_concrete_powder"), new Block());
-const Block* Blocks::PINK_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "pink_concrete_powder"), new Block());
-const Block* Blocks::GRAY_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "gray_concrete_powder"), new Block());
-const Block* Blocks::LIGHT_GRAY_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "light_gray_concrete_powder"), new Block());
-const Block* Blocks::CYAN_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "cyan_concrete_powder"), new Block());
-const Block* Blocks::PURPLE_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "purple_concrete_powder"), new Block());
-const Block* Blocks::BLUE_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "blue_concrete_powder"), new Block());
-const Block* Blocks::BROWN_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "brown_concrete_powder"), new Block());
-const Block* Blocks::GREEN_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "green_concrete_powder"), new Block());
-const Block* Blocks::RED_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "red_concrete_powder"), new Block());
-const Block* Blocks::BLACK_CONCRETE_POWDER = registerBlock(utils::Identifier("minecraft", "black_concrete_powder"), new Block());
-const Block* Blocks::KELP = registerBlock(utils::Identifier("minecraft", "kelp"), new Block());
-const Block* Blocks::KELP_PLANT = registerBlock(utils::Identifier("minecraft", "kelp_plant"), new Block());
-const Block* Blocks::DRIED_KELP_BLOCK = registerBlock(utils::Identifier("minecraft", "dried_kelp_block"), new Block());
-const Block* Blocks::TURTLE_EGG = registerBlock(utils::Identifier("minecraft", "turtle_egg"), new Block());
-const Block* Blocks::SNIFFER_EGG = registerBlock(utils::Identifier("minecraft", "sniffer_egg"), new Block());
-const Block* Blocks::DEAD_TUBE_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "dead_tube_coral_block"), new Block());
-const Block* Blocks::DEAD_BRAIN_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "dead_brain_coral_block"), new Block());
-const Block* Blocks::DEAD_BUBBLE_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "dead_bubble_coral_block"), new Block());
-const Block* Blocks::DEAD_FIRE_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "dead_fire_coral_block"), new Block());
-const Block* Blocks::DEAD_HORN_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "dead_horn_coral_block"), new Block());
-const Block* Blocks::TUBE_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "tube_coral_block"), new Block());
-const Block* Blocks::BRAIN_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "brain_coral_block"), new Block());
-const Block* Blocks::BUBBLE_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "bubble_coral_block"), new Block());
-const Block* Blocks::FIRE_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "fire_coral_block"), new Block());
-const Block* Blocks::HORN_CORAL_BLOCK = registerBlock(utils::Identifier("minecraft", "horn_coral_block"), new Block());
-const Block* Blocks::DEAD_TUBE_CORAL = registerBlock(utils::Identifier("minecraft", "dead_tube_coral"), new Block());
-const Block* Blocks::DEAD_BRAIN_CORAL = registerBlock(utils::Identifier("minecraft", "dead_brain_coral"), new Block());
-const Block* Blocks::DEAD_BUBBLE_CORAL = registerBlock(utils::Identifier("minecraft", "dead_bubble_coral"), new Block());
-const Block* Blocks::DEAD_FIRE_CORAL = registerBlock(utils::Identifier("minecraft", "dead_fire_coral"), new Block());
-const Block* Blocks::DEAD_HORN_CORAL = registerBlock(utils::Identifier("minecraft", "dead_horn_coral"), new Block());
-const Block* Blocks::TUBE_CORAL = registerBlock(utils::Identifier("minecraft", "tube_coral"), new Block());
-const Block* Blocks::BRAIN_CORAL = registerBlock(utils::Identifier("minecraft", "brain_coral"), new Block());
-const Block* Blocks::BUBBLE_CORAL = registerBlock(utils::Identifier("minecraft", "bubble_coral"), new Block());
-const Block* Blocks::FIRE_CORAL = registerBlock(utils::Identifier("minecraft", "fire_coral"), new Block());
-const Block* Blocks::HORN_CORAL = registerBlock(utils::Identifier("minecraft", "horn_coral"), new Block());
-const Block* Blocks::DEAD_TUBE_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "dead_tube_coral_fan"), new Block());
-const Block* Blocks::DEAD_BRAIN_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "dead_brain_coral_fan"), new Block());
-const Block* Blocks::DEAD_BUBBLE_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "dead_bubble_coral_fan"), new Block());
-const Block* Blocks::DEAD_FIRE_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "dead_fire_coral_fan"), new Block());
-const Block* Blocks::DEAD_HORN_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "dead_horn_coral_fan"), new Block());
-const Block* Blocks::TUBE_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "tube_coral_fan"), new Block());
-const Block* Blocks::BRAIN_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "brain_coral_fan"), new Block());
-const Block* Blocks::BUBBLE_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "bubble_coral_fan"), new Block());
-const Block* Blocks::FIRE_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "fire_coral_fan"), new Block());
-const Block* Blocks::HORN_CORAL_FAN = registerBlock(utils::Identifier("minecraft", "horn_coral_fan"), new Block());
-const Block* Blocks::DEAD_TUBE_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "dead_tube_coral_wall_fan"), new Block());
-const Block* Blocks::DEAD_BRAIN_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "dead_brain_coral_wall_fan"), new Block());
-const Block* Blocks::DEAD_BUBBLE_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "dead_bubble_coral_wall_fan"), new Block());
-const Block* Blocks::DEAD_FIRE_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "dead_fire_coral_wall_fan"), new Block());
-const Block* Blocks::DEAD_HORN_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "dead_horn_coral_wall_fan"), new Block());
-const Block* Blocks::TUBE_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "tube_coral_wall_fan"), new Block());
-const Block* Blocks::BRAIN_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "brain_coral_wall_fan"), new Block());
-const Block* Blocks::BUBBLE_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "bubble_coral_wall_fan"), new Block());
-const Block* Blocks::FIRE_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "fire_coral_wall_fan"), new Block());
-const Block* Blocks::HORN_CORAL_WALL_FAN = registerBlock(utils::Identifier("minecraft", "horn_coral_wall_fan"), new Block());
-const Block* Blocks::SEA_PICKLE = registerBlock(utils::Identifier("minecraft", "sea_pickle"), new Block());
-const Block* Blocks::BLUE_ICE = registerBlock(utils::Identifier("minecraft", "blue_ice"), new Block());
-const Block* Blocks::CONDUIT = registerBlock(utils::Identifier("minecraft", "conduit"), new Block());
-const Block* Blocks::BAMBOO_SAPLING = registerBlock(utils::Identifier("minecraft", "bamboo_sapling"), new Block());
-const Block* Blocks::BAMBOO = registerBlock(utils::Identifier("minecraft", "bamboo"), new Block());
-const Block* Blocks::POTTED_BAMBOO = registerBlock(utils::Identifier("minecraft", "potted_bamboo"), new Block());
-const Block* Blocks::VOID_AIR = registerBlock(utils::Identifier("minecraft", "void_air"), new Block());
-const Block* Blocks::CAVE_AIR = registerBlock(utils::Identifier("minecraft", "cave_air"), new Block());
-const Block* Blocks::BUBBLE_COLUMN = registerBlock(utils::Identifier("minecraft", "bubble_column"), new Block());
-const Block* Blocks::POLISHED_GRANITE_STAIRS = registerBlock(utils::Identifier("minecraft", "polished_granite_stairs"), new Block());
-const Block* Blocks::SMOOTH_RED_SANDSTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "smooth_red_sandstone_stairs"), new Block());
-const Block* Blocks::MOSSY_STONE_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "mossy_stone_brick_stairs"), new Block());
-const Block* Blocks::POLISHED_DIORITE_STAIRS = registerBlock(utils::Identifier("minecraft", "polished_diorite_stairs"), new Block());
-const Block* Blocks::MOSSY_COBBLESTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "mossy_cobblestone_stairs"), new Block());
-const Block* Blocks::END_STONE_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "end_stone_brick_stairs"), new Block());
-const Block* Blocks::STONE_STAIRS = registerBlock(utils::Identifier("minecraft", "stone_stairs"), new Block());
-const Block* Blocks::SMOOTH_SANDSTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "smooth_sandstone_stairs"), new Block());
-const Block* Blocks::SMOOTH_QUARTZ_STAIRS = registerBlock(utils::Identifier("minecraft", "smooth_quartz_stairs"), new Block());
-const Block* Blocks::GRANITE_STAIRS = registerBlock(utils::Identifier("minecraft", "granite_stairs"), new Block());
-const Block* Blocks::ANDESITE_STAIRS = registerBlock(utils::Identifier("minecraft", "andesite_stairs"), new Block());
-const Block* Blocks::RED_NETHER_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "red_nether_brick_stairs"), new Block());
-const Block* Blocks::POLISHED_ANDESITE_STAIRS = registerBlock(utils::Identifier("minecraft", "polished_andesite_stairs"), new Block());
-const Block* Blocks::DIORITE_STAIRS = registerBlock(utils::Identifier("minecraft", "diorite_stairs"), new Block());
-const Block* Blocks::POLISHED_GRANITE_SLAB = registerBlock(utils::Identifier("minecraft", "polished_granite_slab"), new Block());
-const Block* Blocks::SMOOTH_RED_SANDSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "smooth_red_sandstone_slab"), new Block());
-const Block* Blocks::MOSSY_STONE_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "mossy_stone_brick_slab"), new Block());
-const Block* Blocks::POLISHED_DIORITE_SLAB = registerBlock(utils::Identifier("minecraft", "polished_diorite_slab"), new Block());
-const Block* Blocks::MOSSY_COBBLESTONE_SLAB = registerBlock(utils::Identifier("minecraft", "mossy_cobblestone_slab"), new Block());
-const Block* Blocks::END_STONE_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "end_stone_brick_slab"), new Block());
-const Block* Blocks::SMOOTH_SANDSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "smooth_sandstone_slab"), new Block());
-const Block* Blocks::SMOOTH_QUARTZ_SLAB = registerBlock(utils::Identifier("minecraft", "smooth_quartz_slab"), new Block());
-const Block* Blocks::GRANITE_SLAB = registerBlock(utils::Identifier("minecraft", "granite_slab"), new Block());
-const Block* Blocks::ANDESITE_SLAB = registerBlock(utils::Identifier("minecraft", "andesite_slab"), new Block());
-const Block* Blocks::RED_NETHER_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "red_nether_brick_slab"), new Block());
-const Block* Blocks::POLISHED_ANDESITE_SLAB = registerBlock(utils::Identifier("minecraft", "polished_andesite_slab"), new Block());
-const Block* Blocks::DIORITE_SLAB = registerBlock(utils::Identifier("minecraft", "diorite_slab"), new Block());
-const Block* Blocks::BRICK_WALL = registerBlock(utils::Identifier("minecraft", "brick_wall"), new Block());
-const Block* Blocks::PRISMARINE_WALL = registerBlock(utils::Identifier("minecraft", "prismarine_wall"), new Block());
-const Block* Blocks::RED_SANDSTONE_WALL = registerBlock(utils::Identifier("minecraft", "red_sandstone_wall"), new Block());
-const Block* Blocks::MOSSY_STONE_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "mossy_stone_brick_wall"), new Block());
-const Block* Blocks::GRANITE_WALL = registerBlock(utils::Identifier("minecraft", "granite_wall"), new Block());
-const Block* Blocks::STONE_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "stone_brick_wall"), new Block());
-const Block* Blocks::MUD_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "mud_brick_wall"), new Block());
-const Block* Blocks::NETHER_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "nether_brick_wall"), new Block());
-const Block* Blocks::ANDESITE_WALL = registerBlock(utils::Identifier("minecraft", "andesite_wall"), new Block());
-const Block* Blocks::RED_NETHER_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "red_nether_brick_wall"), new Block());
-const Block* Blocks::SANDSTONE_WALL = registerBlock(utils::Identifier("minecraft", "sandstone_wall"), new Block());
-const Block* Blocks::END_STONE_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "end_stone_brick_wall"), new Block());
-const Block* Blocks::DIORITE_WALL = registerBlock(utils::Identifier("minecraft", "diorite_wall"), new Block());
-const Block* Blocks::SCAFFOLDING = registerBlock(utils::Identifier("minecraft", "scaffolding"), new Block());
-const Block* Blocks::LOOM = registerBlock(utils::Identifier("minecraft", "loom"), new Block());
-const Block* Blocks::BARREL = registerBlock(utils::Identifier("minecraft", "barrel"), new Block());
-const Block* Blocks::SMOKER = registerBlock(utils::Identifier("minecraft", "smoker"), new Block());
-const Block* Blocks::BLAST_FURNACE = registerBlock(utils::Identifier("minecraft", "blast_furnace"), new Block());
-const Block* Blocks::CARTOGRAPHY_TABLE = registerBlock(utils::Identifier("minecraft", "cartography_table"), new Block());
-const Block* Blocks::FLETCHING_TABLE = registerBlock(utils::Identifier("minecraft", "fletching_table"), new Block());
-const Block* Blocks::GRINDSTONE = registerBlock(utils::Identifier("minecraft", "grindstone"), new Block());
-const Block* Blocks::LECTERN = registerBlock(utils::Identifier("minecraft", "lectern"), new Block());
-const Block* Blocks::SMITHING_TABLE = registerBlock(utils::Identifier("minecraft", "smithing_table"), new Block());
-const Block* Blocks::STONECUTTER = registerBlock(utils::Identifier("minecraft", "stonecutter"), new Block());
-const Block* Blocks::BELL = registerBlock(utils::Identifier("minecraft", "bell"), new Block());
-const Block* Blocks::LANTERN = registerBlock(utils::Identifier("minecraft", "lantern"), new Block());
-const Block* Blocks::SOUL_LANTERN = registerBlock(utils::Identifier("minecraft", "soul_lantern"), new Block());
-const Block* Blocks::CAMPFIRE = registerBlock(utils::Identifier("minecraft", "campfire"), new Block());
-const Block* Blocks::SOUL_CAMPFIRE = registerBlock(utils::Identifier("minecraft", "soul_campfire"), new Block());
-const Block* Blocks::SWEET_BERRY_BUSH = registerBlock(utils::Identifier("minecraft", "sweet_berry_bush"), new Block());
-const Block* Blocks::WARPED_STEM = registerBlock(utils::Identifier("minecraft", "warped_stem"), new Block());
-const Block* Blocks::STRIPPED_WARPED_STEM = registerBlock(utils::Identifier("minecraft", "stripped_warped_stem"), new Block());
-const Block* Blocks::WARPED_HYPHAE = registerBlock(utils::Identifier("minecraft", "warped_hyphae"), new Block());
-const Block* Blocks::STRIPPED_WARPED_HYPHAE = registerBlock(utils::Identifier("minecraft", "stripped_warped_hyphae"), new Block());
-const Block* Blocks::WARPED_NYLIUM = registerBlock(utils::Identifier("minecraft", "warped_nylium"), new Block());
-const Block* Blocks::WARPED_FUNGUS = registerBlock(utils::Identifier("minecraft", "warped_fungus"), new Block());
-const Block* Blocks::WARPED_WART_BLOCK = registerBlock(utils::Identifier("minecraft", "warped_wart_block"), new Block());
-const Block* Blocks::WARPED_ROOTS = registerBlock(utils::Identifier("minecraft", "warped_roots"), new Block());
-const Block* Blocks::NETHER_SPROUTS = registerBlock(utils::Identifier("minecraft", "nether_sprouts"), new Block());
-const Block* Blocks::CRIMSON_STEM = registerBlock(utils::Identifier("minecraft", "crimson_stem"), new Block());
-const Block* Blocks::STRIPPED_CRIMSON_STEM = registerBlock(utils::Identifier("minecraft", "stripped_crimson_stem"), new Block());
-const Block* Blocks::CRIMSON_HYPHAE = registerBlock(utils::Identifier("minecraft", "crimson_hyphae"), new Block());
-const Block* Blocks::STRIPPED_CRIMSON_HYPHAE = registerBlock(utils::Identifier("minecraft", "stripped_crimson_hyphae"), new Block());
-const Block* Blocks::CRIMSON_NYLIUM = registerBlock(utils::Identifier("minecraft", "crimson_nylium"), new Block());
-const Block* Blocks::CRIMSON_FUNGUS = registerBlock(utils::Identifier("minecraft", "crimson_fungus"), new Block());
-const Block* Blocks::SHROOMLIGHT = registerBlock(utils::Identifier("minecraft", "shroomlight"), new Block());
-const Block* Blocks::WEEPING_VINES = registerBlock(utils::Identifier("minecraft", "weeping_vines"), new Block());
-const Block* Blocks::WEEPING_VINES_PLANT = registerBlock(utils::Identifier("minecraft", "weeping_vines_plant"), new Block());
-const Block* Blocks::TWISTING_VINES = registerBlock(utils::Identifier("minecraft", "twisting_vines"), new Block());
-const Block* Blocks::TWISTING_VINES_PLANT = registerBlock(utils::Identifier("minecraft", "twisting_vines_plant"), new Block());
-const Block* Blocks::CRIMSON_ROOTS = registerBlock(utils::Identifier("minecraft", "crimson_roots"), new Block());
-const Block* Blocks::CRIMSON_PLANKS = registerBlock(utils::Identifier("minecraft", "crimson_planks"), new Block());
-const Block* Blocks::WARPED_PLANKS = registerBlock(utils::Identifier("minecraft", "warped_planks"), new Block());
-const Block* Blocks::CRIMSON_SLAB = registerBlock(utils::Identifier("minecraft", "crimson_slab"), new Block());
-const Block* Blocks::WARPED_SLAB = registerBlock(utils::Identifier("minecraft", "warped_slab"), new Block());
-const Block* Blocks::CRIMSON_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "crimson_pressure_plate"), new Block());
-const Block* Blocks::WARPED_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "warped_pressure_plate"), new Block());
-const Block* Blocks::CRIMSON_FENCE = registerBlock(utils::Identifier("minecraft", "crimson_fence"), new Block());
-const Block* Blocks::WARPED_FENCE = registerBlock(utils::Identifier("minecraft", "warped_fence"), new Block());
-const Block* Blocks::CRIMSON_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "crimson_trapdoor"), new Block());
-const Block* Blocks::WARPED_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "warped_trapdoor"), new Block());
-const Block* Blocks::CRIMSON_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "crimson_fence_gate"), new Block());
-const Block* Blocks::WARPED_FENCE_GATE = registerBlock(utils::Identifier("minecraft", "warped_fence_gate"), new Block());
-const Block* Blocks::CRIMSON_STAIRS = registerBlock(utils::Identifier("minecraft", "crimson_stairs"), new Block());
-const Block* Blocks::WARPED_STAIRS = registerBlock(utils::Identifier("minecraft", "warped_stairs"), new Block());
-const Block* Blocks::CRIMSON_BUTTON = registerBlock(utils::Identifier("minecraft", "crimson_button"), new Block());
-const Block* Blocks::WARPED_BUTTON = registerBlock(utils::Identifier("minecraft", "warped_button"), new Block());
-const Block* Blocks::CRIMSON_DOOR = registerBlock(utils::Identifier("minecraft", "crimson_door"), new Block());
-const Block* Blocks::WARPED_DOOR = registerBlock(utils::Identifier("minecraft", "warped_door"), new Block());
-const Block* Blocks::CRIMSON_SIGN = registerBlock(utils::Identifier("minecraft", "crimson_sign"), new Block());
-const Block* Blocks::WARPED_SIGN = registerBlock(utils::Identifier("minecraft", "warped_sign"), new Block());
-const Block* Blocks::CRIMSON_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "crimson_wall_sign"), new Block());
-const Block* Blocks::WARPED_WALL_SIGN = registerBlock(utils::Identifier("minecraft", "warped_wall_sign"), new Block());
-const Block* Blocks::STRUCTURE_BLOCK = registerBlock(utils::Identifier("minecraft", "structure_block"), new Block());
-const Block* Blocks::JIGSAW = registerBlock(utils::Identifier("minecraft", "jigsaw"), new Block());
-const Block* Blocks::TEST_BLOCK = registerBlock(utils::Identifier("minecraft", "test_block"), new Block());
-const Block* Blocks::TEST_INSTANCE_BLOCK = registerBlock(utils::Identifier("minecraft", "test_instance_block"), new Block());
-const Block* Blocks::COMPOSTER = registerBlock(utils::Identifier("minecraft", "composter"), new Block());
-const Block* Blocks::TARGET = registerBlock(utils::Identifier("minecraft", "target"), new Block());
-const Block* Blocks::BEE_NEST = registerBlock(utils::Identifier("minecraft", "bee_nest"), new Block());
-const Block* Blocks::BEEHIVE = registerBlock(utils::Identifier("minecraft", "beehive"), new Block());
-const Block* Blocks::HONEY_BLOCK = registerBlock(utils::Identifier("minecraft", "honey_block"), new Block());
-const Block* Blocks::HONEYCOMB_BLOCK = registerBlock(utils::Identifier("minecraft", "honeycomb_block"), new Block());
-const Block* Blocks::NETHERITE_BLOCK = registerBlock(utils::Identifier("minecraft", "netherite_block"), new Block());
-const Block* Blocks::ANCIENT_DEBRIS = registerBlock(utils::Identifier("minecraft", "ancient_debris"), new Block());
-const Block* Blocks::CRYING_OBSIDIAN = registerBlock(utils::Identifier("minecraft", "crying_obsidian"), new Block());
-const Block* Blocks::RESPAWN_ANCHOR = registerBlock(utils::Identifier("minecraft", "respawn_anchor"), new Block());
-const Block* Blocks::POTTED_CRIMSON_FUNGUS = registerBlock(utils::Identifier("minecraft", "potted_crimson_fungus"), new Block());
-const Block* Blocks::POTTED_WARPED_FUNGUS = registerBlock(utils::Identifier("minecraft", "potted_warped_fungus"), new Block());
-const Block* Blocks::POTTED_CRIMSON_ROOTS = registerBlock(utils::Identifier("minecraft", "potted_crimson_roots"), new Block());
-const Block* Blocks::POTTED_WARPED_ROOTS = registerBlock(utils::Identifier("minecraft", "potted_warped_roots"), new Block());
-const Block* Blocks::LODESTONE = registerBlock(utils::Identifier("minecraft", "lodestone"), new Block());
-const Block* Blocks::BLACKSTONE = registerBlock(utils::Identifier("minecraft", "blackstone"), new Block());
-const Block* Blocks::BLACKSTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "blackstone_stairs"), new Block());
-const Block* Blocks::BLACKSTONE_WALL = registerBlock(utils::Identifier("minecraft", "blackstone_wall"), new Block());
-const Block* Blocks::BLACKSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "blackstone_slab"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE = registerBlock(utils::Identifier("minecraft", "polished_blackstone"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_BRICKS = registerBlock(utils::Identifier("minecraft", "polished_blackstone_bricks"), new Block());
-const Block* Blocks::CRACKED_POLISHED_BLACKSTONE_BRICKS = registerBlock(utils::Identifier("minecraft", "cracked_polished_blackstone_bricks"), new Block());
-const Block* Blocks::CHISELED_POLISHED_BLACKSTONE = registerBlock(utils::Identifier("minecraft", "chiseled_polished_blackstone"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "polished_blackstone_brick_slab"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "polished_blackstone_brick_stairs"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "polished_blackstone_brick_wall"), new Block());
-const Block* Blocks::GILDED_BLACKSTONE = registerBlock(utils::Identifier("minecraft", "gilded_blackstone"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_STAIRS = registerBlock(utils::Identifier("minecraft", "polished_blackstone_stairs"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_SLAB = registerBlock(utils::Identifier("minecraft", "polished_blackstone_slab"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_PRESSURE_PLATE = registerBlock(utils::Identifier("minecraft", "polished_blackstone_pressure_plate"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_BUTTON = registerBlock(utils::Identifier("minecraft", "polished_blackstone_button"), new Block());
-const Block* Blocks::POLISHED_BLACKSTONE_WALL = registerBlock(utils::Identifier("minecraft", "polished_blackstone_wall"), new Block());
-const Block* Blocks::CHISELED_NETHER_BRICKS = registerBlock(utils::Identifier("minecraft", "chiseled_nether_bricks"), new Block());
-const Block* Blocks::CRACKED_NETHER_BRICKS = registerBlock(utils::Identifier("minecraft", "cracked_nether_bricks"), new Block());
-const Block* Blocks::QUARTZ_BRICKS = registerBlock(utils::Identifier("minecraft", "quartz_bricks"), new Block());
-const Block* Blocks::CANDLE = registerBlock(utils::Identifier("minecraft", "candle"), new Block());
-const Block* Blocks::WHITE_CANDLE = registerBlock(utils::Identifier("minecraft", "white_candle"), new Block());
-const Block* Blocks::ORANGE_CANDLE = registerBlock(utils::Identifier("minecraft", "orange_candle"), new Block());
-const Block* Blocks::MAGENTA_CANDLE = registerBlock(utils::Identifier("minecraft", "magenta_candle"), new Block());
-const Block* Blocks::LIGHT_BLUE_CANDLE = registerBlock(utils::Identifier("minecraft", "light_blue_candle"), new Block());
-const Block* Blocks::YELLOW_CANDLE = registerBlock(utils::Identifier("minecraft", "yellow_candle"), new Block());
-const Block* Blocks::LIME_CANDLE = registerBlock(utils::Identifier("minecraft", "lime_candle"), new Block());
-const Block* Blocks::PINK_CANDLE = registerBlock(utils::Identifier("minecraft", "pink_candle"), new Block());
-const Block* Blocks::GRAY_CANDLE = registerBlock(utils::Identifier("minecraft", "gray_candle"), new Block());
-const Block* Blocks::LIGHT_GRAY_CANDLE = registerBlock(utils::Identifier("minecraft", "light_gray_candle"), new Block());
-const Block* Blocks::CYAN_CANDLE = registerBlock(utils::Identifier("minecraft", "cyan_candle"), new Block());
-const Block* Blocks::PURPLE_CANDLE = registerBlock(utils::Identifier("minecraft", "purple_candle"), new Block());
-const Block* Blocks::BLUE_CANDLE = registerBlock(utils::Identifier("minecraft", "blue_candle"), new Block());
-const Block* Blocks::BROWN_CANDLE = registerBlock(utils::Identifier("minecraft", "brown_candle"), new Block());
-const Block* Blocks::GREEN_CANDLE = registerBlock(utils::Identifier("minecraft", "green_candle"), new Block());
-const Block* Blocks::RED_CANDLE = registerBlock(utils::Identifier("minecraft", "red_candle"), new Block());
-const Block* Blocks::BLACK_CANDLE = registerBlock(utils::Identifier("minecraft", "black_candle"), new Block());
-const Block* Blocks::CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "candle_cake"), new Block());
-const Block* Blocks::WHITE_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "white_candle_cake"), new Block());
-const Block* Blocks::ORANGE_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "orange_candle_cake"), new Block());
-const Block* Blocks::MAGENTA_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "magenta_candle_cake"), new Block());
-const Block* Blocks::LIGHT_BLUE_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "light_blue_candle_cake"), new Block());
-const Block* Blocks::YELLOW_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "yellow_candle_cake"), new Block());
-const Block* Blocks::LIME_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "lime_candle_cake"), new Block());
-const Block* Blocks::PINK_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "pink_candle_cake"), new Block());
-const Block* Blocks::GRAY_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "gray_candle_cake"), new Block());
-const Block* Blocks::LIGHT_GRAY_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "light_gray_candle_cake"), new Block());
-const Block* Blocks::CYAN_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "cyan_candle_cake"), new Block());
-const Block* Blocks::PURPLE_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "purple_candle_cake"), new Block());
-const Block* Blocks::BLUE_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "blue_candle_cake"), new Block());
-const Block* Blocks::BROWN_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "brown_candle_cake"), new Block());
-const Block* Blocks::GREEN_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "green_candle_cake"), new Block());
-const Block* Blocks::RED_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "red_candle_cake"), new Block());
-const Block* Blocks::BLACK_CANDLE_CAKE = registerBlock(utils::Identifier("minecraft", "black_candle_cake"), new Block());
-const Block* Blocks::AMETHYST_BLOCK = registerBlock(utils::Identifier("minecraft", "amethyst_block"), new Block());
-const Block* Blocks::BUDDING_AMETHYST = registerBlock(utils::Identifier("minecraft", "budding_amethyst"), new Block());
-const Block* Blocks::AMETHYST_CLUSTER = registerBlock(utils::Identifier("minecraft", "amethyst_cluster"), new Block());
-const Block* Blocks::LARGE_AMETHYST_BUD = registerBlock(utils::Identifier("minecraft", "large_amethyst_bud"), new Block());
-const Block* Blocks::MEDIUM_AMETHYST_BUD = registerBlock(utils::Identifier("minecraft", "medium_amethyst_bud"), new Block());
-const Block* Blocks::SMALL_AMETHYST_BUD = registerBlock(utils::Identifier("minecraft", "small_amethyst_bud"), new Block());
-const Block* Blocks::TUFF = registerBlock(utils::Identifier("minecraft", "tuff"), new Block());
-const Block* Blocks::TUFF_SLAB = registerBlock(utils::Identifier("minecraft", "tuff_slab"), new Block());
-const Block* Blocks::TUFF_STAIRS = registerBlock(utils::Identifier("minecraft", "tuff_stairs"), new Block());
-const Block* Blocks::TUFF_WALL = registerBlock(utils::Identifier("minecraft", "tuff_wall"), new Block());
-const Block* Blocks::POLISHED_TUFF = registerBlock(utils::Identifier("minecraft", "polished_tuff"), new Block());
-const Block* Blocks::POLISHED_TUFF_SLAB = registerBlock(utils::Identifier("minecraft", "polished_tuff_slab"), new Block());
-const Block* Blocks::POLISHED_TUFF_STAIRS = registerBlock(utils::Identifier("minecraft", "polished_tuff_stairs"), new Block());
-const Block* Blocks::POLISHED_TUFF_WALL = registerBlock(utils::Identifier("minecraft", "polished_tuff_wall"), new Block());
-const Block* Blocks::CHISELED_TUFF = registerBlock(utils::Identifier("minecraft", "chiseled_tuff"), new Block());
-const Block* Blocks::TUFF_BRICKS = registerBlock(utils::Identifier("minecraft", "tuff_bricks"), new Block());
-const Block* Blocks::TUFF_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "tuff_brick_slab"), new Block());
-const Block* Blocks::TUFF_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "tuff_brick_stairs"), new Block());
-const Block* Blocks::TUFF_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "tuff_brick_wall"), new Block());
-const Block* Blocks::CHISELED_TUFF_BRICKS = registerBlock(utils::Identifier("minecraft", "chiseled_tuff_bricks"), new Block());
-const Block* Blocks::CALCITE = registerBlock(utils::Identifier("minecraft", "calcite"), new Block());
-const Block* Blocks::TINTED_GLASS = registerBlock(utils::Identifier("minecraft", "tinted_glass"), new Block());
-const Block* Blocks::POWDER_SNOW = registerBlock(utils::Identifier("minecraft", "powder_snow"), new Block());
-const Block* Blocks::SCULK_SENSOR = registerBlock(utils::Identifier("minecraft", "sculk_sensor"), new Block());
-const Block* Blocks::CALIBRATED_SCULK_SENSOR = registerBlock(utils::Identifier("minecraft", "calibrated_sculk_sensor"), new Block());
-const Block* Blocks::SCULK = registerBlock(utils::Identifier("minecraft", "sculk"), new Block());
-const Block* Blocks::SCULK_VEIN = registerBlock(utils::Identifier("minecraft", "sculk_vein"), new Block());
-const Block* Blocks::SCULK_CATALYST = registerBlock(utils::Identifier("minecraft", "sculk_catalyst"), new Block());
-const Block* Blocks::SCULK_SHRIEKER = registerBlock(utils::Identifier("minecraft", "sculk_shrieker"), new Block());
-const Block* Blocks::COPPER_BLOCK = registerBlock(utils::Identifier("minecraft", "copper_block"), new Block());
-const Block* Blocks::EXPOSED_COPPER = registerBlock(utils::Identifier("minecraft", "exposed_copper"), new Block());
-const Block* Blocks::WEATHERED_COPPER = registerBlock(utils::Identifier("minecraft", "weathered_copper"), new Block());
-const Block* Blocks::OXIDIZED_COPPER = registerBlock(utils::Identifier("minecraft", "oxidized_copper"), new Block());
-const Block* Blocks::COPPER_ORE = registerBlock(utils::Identifier("minecraft", "copper_ore"), new Block());
-const Block* Blocks::DEEPSLATE_COPPER_ORE = registerBlock(utils::Identifier("minecraft", "deepslate_copper_ore"), new Block());
-const Block* Blocks::OXIDIZED_CUT_COPPER = registerBlock(utils::Identifier("minecraft", "oxidized_cut_copper"), new Block());
-const Block* Blocks::WEATHERED_CUT_COPPER = registerBlock(utils::Identifier("minecraft", "weathered_cut_copper"), new Block());
-const Block* Blocks::EXPOSED_CUT_COPPER = registerBlock(utils::Identifier("minecraft", "exposed_cut_copper"), new Block());
-const Block* Blocks::CUT_COPPER = registerBlock(utils::Identifier("minecraft", "cut_copper"), new Block());
-const Block* Blocks::OXIDIZED_CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "oxidized_chiseled_copper"), new Block());
-const Block* Blocks::WEATHERED_CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "weathered_chiseled_copper"), new Block());
-const Block* Blocks::EXPOSED_CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "exposed_chiseled_copper"), new Block());
-const Block* Blocks::CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "chiseled_copper"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_chiseled_copper"), new Block());
-const Block* Blocks::WAXED_WEATHERED_CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_weathered_chiseled_copper"), new Block());
-const Block* Blocks::WAXED_EXPOSED_CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_exposed_chiseled_copper"), new Block());
-const Block* Blocks::WAXED_CHISELED_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_chiseled_copper"), new Block());
-const Block* Blocks::OXIDIZED_CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "oxidized_cut_copper_stairs"), new Block());
-const Block* Blocks::WEATHERED_CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "weathered_cut_copper_stairs"), new Block());
-const Block* Blocks::EXPOSED_CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "exposed_cut_copper_stairs"), new Block());
-const Block* Blocks::CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "cut_copper_stairs"), new Block());
-const Block* Blocks::OXIDIZED_CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "oxidized_cut_copper_slab"), new Block());
-const Block* Blocks::WEATHERED_CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "weathered_cut_copper_slab"), new Block());
-const Block* Blocks::EXPOSED_CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "exposed_cut_copper_slab"), new Block());
-const Block* Blocks::CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "cut_copper_slab"), new Block());
-const Block* Blocks::WAXED_COPPER_BLOCK = registerBlock(utils::Identifier("minecraft", "waxed_copper_block"), new Block());
-const Block* Blocks::WAXED_WEATHERED_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_weathered_copper"), new Block());
-const Block* Blocks::WAXED_EXPOSED_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_exposed_copper"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_copper"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_CUT_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_cut_copper"), new Block());
-const Block* Blocks::WAXED_WEATHERED_CUT_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_weathered_cut_copper"), new Block());
-const Block* Blocks::WAXED_EXPOSED_CUT_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_exposed_cut_copper"), new Block());
-const Block* Blocks::WAXED_CUT_COPPER = registerBlock(utils::Identifier("minecraft", "waxed_cut_copper"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_cut_copper_stairs"), new Block());
-const Block* Blocks::WAXED_WEATHERED_CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "waxed_weathered_cut_copper_stairs"), new Block());
-const Block* Blocks::WAXED_EXPOSED_CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "waxed_exposed_cut_copper_stairs"), new Block());
-const Block* Blocks::WAXED_CUT_COPPER_STAIRS = registerBlock(utils::Identifier("minecraft", "waxed_cut_copper_stairs"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_cut_copper_slab"), new Block());
-const Block* Blocks::WAXED_WEATHERED_CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "waxed_weathered_cut_copper_slab"), new Block());
-const Block* Blocks::WAXED_EXPOSED_CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "waxed_exposed_cut_copper_slab"), new Block());
-const Block* Blocks::WAXED_CUT_COPPER_SLAB = registerBlock(utils::Identifier("minecraft", "waxed_cut_copper_slab"), new Block());
-const Block* Blocks::COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "copper_door"), new Block());
-const Block* Blocks::EXPOSED_COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "exposed_copper_door"), new Block());
-const Block* Blocks::OXIDIZED_COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "oxidized_copper_door"), new Block());
-const Block* Blocks::WEATHERED_COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "weathered_copper_door"), new Block());
-const Block* Blocks::WAXED_COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "waxed_copper_door"), new Block());
-const Block* Blocks::WAXED_EXPOSED_COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "waxed_exposed_copper_door"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_copper_door"), new Block());
-const Block* Blocks::WAXED_WEATHERED_COPPER_DOOR = registerBlock(utils::Identifier("minecraft", "waxed_weathered_copper_door"), new Block());
-const Block* Blocks::COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "copper_trapdoor"), new Block());
-const Block* Blocks::EXPOSED_COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "exposed_copper_trapdoor"), new Block());
-const Block* Blocks::OXIDIZED_COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "oxidized_copper_trapdoor"), new Block());
-const Block* Blocks::WEATHERED_COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "weathered_copper_trapdoor"), new Block());
-const Block* Blocks::WAXED_COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "waxed_copper_trapdoor"), new Block());
-const Block* Blocks::WAXED_EXPOSED_COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "waxed_exposed_copper_trapdoor"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_copper_trapdoor"), new Block());
-const Block* Blocks::WAXED_WEATHERED_COPPER_TRAPDOOR = registerBlock(utils::Identifier("minecraft", "waxed_weathered_copper_trapdoor"), new Block());
-const Block* Blocks::COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "copper_grate"), new Block());
-const Block* Blocks::EXPOSED_COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "exposed_copper_grate"), new Block());
-const Block* Blocks::WEATHERED_COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "weathered_copper_grate"), new Block());
-const Block* Blocks::OXIDIZED_COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "oxidized_copper_grate"), new Block());
-const Block* Blocks::WAXED_COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "waxed_copper_grate"), new Block());
-const Block* Blocks::WAXED_EXPOSED_COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "waxed_exposed_copper_grate"), new Block());
-const Block* Blocks::WAXED_WEATHERED_COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "waxed_weathered_copper_grate"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_COPPER_GRATE = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_copper_grate"), new Block());
-const Block* Blocks::COPPER_BULB = registerBlock(utils::Identifier("minecraft", "copper_bulb"), new Block());
-const Block* Blocks::EXPOSED_COPPER_BULB = registerBlock(utils::Identifier("minecraft", "exposed_copper_bulb"), new Block());
-const Block* Blocks::WEATHERED_COPPER_BULB = registerBlock(utils::Identifier("minecraft", "weathered_copper_bulb"), new Block());
-const Block* Blocks::OXIDIZED_COPPER_BULB = registerBlock(utils::Identifier("minecraft", "oxidized_copper_bulb"), new Block());
-const Block* Blocks::WAXED_COPPER_BULB = registerBlock(utils::Identifier("minecraft", "waxed_copper_bulb"), new Block());
-const Block* Blocks::WAXED_EXPOSED_COPPER_BULB = registerBlock(utils::Identifier("minecraft", "waxed_exposed_copper_bulb"), new Block());
-const Block* Blocks::WAXED_WEATHERED_COPPER_BULB = registerBlock(utils::Identifier("minecraft", "waxed_weathered_copper_bulb"), new Block());
-const Block* Blocks::WAXED_OXIDIZED_COPPER_BULB = registerBlock(utils::Identifier("minecraft", "waxed_oxidized_copper_bulb"), new Block());
-const Block* Blocks::LIGHTNING_ROD = registerBlock(utils::Identifier("minecraft", "lightning_rod"), new Block());
-const Block* Blocks::POINTED_DRIPSTONE = registerBlock(utils::Identifier("minecraft", "pointed_dripstone"), new Block());
-const Block* Blocks::DRIPSTONE_BLOCK = registerBlock(utils::Identifier("minecraft", "dripstone_block"), new Block());
-const Block* Blocks::CAVE_VINES = registerBlock(utils::Identifier("minecraft", "cave_vines"), new Block());
-const Block* Blocks::CAVE_VINES_PLANT = registerBlock(utils::Identifier("minecraft", "cave_vines_plant"), new Block());
-const Block* Blocks::SPORE_BLOSSOM = registerBlock(utils::Identifier("minecraft", "spore_blossom"), new Block());
-const Block* Blocks::AZALEA = registerBlock(utils::Identifier("minecraft", "azalea"), new Block());
-const Block* Blocks::FLOWERING_AZALEA = registerBlock(utils::Identifier("minecraft", "flowering_azalea"), new Block());
-const Block* Blocks::MOSS_CARPET = registerBlock(utils::Identifier("minecraft", "moss_carpet"), new Block());
-const Block* Blocks::PINK_PETALS = registerBlock(utils::Identifier("minecraft", "pink_petals"), new Block());
-const Block* Blocks::WILDFLOWERS = registerBlock(utils::Identifier("minecraft", "wildflowers"), new Block());
-const Block* Blocks::LEAF_LITTER = registerBlock(utils::Identifier("minecraft", "leaf_litter"), new Block());
-const Block* Blocks::MOSS_BLOCK = registerBlock(utils::Identifier("minecraft", "moss_block"), new Block());
-const Block* Blocks::BIG_DRIPLEAF = registerBlock(utils::Identifier("minecraft", "big_dripleaf"), new Block());
-const Block* Blocks::BIG_DRIPLEAF_STEM = registerBlock(utils::Identifier("minecraft", "big_dripleaf_stem"), new Block());
-const Block* Blocks::SMALL_DRIPLEAF = registerBlock(utils::Identifier("minecraft", "small_dripleaf"), new Block());
-const Block* Blocks::HANGING_ROOTS = registerBlock(utils::Identifier("minecraft", "hanging_roots"), new Block());
-const Block* Blocks::ROOTED_DIRT = registerBlock(utils::Identifier("minecraft", "rooted_dirt"), new Block());
-const Block* Blocks::MUD = registerBlock(utils::Identifier("minecraft", "mud"), new Block());
-const Block* Blocks::DEEPSLATE = registerBlock(utils::Identifier("minecraft", "deepslate"), new Block());
-const Block* Blocks::COBBLED_DEEPSLATE = registerBlock(utils::Identifier("minecraft", "cobbled_deepslate"), new Block());
-const Block* Blocks::COBBLED_DEEPSLATE_STAIRS = registerBlock(utils::Identifier("minecraft", "cobbled_deepslate_stairs"), new Block());
-const Block* Blocks::COBBLED_DEEPSLATE_SLAB = registerBlock(utils::Identifier("minecraft", "cobbled_deepslate_slab"), new Block());
-const Block* Blocks::COBBLED_DEEPSLATE_WALL = registerBlock(utils::Identifier("minecraft", "cobbled_deepslate_wall"), new Block());
-const Block* Blocks::POLISHED_DEEPSLATE = registerBlock(utils::Identifier("minecraft", "polished_deepslate"), new Block());
-const Block* Blocks::POLISHED_DEEPSLATE_STAIRS = registerBlock(utils::Identifier("minecraft", "polished_deepslate_stairs"), new Block());
-const Block* Blocks::POLISHED_DEEPSLATE_SLAB = registerBlock(utils::Identifier("minecraft", "polished_deepslate_slab"), new Block());
-const Block* Blocks::POLISHED_DEEPSLATE_WALL = registerBlock(utils::Identifier("minecraft", "polished_deepslate_wall"), new Block());
-const Block* Blocks::DEEPSLATE_TILES = registerBlock(utils::Identifier("minecraft", "deepslate_tiles"), new Block());
-const Block* Blocks::DEEPSLATE_TILE_STAIRS = registerBlock(utils::Identifier("minecraft", "deepslate_tile_stairs"), new Block());
-const Block* Blocks::DEEPSLATE_TILE_SLAB = registerBlock(utils::Identifier("minecraft", "deepslate_tile_slab"), new Block());
-const Block* Blocks::DEEPSLATE_TILE_WALL = registerBlock(utils::Identifier("minecraft", "deepslate_tile_wall"), new Block());
-const Block* Blocks::DEEPSLATE_BRICKS = registerBlock(utils::Identifier("minecraft", "deepslate_bricks"), new Block());
-const Block* Blocks::DEEPSLATE_BRICK_STAIRS = registerBlock(utils::Identifier("minecraft", "deepslate_brick_stairs"), new Block());
-const Block* Blocks::DEEPSLATE_BRICK_SLAB = registerBlock(utils::Identifier("minecraft", "deepslate_brick_slab"), new Block());
-const Block* Blocks::DEEPSLATE_BRICK_WALL = registerBlock(utils::Identifier("minecraft", "deepslate_brick_wall"), new Block());
-const Block* Blocks::CHISELED_DEEPSLATE = registerBlock(utils::Identifier("minecraft", "chiseled_deepslate"), new Block());
-const Block* Blocks::CRACKED_DEEPSLATE_BRICKS = registerBlock(utils::Identifier("minecraft", "cracked_deepslate_bricks"), new Block());
-const Block* Blocks::CRACKED_DEEPSLATE_TILES = registerBlock(utils::Identifier("minecraft", "cracked_deepslate_tiles"), new Block());
-const Block* Blocks::INFESTED_DEEPSLATE = registerBlock(utils::Identifier("minecraft", "infested_deepslate"), new Block());
-const Block* Blocks::SMOOTH_BASALT = registerBlock(utils::Identifier("minecraft", "smooth_basalt"), new Block());
-const Block* Blocks::RAW_IRON_BLOCK = registerBlock(utils::Identifier("minecraft", "raw_iron_block"), new Block());
-const Block* Blocks::RAW_COPPER_BLOCK = registerBlock(utils::Identifier("minecraft", "raw_copper_block"), new Block());
-const Block* Blocks::RAW_GOLD_BLOCK = registerBlock(utils::Identifier("minecraft", "raw_gold_block"), new Block());
-const Block* Blocks::POTTED_AZALEA_BUSH = registerBlock(utils::Identifier("minecraft", "potted_azalea_bush"), new Block());
-const Block* Blocks::POTTED_FLOWERING_AZALEA_BUSH = registerBlock(utils::Identifier("minecraft", "potted_flowering_azalea_bush"), new Block());
-const Block* Blocks::OCHRE_FROGLIGHT = registerBlock(utils::Identifier("minecraft", "ochre_froglight"), new Block());
-const Block* Blocks::VERDANT_FROGLIGHT = registerBlock(utils::Identifier("minecraft", "verdant_froglight"), new Block());
-const Block* Blocks::PEARLESCENT_FROGLIGHT = registerBlock(utils::Identifier("minecraft", "pearlescent_froglight"), new Block());
-const Block* Blocks::FROGSPAWN = registerBlock(utils::Identifier("minecraft", "frogspawn"), new Block());
-const Block* Blocks::REINFORCED_DEEPSLATE = registerBlock(utils::Identifier("minecraft", "reinforced_deepslate"), new Block());
-const Block* Blocks::DECORATED_POT = registerBlock(utils::Identifier("minecraft", "decorated_pot"), new Block());
-const Block* Blocks::CRAFTER = registerBlock(utils::Identifier("minecraft", "crafter"), new Block());
-const Block* Blocks::TRIAL_SPAWNER = registerBlock(utils::Identifier("minecraft", "trial_spawner"), new Block());
-const Block* Blocks::VAULT = registerBlock(utils::Identifier("minecraft", "vault"), new Block());
-const Block* Blocks::HEAVY_CORE = registerBlock(utils::Identifier("minecraft", "heavy_core"), new Block());
-const Block* Blocks::PALE_MOSS_BLOCK = registerBlock(utils::Identifier("minecraft", "pale_moss_block"), new Block());
-const Block* Blocks::PALE_MOSS_CARPET = registerBlock(utils::Identifier("minecraft", "pale_moss_carpet"), new Block());
-const Block* Blocks::PALE_HANGING_MOSS = registerBlock(utils::Identifier("minecraft", "pale_hanging_moss"), new Block());
-const Block* Blocks::OPEN_EYEBLOSSOM = registerBlock(utils::Identifier("minecraft", "open_eyeblossom"), new Block());
-const Block* Blocks::CLOSED_EYEBLOSSOM = registerBlock(utils::Identifier("minecraft", "closed_eyeblossom"), new Block());
-const Block* Blocks::POTTED_OPEN_EYEBLOSSOM = registerBlock(utils::Identifier("minecraft", "potted_open_eyeblossom"), new Block());
-const Block* Blocks::POTTED_CLOSED_EYEBLOSSOM = registerBlock(utils::Identifier("minecraft", "potted_closed_eyeblossom"), new Block());
-const Block* Blocks::FIREFLY_BUSH = registerBlock(utils::Identifier("minecraft", "firefly_bush"), new Block());
+    REGISTER_BLOCK(AIR, "air")
+    REGISTER_BLOCK(STONE, "stone")
+    REGISTER_BLOCK(GRANITE, "granite")
+    REGISTER_BLOCK(POLISHED_GRANITE, "polished_granite")
+    REGISTER_BLOCK(DIORITE, "diorite")
+    REGISTER_BLOCK(POLISHED_DIORITE, "polished_diorite")
+    REGISTER_BLOCK(ANDESITE, "andesite")
+    REGISTER_BLOCK(POLISHED_ANDESITE, "polished_andesite")
+    REGISTER_BLOCK(GRASS_BLOCK, "grass_block")
+    REGISTER_BLOCK(DIRT, "dirt")
+    REGISTER_BLOCK(COARSE_DIRT, "coarse_dirt")
+    REGISTER_BLOCK(PODZOL, "podzol")
+    REGISTER_BLOCK(COBBLESTONE, "cobblestone")
+    REGISTER_BLOCK(OAK_PLANKS, "oak_planks")
+    REGISTER_BLOCK(SPRUCE_PLANKS, "spruce_planks")
+    REGISTER_BLOCK(BIRCH_PLANKS, "birch_planks")
+    REGISTER_BLOCK(JUNGLE_PLANKS, "jungle_planks")
+    REGISTER_BLOCK(ACACIA_PLANKS, "acacia_planks")
+    REGISTER_BLOCK(CHERRY_PLANKS, "cherry_planks")
+    REGISTER_BLOCK(DARK_OAK_PLANKS, "dark_oak_planks")
+    REGISTER_BLOCK(PALE_OAK_WOOD, "pale_oak_wood")
+    REGISTER_BLOCK(PALE_OAK_PLANKS, "pale_oak_planks")
+    REGISTER_BLOCK(MANGROVE_PLANKS, "mangrove_planks")
+    REGISTER_BLOCK(BAMBOO_PLANKS, "bamboo_planks")
+    REGISTER_BLOCK(BAMBOO_MOSAIC, "bamboo_mosaic")
+    REGISTER_BLOCK(OAK_SAPLING, "oak_sapling")
+    REGISTER_BLOCK(SPRUCE_SAPLING, "spruce_sapling")
+    REGISTER_BLOCK(BIRCH_SAPLING, "birch_sapling")
+    REGISTER_BLOCK(JUNGLE_SAPLING, "jungle_sapling")
+    REGISTER_BLOCK(ACACIA_SAPLING, "acacia_sapling")
+    REGISTER_BLOCK(CHERRY_SAPLING, "cherry_sapling")
+    REGISTER_BLOCK(DARK_OAK_SAPLING, "dark_oak_sapling")
+    REGISTER_BLOCK(PALE_OAK_SAPLING, "pale_oak_sapling")
+    REGISTER_BLOCK(MANGROVE_PROPAGULE, "mangrove_propagule")
+    REGISTER_BLOCK(BEDROCK, "bedrock")
+    REGISTER_BLOCK(WATER, "water")
+    REGISTER_BLOCK(LAVA, "lava")
+    REGISTER_BLOCK(SAND, "sand")
+    REGISTER_BLOCK(SUSPICIOUS_SAND, "suspicious_sand")
+    REGISTER_BLOCK(RED_SAND, "red_sand")
+    REGISTER_BLOCK(GRAVEL, "gravel")
+    REGISTER_BLOCK(SUSPICIOUS_GRAVEL, "suspicious_gravel")
+    REGISTER_BLOCK(GOLD_ORE, "gold_ore")
+    REGISTER_BLOCK(DEEPSLATE_GOLD_ORE, "deepslate_gold_ore")
+    REGISTER_BLOCK(IRON_ORE, "iron_ore")
+    REGISTER_BLOCK(DEEPSLATE_IRON_ORE, "deepslate_iron_ore")
+    REGISTER_BLOCK(COAL_ORE, "coal_ore")
+    REGISTER_BLOCK(DEEPSLATE_COAL_ORE, "deepslate_coal_ore")
+    REGISTER_BLOCK(NETHER_GOLD_ORE, "nether_gold_ore")
+    REGISTER_BLOCK(OAK_LOG, "oak_log")
+    REGISTER_BLOCK(SPRUCE_LOG, "spruce_log")
+    REGISTER_BLOCK(BIRCH_LOG, "birch_log")
+    REGISTER_BLOCK(JUNGLE_LOG, "jungle_log")
+    REGISTER_BLOCK(ACACIA_LOG, "acacia_log")
+    REGISTER_BLOCK(CHERRY_LOG, "cherry_log")
+    REGISTER_BLOCK(DARK_OAK_LOG, "dark_oak_log")
+    REGISTER_BLOCK(PALE_OAK_LOG, "pale_oak_log")
+    REGISTER_BLOCK(MANGROVE_LOG, "mangrove_log")
+    REGISTER_BLOCK(MANGROVE_ROOTS, "mangrove_roots")
+    REGISTER_BLOCK(MUDDY_MANGROVE_ROOTS, "muddy_mangrove_roots")
+    REGISTER_BLOCK(BAMBOO_BLOCK, "bamboo_block")
+    REGISTER_BLOCK(STRIPPED_SPRUCE_LOG, "stripped_spruce_log")
+    REGISTER_BLOCK(STRIPPED_BIRCH_LOG, "stripped_birch_log")
+    REGISTER_BLOCK(STRIPPED_JUNGLE_LOG, "stripped_jungle_log")
+    REGISTER_BLOCK(STRIPPED_ACACIA_LOG, "stripped_acacia_log")
+    REGISTER_BLOCK(STRIPPED_CHERRY_LOG, "stripped_cherry_log")
+    REGISTER_BLOCK(STRIPPED_DARK_OAK_LOG, "stripped_dark_oak_log")
+    REGISTER_BLOCK(STRIPPED_PALE_OAK_LOG, "stripped_pale_oak_log")
+    REGISTER_BLOCK(STRIPPED_OAK_LOG, "stripped_oak_log")
+    REGISTER_BLOCK(STRIPPED_MANGROVE_LOG, "stripped_mangrove_log")
+    REGISTER_BLOCK(STRIPPED_BAMBOO_BLOCK, "stripped_bamboo_block")
+    REGISTER_BLOCK(OAK_WOOD, "oak_wood")
+    REGISTER_BLOCK(SPRUCE_WOOD, "spruce_wood")
+    REGISTER_BLOCK(BIRCH_WOOD, "birch_wood")
+    REGISTER_BLOCK(JUNGLE_WOOD, "jungle_wood")
+    REGISTER_BLOCK(ACACIA_WOOD, "acacia_wood")
+    REGISTER_BLOCK(CHERRY_WOOD, "cherry_wood")
+    REGISTER_BLOCK(DARK_OAK_WOOD, "dark_oak_wood")
+    REGISTER_BLOCK(MANGROVE_WOOD, "mangrove_wood")
+    REGISTER_BLOCK(STRIPPED_OAK_WOOD, "stripped_oak_wood")
+    REGISTER_BLOCK(STRIPPED_SPRUCE_WOOD, "stripped_spruce_wood")
+    REGISTER_BLOCK(STRIPPED_BIRCH_WOOD, "stripped_birch_wood")
+    REGISTER_BLOCK(STRIPPED_JUNGLE_WOOD, "stripped_jungle_wood")
+    REGISTER_BLOCK(STRIPPED_ACACIA_WOOD, "stripped_acacia_wood")
+    REGISTER_BLOCK(STRIPPED_CHERRY_WOOD, "stripped_cherry_wood")
+    REGISTER_BLOCK(STRIPPED_DARK_OAK_WOOD, "stripped_dark_oak_wood")
+    REGISTER_BLOCK(STRIPPED_PALE_OAK_WOOD, "stripped_pale_oak_wood")
+    REGISTER_BLOCK(STRIPPED_MANGROVE_WOOD, "stripped_mangrove_wood")
+    REGISTER_BLOCK(OAK_LEAVES, "oak_leaves")
+    REGISTER_BLOCK(SPRUCE_LEAVES, "spruce_leaves")
+    REGISTER_BLOCK(BIRCH_LEAVES, "birch_leaves")
+    REGISTER_BLOCK(JUNGLE_LEAVES, "jungle_leaves")
+    REGISTER_BLOCK(ACACIA_LEAVES, "acacia_leaves")
+    REGISTER_BLOCK(CHERRY_LEAVES, "cherry_leaves")
+    REGISTER_BLOCK(DARK_OAK_LEAVES, "dark_oak_leaves")
+    REGISTER_BLOCK(PALE_OAK_LEAVES, "pale_oak_leaves")
+    REGISTER_BLOCK(MANGROVE_LEAVES, "mangrove_leaves")
+    REGISTER_BLOCK(AZALEA_LEAVES, "azalea_leaves")
+    REGISTER_BLOCK(FLOWERING_AZALEA_LEAVES, "flowering_azalea_leaves")
+    REGISTER_BLOCK(SPONGE, "sponge")
+    REGISTER_BLOCK(WET_SPONGE, "wet_sponge")
+    REGISTER_BLOCK(GLASS, "glass")
+    REGISTER_BLOCK(LAPIS_ORE, "lapis_ore")
+    REGISTER_BLOCK(DEEPSLATE_LAPIS_ORE, "deepslate_lapis_ore")
+    REGISTER_BLOCK(LAPIS_BLOCK, "lapis_block")
+    REGISTER_BLOCK(DISPENSER, "dispenser")
+    REGISTER_BLOCK(SANDSTONE, "sandstone")
+    REGISTER_BLOCK(CHISELED_SANDSTONE, "chiseled_sandstone")
+    REGISTER_BLOCK(CUT_SANDSTONE, "cut_sandstone")
+    REGISTER_BLOCK(NOTE_BLOCK, "note_block")
+    REGISTER_BLOCK(WHITE_BED, "white_bed")
+    REGISTER_BLOCK(ORANGE_BED, "orange_bed")
+    REGISTER_BLOCK(MAGENTA_BED, "magenta_bed")
+    REGISTER_BLOCK(LIGHT_BLUE_BED, "light_blue_bed")
+    REGISTER_BLOCK(YELLOW_BED, "yellow_bed")
+    REGISTER_BLOCK(LIME_BED, "lime_bed")
+    REGISTER_BLOCK(PINK_BED, "pink_bed")
+    REGISTER_BLOCK(GRAY_BED, "gray_bed")
+    REGISTER_BLOCK(LIGHT_GRAY_BED, "light_gray_bed")
+    REGISTER_BLOCK(CYAN_BED, "cyan_bed")
+    REGISTER_BLOCK(PURPLE_BED, "purple_bed")
+    REGISTER_BLOCK(BLUE_BED, "blue_bed")
+    REGISTER_BLOCK(BROWN_BED, "brown_bed")
+    REGISTER_BLOCK(GREEN_BED, "green_bed")
+    REGISTER_BLOCK(RED_BED, "red_bed")
+    REGISTER_BLOCK(BLACK_BED, "black_bed")
+    REGISTER_BLOCK(POWERED_RAIL, "powered_rail")
+    REGISTER_BLOCK(DETECTOR_RAIL, "detector_rail")
+    REGISTER_BLOCK(STICKY_PISTON, "sticky_piston")
+    REGISTER_BLOCK(COBWEB, "cobweb")
+    REGISTER_BLOCK(SHORT_GRASS, "short_grass")
+    REGISTER_BLOCK(FERN, "fern")
+    REGISTER_BLOCK(DEAD_BUSH, "dead_bush")
+    REGISTER_BLOCK(BUSH, "bush")
+    REGISTER_BLOCK(SHORT_DRY_GRASS, "short_dry_grass")
+    REGISTER_BLOCK(TALL_DRY_GRASS, "tall_dry_grass")
+    REGISTER_BLOCK(SEAGRASS, "seagrass")
+    REGISTER_BLOCK(TALL_SEAGRASS, "tall_seagrass")
+    REGISTER_BLOCK(PISTON, "piston")
+    REGISTER_BLOCK(PISTON_HEAD, "piston_head")
+    REGISTER_BLOCK(WHITE_WOOL, "white_wool")
+    REGISTER_BLOCK(ORANGE_WOOL, "orange_wool")
+    REGISTER_BLOCK(MAGENTA_WOOL, "magenta_wool")
+    REGISTER_BLOCK(LIGHT_BLUE_WOOL, "light_blue_wool")
+    REGISTER_BLOCK(YELLOW_WOOL, "yellow_wool")
+    REGISTER_BLOCK(LIME_WOOL, "lime_wool")
+    REGISTER_BLOCK(PINK_WOOL, "pink_wool")
+    REGISTER_BLOCK(GRAY_WOOL, "gray_wool")
+    REGISTER_BLOCK(LIGHT_GRAY_WOOL, "light_gray_wool")
+    REGISTER_BLOCK(CYAN_WOOL, "cyan_wool")
+    REGISTER_BLOCK(PURPLE_WOOL, "purple_wool")
+    REGISTER_BLOCK(BLUE_WOOL, "blue_wool")
+    REGISTER_BLOCK(BROWN_WOOL, "brown_wool")
+    REGISTER_BLOCK(GREEN_WOOL, "green_wool")
+    REGISTER_BLOCK(RED_WOOL, "red_wool")
+    REGISTER_BLOCK(BLACK_WOOL, "black_wool")
+    REGISTER_BLOCK(MOVING_PISTON, "moving_piston")
+    REGISTER_BLOCK(DANDELION, "dandelion")
+    REGISTER_BLOCK(TORCHFLOWER, "torchflower")
+    REGISTER_BLOCK(POPPY, "poppy")
+    REGISTER_BLOCK(BLUE_ORCHID, "blue_orchid")
+    REGISTER_BLOCK(ALLIUM, "allium")
+    REGISTER_BLOCK(AZURE_BLUET, "azure_bluet")
+    REGISTER_BLOCK(RED_TULIP, "red_tulip")
+    REGISTER_BLOCK(ORANGE_TULIP, "orange_tulip")
+    REGISTER_BLOCK(WHITE_TULIP, "white_tulip")
+    REGISTER_BLOCK(PINK_TULIP, "pink_tulip")
+    REGISTER_BLOCK(OXEYE_DAISY, "oxeye_daisy")
+    REGISTER_BLOCK(CORNFLOWER, "cornflower")
+    REGISTER_BLOCK(WITHER_ROSE, "wither_rose")
+    REGISTER_BLOCK(LILY_OF_THE_VALLEY, "lily_of_the_valley")
+    REGISTER_BLOCK(BROWN_MUSHROOM, "brown_mushroom")
+    REGISTER_BLOCK(RED_MUSHROOM, "red_mushroom")
+    REGISTER_BLOCK(GOLD_BLOCK, "gold_block")
+    REGISTER_BLOCK(IRON_BLOCK, "iron_block")
+    REGISTER_BLOCK(BRICKS, "bricks")
+    REGISTER_BLOCK(TNT, "tnt")
+    REGISTER_BLOCK(BOOKSHELF, "bookshelf")
+    REGISTER_BLOCK(CHISELED_BOOKSHELF, "chiseled_bookshelf")
+    REGISTER_BLOCK(MOSSY_COBBLESTONE, "mossy_cobblestone")
+    REGISTER_BLOCK(OBSIDIAN, "obsidian")
+    REGISTER_BLOCK(TORCH, "torch")
+    REGISTER_BLOCK(WALL_TORCH, "wall_torch")
+    REGISTER_BLOCK(FIRE, "fire")
+    REGISTER_BLOCK(SOUL_FIRE, "soul_fire")
+    REGISTER_BLOCK(SPAWNER, "spawner")
+    REGISTER_BLOCK(CREAKING_HEART, "creaking_heart")
+    REGISTER_BLOCK(OAK_STAIRS, "oak_stairs")
+    REGISTER_BLOCK(CHEST, "chest")
+    REGISTER_BLOCK(REDSTONE_WIRE, "redstone_wire")
+    REGISTER_BLOCK(DIAMOND_ORE, "diamond_ore")
+    REGISTER_BLOCK(DEEPSLATE_DIAMOND_ORE, "deepslate_diamond_ore")
+    REGISTER_BLOCK(DIAMOND_BLOCK, "diamond_block")
+    REGISTER_BLOCK(CRAFTING_TABLE, "crafting_table")
+    REGISTER_BLOCK(WHEAT, "wheat")
+    REGISTER_BLOCK(FARMLAND, "farmland")
+    REGISTER_BLOCK(FURNACE, "furnace")
+    REGISTER_BLOCK(OAK_SIGN, "oak_sign")
+    REGISTER_BLOCK(SPRUCE_SIGN, "spruce_sign")
+    REGISTER_BLOCK(BIRCH_SIGN, "birch_sign")
+    REGISTER_BLOCK(ACACIA_SIGN, "acacia_sign")
+    REGISTER_BLOCK(CHERRY_SIGN, "cherry_sign")
+    REGISTER_BLOCK(JUNGLE_SIGN, "jungle_sign")
+    REGISTER_BLOCK(DARK_OAK_SIGN, "dark_oak_sign")
+    REGISTER_BLOCK(PALE_OAK_SIGN, "pale_oak_sign")
+    REGISTER_BLOCK(MANGROVE_SIGN, "mangrove_sign")
+    REGISTER_BLOCK(BAMBOO_SIGN, "bamboo_sign")
+    REGISTER_BLOCK(OAK_DOOR, "oak_door")
+    REGISTER_BLOCK(LADDER, "ladder")
+    REGISTER_BLOCK(RAIL, "rail")
+    REGISTER_BLOCK(COBBLESTONE_STAIRS, "cobblestone_stairs")
+    REGISTER_BLOCK(OAK_WALL_SIGN, "oak_wall_sign")
+    REGISTER_BLOCK(SPRUCE_WALL_SIGN, "spruce_wall_sign")
+    REGISTER_BLOCK(BIRCH_WALL_SIGN, "birch_wall_sign")
+    REGISTER_BLOCK(ACACIA_WALL_SIGN, "acacia_wall_sign")
+    REGISTER_BLOCK(CHERRY_WALL_SIGN, "cherry_wall_sign")
+    REGISTER_BLOCK(JUNGLE_WALL_SIGN, "jungle_wall_sign")
+    REGISTER_BLOCK(DARK_OAK_WALL_SIGN, "dark_oak_wall_sign")
+    REGISTER_BLOCK(PALE_OAK_WALL_SIGN, "pale_oak_wall_sign")
+    REGISTER_BLOCK(MANGROVE_WALL_SIGN, "mangrove_wall_sign")
+    REGISTER_BLOCK(BAMBOO_WALL_SIGN, "bamboo_wall_sign")
+    REGISTER_BLOCK(OAK_HANGING_SIGN, "oak_hanging_sign")
+    REGISTER_BLOCK(SPRUCE_HANGING_SIGN, "spruce_hanging_sign")
+    REGISTER_BLOCK(BIRCH_HANGING_SIGN, "birch_hanging_sign")
+    REGISTER_BLOCK(ACACIA_HANGING_SIGN, "acacia_hanging_sign")
+    REGISTER_BLOCK(CHERRY_HANGING_SIGN, "cherry_hanging_sign")
+    REGISTER_BLOCK(JUNGLE_HANGING_SIGN, "jungle_hanging_sign")
+    REGISTER_BLOCK(DARK_OAK_HANGING_SIGN, "dark_oak_hanging_sign")
+    REGISTER_BLOCK(PALE_OAK_HANGING_SIGN, "pale_oak_hanging_sign")
+    REGISTER_BLOCK(CRIMSON_HANGING_SIGN, "crimson_hanging_sign")
+    REGISTER_BLOCK(WARPED_HANGING_SIGN, "warped_hanging_sign")
+    REGISTER_BLOCK(MANGROVE_HANGING_SIGN, "mangrove_hanging_sign")
+    REGISTER_BLOCK(BAMBOO_HANGING_SIGN, "bamboo_hanging_sign")
+    REGISTER_BLOCK(OAK_WALL_HANGING_SIGN, "oak_wall_hanging_sign")
+    REGISTER_BLOCK(SPRUCE_WALL_HANGING_SIGN, "spruce_wall_hanging_sign")
+    REGISTER_BLOCK(BIRCH_WALL_HANGING_SIGN, "birch_wall_hanging_sign")
+    REGISTER_BLOCK(ACACIA_WALL_HANGING_SIGN, "acacia_wall_hanging_sign")
+    REGISTER_BLOCK(CHERRY_WALL_HANGING_SIGN, "cherry_wall_hanging_sign")
+    REGISTER_BLOCK(JUNGLE_WALL_HANGING_SIGN, "jungle_wall_hanging_sign")
+    REGISTER_BLOCK(DARK_OAK_WALL_HANGING_SIGN, "dark_oak_wall_hanging_sign")
+    REGISTER_BLOCK(PALE_OAK_WALL_HANGING_SIGN, "pale_oak_wall_hanging_sign")
+    REGISTER_BLOCK(MANGROVE_WALL_HANGING_SIGN, "mangrove_wall_hanging_sign")
+    REGISTER_BLOCK(CRIMSON_WALL_HANGING_SIGN, "crimson_wall_hanging_sign")
+    REGISTER_BLOCK(WARPED_WALL_HANGING_SIGN, "warped_wall_hanging_sign")
+    REGISTER_BLOCK(BAMBOO_WALL_HANGING_SIGN, "bamboo_wall_hanging_sign")
+    REGISTER_BLOCK(LEVER, "lever")
+    REGISTER_BLOCK(STONE_PRESSURE_PLATE, "stone_pressure_plate")
+    REGISTER_BLOCK(IRON_DOOR, "iron_door")
+    REGISTER_BLOCK(OAK_PRESSURE_PLATE, "oak_pressure_plate")
+    REGISTER_BLOCK(SPRUCE_PRESSURE_PLATE, "spruce_pressure_plate")
+    REGISTER_BLOCK(BIRCH_PRESSURE_PLATE, "birch_pressure_plate")
+    REGISTER_BLOCK(JUNGLE_PRESSURE_PLATE, "jungle_pressure_plate")
+    REGISTER_BLOCK(ACACIA_PRESSURE_PLATE, "acacia_pressure_plate")
+    REGISTER_BLOCK(CHERRY_PRESSURE_PLATE, "cherry_pressure_plate")
+    REGISTER_BLOCK(DARK_OAK_PRESSURE_PLATE, "dark_oak_pressure_plate")
+    REGISTER_BLOCK(PALE_OAK_PRESSURE_PLATE, "pale_oak_pressure_plate")
+    REGISTER_BLOCK(MANGROVE_PRESSURE_PLATE, "mangrove_pressure_plate")
+    REGISTER_BLOCK(BAMBOO_PRESSURE_PLATE, "bamboo_pressure_plate")
+    REGISTER_BLOCK(REDSTONE_ORE, "redstone_ore")
+    REGISTER_BLOCK(DEEPSLATE_REDSTONE_ORE, "deepslate_redstone_ore")
+    REGISTER_BLOCK(REDSTONE_TORCH, "redstone_torch")
+    REGISTER_BLOCK(REDSTONE_WALL_TORCH, "redstone_wall_torch")
+    REGISTER_BLOCK(STONE_BUTTON, "stone_button")
+    REGISTER_BLOCK(SNOW, "snow")
+    REGISTER_BLOCK(ICE, "ice")
+    REGISTER_BLOCK(SNOW_BLOCK, "snow_block")
+    REGISTER_BLOCK(CACTUS, "cactus")
+    REGISTER_BLOCK(CACTUS_FLOWER, "cactus_flower")
+    REGISTER_BLOCK(CLAY, "clay")
+    REGISTER_BLOCK(SUGAR_CANE, "sugar_cane")
+    REGISTER_BLOCK(JUKEBOX, "jukebox")
+    REGISTER_BLOCK(OAK_FENCE, "oak_fence")
+    REGISTER_BLOCK(NETHERRACK, "netherrack")
+    REGISTER_BLOCK(SOUL_SAND, "soul_sand")
+    REGISTER_BLOCK(SOUL_SOIL, "soul_soil")
+    REGISTER_BLOCK(BASALT, "basalt")
+    REGISTER_BLOCK(POLISHED_BASALT, "polished_basalt")
+    REGISTER_BLOCK(SOUL_TORCH, "soul_torch")
+    REGISTER_BLOCK(SOUL_WALL_TORCH, "soul_wall_torch")
+    REGISTER_BLOCK(GLOWSTONE, "glowstone")
+    REGISTER_BLOCK(NETHER_PORTAL, "nether_portal")
+    REGISTER_BLOCK(CARVED_PUMPKIN, "carved_pumpkin")
+    REGISTER_BLOCK(JACK_O_LANTERN, "jack_o_lantern")
+    REGISTER_BLOCK(CAKE, "cake")
+    REGISTER_BLOCK(REPEATER, "repeater")
+    REGISTER_BLOCK(WHITE_STAINED_GLASS, "white_stained_glass")
+    REGISTER_BLOCK(ORANGE_STAINED_GLASS, "orange_stained_glass")
+    REGISTER_BLOCK(MAGENTA_STAINED_GLASS, "magenta_stained_glass")
+    REGISTER_BLOCK(LIGHT_BLUE_STAINED_GLASS, "light_blue_stained_glass")
+    REGISTER_BLOCK(YELLOW_STAINED_GLASS, "yellow_stained_glass")
+    REGISTER_BLOCK(LIME_STAINED_GLASS, "lime_stained_glass")
+    REGISTER_BLOCK(PINK_STAINED_GLASS, "pink_stained_glass")
+    REGISTER_BLOCK(GRAY_STAINED_GLASS, "gray_stained_glass")
+    REGISTER_BLOCK(LIGHT_GRAY_STAINED_GLASS, "light_gray_stained_glass")
+    REGISTER_BLOCK(CYAN_STAINED_GLASS, "cyan_stained_glass")
+    REGISTER_BLOCK(PURPLE_STAINED_GLASS, "purple_stained_glass")
+    REGISTER_BLOCK(BLUE_STAINED_GLASS, "blue_stained_glass")
+    REGISTER_BLOCK(BROWN_STAINED_GLASS, "brown_stained_glass")
+    REGISTER_BLOCK(GREEN_STAINED_GLASS, "green_stained_glass")
+    REGISTER_BLOCK(RED_STAINED_GLASS, "red_stained_glass")
+    REGISTER_BLOCK(BLACK_STAINED_GLASS, "black_stained_glass")
+    REGISTER_BLOCK(OAK_TRAPDOOR, "oak_trapdoor")
+    REGISTER_BLOCK(SPRUCE_TRAPDOOR, "spruce_trapdoor")
+    REGISTER_BLOCK(BIRCH_TRAPDOOR, "birch_trapdoor")
+    REGISTER_BLOCK(JUNGLE_TRAPDOOR, "jungle_trapdoor")
+    REGISTER_BLOCK(ACACIA_TRAPDOOR, "acacia_trapdoor")
+    REGISTER_BLOCK(CHERRY_TRAPDOOR, "cherry_trapdoor")
+    REGISTER_BLOCK(DARK_OAK_TRAPDOOR, "dark_oak_trapdoor")
+    REGISTER_BLOCK(PALE_OAK_TRAPDOOR, "pale_oak_trapdoor")
+    REGISTER_BLOCK(MANGROVE_TRAPDOOR, "mangrove_trapdoor")
+    REGISTER_BLOCK(BAMBOO_TRAPDOOR, "bamboo_trapdoor")
+    REGISTER_BLOCK(STONE_BRICKS, "stone_bricks")
+    REGISTER_BLOCK(MOSSY_STONE_BRICKS, "mossy_stone_bricks")
+    REGISTER_BLOCK(CRACKED_STONE_BRICKS, "cracked_stone_bricks")
+    REGISTER_BLOCK(CHISELED_STONE_BRICKS, "chiseled_stone_bricks")
+    REGISTER_BLOCK(PACKED_MUD, "packed_mud")
+    REGISTER_BLOCK(MUD_BRICKS, "mud_bricks")
+    REGISTER_BLOCK(INFESTED_STONE, "infested_stone")
+    REGISTER_BLOCK(INFESTED_COBBLESTONE, "infested_cobblestone")
+    REGISTER_BLOCK(INFESTED_STONE_BRICKS, "infested_stone_bricks")
+    REGISTER_BLOCK(INFESTED_MOSSY_STONE_BRICKS, "infested_mossy_stone_bricks")
+    REGISTER_BLOCK(INFESTED_CRACKED_STONE_BRICKS, "infested_cracked_stone_bricks")
+    REGISTER_BLOCK(INFESTED_CHISELED_STONE_BRICKS, "infested_chiseled_stone_bricks")
+    REGISTER_BLOCK(BROWN_MUSHROOM_BLOCK, "brown_mushroom_block")
+    REGISTER_BLOCK(RED_MUSHROOM_BLOCK, "red_mushroom_block")
+    REGISTER_BLOCK(MUSHROOM_STEM, "mushroom_stem")
+    REGISTER_BLOCK(IRON_BARS, "iron_bars")
+    REGISTER_BLOCK(CHAIN, "chain")
+    REGISTER_BLOCK(GLASS_PANE, "glass_pane")
+    REGISTER_BLOCK(PUMPKIN, "pumpkin")
+    REGISTER_BLOCK(MELON, "melon")
+    REGISTER_BLOCK(ATTACHED_PUMPKIN_STEM, "attached_pumpkin_stem")
+    REGISTER_BLOCK(ATTACHED_MELON_STEM, "attached_melon_stem")
+    REGISTER_BLOCK(PUMPKIN_STEM, "pumpkin_stem")
+    REGISTER_BLOCK(MELON_STEM, "melon_stem")
+    REGISTER_BLOCK(VINE, "vine")
+    REGISTER_BLOCK(GLOW_LICHEN, "glow_lichen")
+    REGISTER_BLOCK(RESIN_CLUMP, "resin_clump")
+    REGISTER_BLOCK(OAK_FENCE_GATE, "oak_fence_gate")
+    REGISTER_BLOCK(BRICK_STAIRS, "brick_stairs")
+    REGISTER_BLOCK(STONE_BRICK_STAIRS, "stone_brick_stairs")
+    REGISTER_BLOCK(MUD_BRICK_STAIRS, "mud_brick_stairs")
+    REGISTER_BLOCK(MYCELIUM, "mycelium")
+    REGISTER_BLOCK(LILY_PAD, "lily_pad")
+    REGISTER_BLOCK(RESIN_BLOCK, "resin_block")
+    REGISTER_BLOCK(RESIN_BRICKS, "resin_bricks")
+    REGISTER_BLOCK(RESIN_BRICK_STAIRS, "resin_brick_stairs")
+    REGISTER_BLOCK(RESIN_BRICK_SLAB, "resin_brick_slab")
+    REGISTER_BLOCK(RESIN_BRICK_WALL, "resin_brick_wall")
+    REGISTER_BLOCK(CHISELED_RESIN_BRICKS, "chiseled_resin_bricks")
+    REGISTER_BLOCK(NETHER_BRICKS, "nether_bricks")
+    REGISTER_BLOCK(NETHER_BRICK_FENCE, "nether_brick_fence")
+    REGISTER_BLOCK(NETHER_BRICK_STAIRS, "nether_brick_stairs")
+    REGISTER_BLOCK(NETHER_WART, "nether_wart")
+    REGISTER_BLOCK(ENCHANTING_TABLE, "enchanting_table")
+    REGISTER_BLOCK(BREWING_STAND, "brewing_stand")
+    REGISTER_BLOCK(CAULDRON, "cauldron")
+    REGISTER_BLOCK(WATER_CAULDRON, "water_cauldron")
+    REGISTER_BLOCK(LAVA_CAULDRON, "lava_cauldron")
+    REGISTER_BLOCK(POWDER_SNOW_CAULDRON, "powder_snow_cauldron")
+    REGISTER_BLOCK(END_PORTAL, "end_portal")
+    REGISTER_BLOCK(END_PORTAL_FRAME, "end_portal_frame")
+    REGISTER_BLOCK(END_STONE, "end_stone")
+    REGISTER_BLOCK(DRAGON_EGG, "dragon_egg")
+    REGISTER_BLOCK(REDSTONE_LAMP, "redstone_lamp")
+    REGISTER_BLOCK(COCOA, "cocoa")
+    REGISTER_BLOCK(SANDSTONE_STAIRS, "sandstone_stairs")
+    REGISTER_BLOCK(EMERALD_ORE, "emerald_ore")
+    REGISTER_BLOCK(DEEPSLATE_EMERALD_ORE, "deepslate_emerald_ore")
+    REGISTER_BLOCK(ENDER_CHEST, "ender_chest")
+    REGISTER_BLOCK(TRIPWIRE_HOOK, "tripwire_hook")
+    REGISTER_BLOCK(TRIPWIRE, "tripwire")
+    REGISTER_BLOCK(EMERALD_BLOCK, "emerald_block")
+    REGISTER_BLOCK(SPRUCE_STAIRS, "spruce_stairs")
+    REGISTER_BLOCK(BIRCH_STAIRS, "birch_stairs")
+    REGISTER_BLOCK(JUNGLE_STAIRS, "jungle_stairs")
+    REGISTER_BLOCK(COMMAND_BLOCK, "command_block")
+    REGISTER_BLOCK(BEACON, "beacon")
+    REGISTER_BLOCK(COBBLESTONE_WALL, "cobblestone_wall")
+    REGISTER_BLOCK(MOSSY_COBBLESTONE_WALL, "mossy_cobblestone_wall")
+    REGISTER_BLOCK(FLOWER_POT, "flower_pot")
+    REGISTER_BLOCK(POTTED_TORCHFLOWER, "potted_torchflower")
+    REGISTER_BLOCK(POTTED_OAK_SAPLING, "potted_oak_sapling")
+    REGISTER_BLOCK(POTTED_SPRUCE_SAPLING, "potted_spruce_sapling")
+    REGISTER_BLOCK(POTTED_BIRCH_SAPLING, "potted_birch_sapling")
+    REGISTER_BLOCK(POTTED_JUNGLE_SAPLING, "potted_jungle_sapling")
+    REGISTER_BLOCK(POTTED_ACACIA_SAPLING, "potted_acacia_sapling")
+    REGISTER_BLOCK(POTTED_CHERRY_SAPLING, "potted_cherry_sapling")
+    REGISTER_BLOCK(POTTED_DARK_OAK_SAPLING, "potted_dark_oak_sapling")
+    REGISTER_BLOCK(POTTED_PALE_OAK_SAPLING, "potted_pale_oak_sapling")
+    REGISTER_BLOCK(POTTED_MANGROVE_PROPAGULE, "potted_mangrove_propagule")
+    REGISTER_BLOCK(POTTED_FERN, "potted_fern")
+    REGISTER_BLOCK(POTTED_DANDELION, "potted_dandelion")
+    REGISTER_BLOCK(POTTED_POPPY, "potted_poppy")
+    REGISTER_BLOCK(POTTED_BLUE_ORCHID, "potted_blue_orchid")
+    REGISTER_BLOCK(POTTED_ALLIUM, "potted_allium")
+    REGISTER_BLOCK(POTTED_AZURE_BLUET, "potted_azure_bluet")
+    REGISTER_BLOCK(POTTED_RED_TULIP, "potted_red_tulip")
+    REGISTER_BLOCK(POTTED_ORANGE_TULIP, "potted_orange_tulip")
+    REGISTER_BLOCK(POTTED_WHITE_TULIP, "potted_white_tulip")
+    REGISTER_BLOCK(POTTED_PINK_TULIP, "potted_pink_tulip")
+    REGISTER_BLOCK(POTTED_OXEYE_DAISY, "potted_oxeye_daisy")
+    REGISTER_BLOCK(POTTED_CORNFLOWER, "potted_cornflower")
+    REGISTER_BLOCK(POTTED_LILY_OF_THE_VALLEY, "potted_lily_of_the_valley")
+    REGISTER_BLOCK(POTTED_WITHER_ROSE, "potted_wither_rose")
+    REGISTER_BLOCK(POTTED_RED_MUSHROOM, "potted_red_mushroom")
+    REGISTER_BLOCK(POTTED_BROWN_MUSHROOM, "potted_brown_mushroom")
+    REGISTER_BLOCK(POTTED_DEAD_BUSH, "potted_dead_bush")
+    REGISTER_BLOCK(POTTED_CACTUS, "potted_cactus")
+    REGISTER_BLOCK(CARROTS, "carrots")
+    REGISTER_BLOCK(POTATOES, "potatoes")
+    REGISTER_BLOCK(OAK_BUTTON, "oak_button")
+    REGISTER_BLOCK(SPRUCE_BUTTON, "spruce_button")
+    REGISTER_BLOCK(BIRCH_BUTTON, "birch_button")
+    REGISTER_BLOCK(JUNGLE_BUTTON, "jungle_button")
+    REGISTER_BLOCK(ACACIA_BUTTON, "acacia_button")
+    REGISTER_BLOCK(CHERRY_BUTTON, "cherry_button")
+    REGISTER_BLOCK(DARK_OAK_BUTTON, "dark_oak_button")
+    REGISTER_BLOCK(PALE_OAK_BUTTON, "pale_oak_button")
+    REGISTER_BLOCK(MANGROVE_BUTTON, "mangrove_button")
+    REGISTER_BLOCK(BAMBOO_BUTTON, "bamboo_button")
+    REGISTER_BLOCK(SKELETON_SKULL, "skeleton_skull")
+    REGISTER_BLOCK(SKELETON_WALL_SKULL, "skeleton_wall_skull")
+    REGISTER_BLOCK(WITHER_SKELETON_SKULL, "wither_skeleton_skull")
+    REGISTER_BLOCK(WITHER_SKELETON_WALL_SKULL, "wither_skeleton_wall_skull")
+    REGISTER_BLOCK(ZOMBIE_HEAD, "zombie_head")
+    REGISTER_BLOCK(ZOMBIE_WALL_HEAD, "zombie_wall_head")
+    REGISTER_BLOCK(PLAYER_HEAD, "player_head")
+    REGISTER_BLOCK(PLAYER_WALL_HEAD, "player_wall_head")
+    REGISTER_BLOCK(CREEPER_HEAD, "creeper_head")
+    REGISTER_BLOCK(CREEPER_WALL_HEAD, "creeper_wall_head")
+    REGISTER_BLOCK(DRAGON_HEAD, "dragon_head")
+    REGISTER_BLOCK(DRAGON_WALL_HEAD, "dragon_wall_head")
+    REGISTER_BLOCK(PIGLIN_HEAD, "piglin_head")
+    REGISTER_BLOCK(PIGLIN_WALL_HEAD, "piglin_wall_head")
+    REGISTER_BLOCK(ANVIL, "anvil")
+    REGISTER_BLOCK(CHIPPED_ANVIL, "chipped_anvil")
+    REGISTER_BLOCK(DAMAGED_ANVIL, "damaged_anvil")
+    REGISTER_BLOCK(TRAPPED_CHEST, "trapped_chest")
+    REGISTER_BLOCK(LIGHT_WEIGHTED_PRESSURE_PLATE, "light_weighted_pressure_plate")
+    REGISTER_BLOCK(HEAVY_WEIGHTED_PRESSURE_PLATE, "heavy_weighted_pressure_plate")
+    REGISTER_BLOCK(COMPARATOR, "comparator")
+    REGISTER_BLOCK(DAYLIGHT_DETECTOR, "daylight_detector")
+    REGISTER_BLOCK(REDSTONE_BLOCK, "redstone_block")
+    REGISTER_BLOCK(NETHER_QUARTZ_ORE, "nether_quartz_ore")
+    REGISTER_BLOCK(HOPPER, "hopper")
+    REGISTER_BLOCK(QUARTZ_BLOCK, "quartz_block")
+    REGISTER_BLOCK(CHISELED_QUARTZ_BLOCK, "chiseled_quartz_block")
+    REGISTER_BLOCK(QUARTZ_PILLAR, "quartz_pillar")
+    REGISTER_BLOCK(QUARTZ_STAIRS, "quartz_stairs")
+    REGISTER_BLOCK(ACTIVATOR_RAIL, "activator_rail")
+    REGISTER_BLOCK(DROPPER, "dropper")
+    REGISTER_BLOCK(WHITE_TERRACOTTA, "white_terracotta")
+    REGISTER_BLOCK(ORANGE_TERRACOTTA, "orange_terracotta")
+    REGISTER_BLOCK(MAGENTA_TERRACOTTA, "magenta_terracotta")
+    REGISTER_BLOCK(LIGHT_BLUE_TERRACOTTA, "light_blue_terracotta")
+    REGISTER_BLOCK(YELLOW_TERRACOTTA, "yellow_terracotta")
+    REGISTER_BLOCK(LIME_TERRACOTTA, "lime_terracotta")
+    REGISTER_BLOCK(PINK_TERRACOTTA, "pink_terracotta")
+    REGISTER_BLOCK(GRAY_TERRACOTTA, "gray_terracotta")
+    REGISTER_BLOCK(LIGHT_GRAY_TERRACOTTA, "light_gray_terracotta")
+    REGISTER_BLOCK(CYAN_TERRACOTTA, "cyan_terracotta")
+    REGISTER_BLOCK(PURPLE_TERRACOTTA, "purple_terracotta")
+    REGISTER_BLOCK(BLUE_TERRACOTTA, "blue_terracotta")
+    REGISTER_BLOCK(BROWN_TERRACOTTA, "brown_terracotta")
+    REGISTER_BLOCK(GREEN_TERRACOTTA, "green_terracotta")
+    REGISTER_BLOCK(RED_TERRACOTTA, "red_terracotta")
+    REGISTER_BLOCK(BLACK_TERRACOTTA, "black_terracotta")
+    REGISTER_BLOCK(WHITE_STAINED_GLASS_PANE, "white_stained_glass_pane")
+    REGISTER_BLOCK(ORANGE_STAINED_GLASS_PANE, "orange_stained_glass_pane")
+    REGISTER_BLOCK(MAGENTA_STAINED_GLASS_PANE, "magenta_stained_glass_pane")
+    REGISTER_BLOCK(LIGHT_BLUE_STAINED_GLASS_PANE, "light_blue_stained_glass_pane")
+    REGISTER_BLOCK(YELLOW_STAINED_GLASS_PANE, "yellow_stained_glass_pane")
+    REGISTER_BLOCK(LIME_STAINED_GLASS_PANE, "lime_stained_glass_pane")
+    REGISTER_BLOCK(PINK_STAINED_GLASS_PANE, "pink_stained_glass_pane")
+    REGISTER_BLOCK(GRAY_STAINED_GLASS_PANE, "gray_stained_glass_pane")
+    REGISTER_BLOCK(LIGHT_GRAY_STAINED_GLASS_PANE, "light_gray_stained_glass_pane")
+    REGISTER_BLOCK(CYAN_STAINED_GLASS_PANE, "cyan_stained_glass_pane")
+    REGISTER_BLOCK(PURPLE_STAINED_GLASS_PANE, "purple_stained_glass_pane")
+    REGISTER_BLOCK(BLUE_STAINED_GLASS_PANE, "blue_stained_glass_pane")
+    REGISTER_BLOCK(BROWN_STAINED_GLASS_PANE, "brown_stained_glass_pane")
+    REGISTER_BLOCK(GREEN_STAINED_GLASS_PANE, "green_stained_glass_pane")
+    REGISTER_BLOCK(RED_STAINED_GLASS_PANE, "red_stained_glass_pane")
+    REGISTER_BLOCK(BLACK_STAINED_GLASS_PANE, "black_stained_glass_pane")
+    REGISTER_BLOCK(ACACIA_STAIRS, "acacia_stairs")
+    REGISTER_BLOCK(CHERRY_STAIRS, "cherry_stairs")
+    REGISTER_BLOCK(DARK_OAK_STAIRS, "dark_oak_stairs")
+    REGISTER_BLOCK(PALE_OAK_STAIRS, "pale_oak_stairs")
+    REGISTER_BLOCK(MANGROVE_STAIRS, "mangrove_stairs")
+    REGISTER_BLOCK(BAMBOO_STAIRS, "bamboo_stairs")
+    REGISTER_BLOCK(BAMBOO_MOSAIC_STAIRS, "bamboo_mosaic_stairs")
+    REGISTER_BLOCK(SLIME_BLOCK, "slime_block")
+    REGISTER_BLOCK(BARRIER, "barrier")
+    REGISTER_BLOCK(LIGHT, "light")
+    REGISTER_BLOCK(IRON_TRAPDOOR, "iron_trapdoor")
+    REGISTER_BLOCK(PRISMARINE, "prismarine")
+    REGISTER_BLOCK(PRISMARINE_BRICKS, "prismarine_bricks")
+    REGISTER_BLOCK(DARK_PRISMARINE, "dark_prismarine")
+    REGISTER_BLOCK(PRISMARINE_STAIRS, "prismarine_stairs")
+    REGISTER_BLOCK(PRISMARINE_BRICK_STAIRS, "prismarine_brick_stairs")
+    REGISTER_BLOCK(DARK_PRISMARINE_STAIRS, "dark_prismarine_stairs")
+    REGISTER_BLOCK(PRISMARINE_SLAB, "prismarine_slab")
+    REGISTER_BLOCK(PRISMARINE_BRICK_SLAB, "prismarine_brick_slab")
+    REGISTER_BLOCK(DARK_PRISMARINE_SLAB, "dark_prismarine_slab")
+    REGISTER_BLOCK(SEA_LANTERN, "sea_lantern")
+    REGISTER_BLOCK(HAY_BLOCK, "hay_block")
+    REGISTER_BLOCK(WHITE_CARPET, "white_carpet")
+    REGISTER_BLOCK(ORANGE_CARPET, "orange_carpet")
+    REGISTER_BLOCK(MAGENTA_CARPET, "magenta_carpet")
+    REGISTER_BLOCK(LIGHT_BLUE_CARPET, "light_blue_carpet")
+    REGISTER_BLOCK(YELLOW_CARPET, "yellow_carpet")
+    REGISTER_BLOCK(LIME_CARPET, "lime_carpet")
+    REGISTER_BLOCK(PINK_CARPET, "pink_carpet")
+    REGISTER_BLOCK(GRAY_CARPET, "gray_carpet")
+    REGISTER_BLOCK(LIGHT_GRAY_CARPET, "light_gray_carpet")
+    REGISTER_BLOCK(CYAN_CARPET, "cyan_carpet")
+    REGISTER_BLOCK(PURPLE_CARPET, "purple_carpet")
+    REGISTER_BLOCK(BLUE_CARPET, "blue_carpet")
+    REGISTER_BLOCK(BROWN_CARPET, "brown_carpet")
+    REGISTER_BLOCK(GREEN_CARPET, "green_carpet")
+    REGISTER_BLOCK(RED_CARPET, "red_carpet")
+    REGISTER_BLOCK(BLACK_CARPET, "black_carpet")
+    REGISTER_BLOCK(TERRACOTTA, "terracotta")
+    REGISTER_BLOCK(COAL_BLOCK, "coal_block")
+    REGISTER_BLOCK(PACKED_ICE, "packed_ice")
+    REGISTER_BLOCK(SUNFLOWER, "sunflower")
+    REGISTER_BLOCK(LILAC, "lilac")
+    REGISTER_BLOCK(ROSE_BUSH, "rose_bush")
+    REGISTER_BLOCK(PEONY, "peony")
+    REGISTER_BLOCK(TALL_GRASS, "tall_grass")
+    REGISTER_BLOCK(LARGE_FERN, "large_fern")
+    REGISTER_BLOCK(WHITE_BANNER, "white_banner")
+    REGISTER_BLOCK(ORANGE_BANNER, "orange_banner")
+    REGISTER_BLOCK(MAGENTA_BANNER, "magenta_banner")
+    REGISTER_BLOCK(LIGHT_BLUE_BANNER, "light_blue_banner")
+    REGISTER_BLOCK(YELLOW_BANNER, "yellow_banner")
+    REGISTER_BLOCK(LIME_BANNER, "lime_banner")
+    REGISTER_BLOCK(PINK_BANNER, "pink_banner")
+    REGISTER_BLOCK(GRAY_BANNER, "gray_banner")
+    REGISTER_BLOCK(LIGHT_GRAY_BANNER, "light_gray_banner")
+    REGISTER_BLOCK(CYAN_BANNER, "cyan_banner")
+    REGISTER_BLOCK(PURPLE_BANNER, "purple_banner")
+    REGISTER_BLOCK(BLUE_BANNER, "blue_banner")
+    REGISTER_BLOCK(BROWN_BANNER, "brown_banner")
+    REGISTER_BLOCK(GREEN_BANNER, "green_banner")
+    REGISTER_BLOCK(RED_BANNER, "red_banner")
+    REGISTER_BLOCK(BLACK_BANNER, "black_banner")
+    REGISTER_BLOCK(WHITE_WALL_BANNER, "white_wall_banner")
+    REGISTER_BLOCK(ORANGE_WALL_BANNER, "orange_wall_banner")
+    REGISTER_BLOCK(MAGENTA_WALL_BANNER, "magenta_wall_banner")
+    REGISTER_BLOCK(LIGHT_BLUE_WALL_BANNER, "light_blue_wall_banner")
+    REGISTER_BLOCK(YELLOW_WALL_BANNER, "yellow_wall_banner")
+    REGISTER_BLOCK(LIME_WALL_BANNER, "lime_wall_banner")
+    REGISTER_BLOCK(PINK_WALL_BANNER, "pink_wall_banner")
+    REGISTER_BLOCK(GRAY_WALL_BANNER, "gray_wall_banner")
+    REGISTER_BLOCK(LIGHT_GRAY_WALL_BANNER, "light_gray_wall_banner")
+    REGISTER_BLOCK(CYAN_WALL_BANNER, "cyan_wall_banner")
+    REGISTER_BLOCK(PURPLE_WALL_BANNER, "purple_wall_banner")
+    REGISTER_BLOCK(BLUE_WALL_BANNER, "blue_wall_banner")
+    REGISTER_BLOCK(BROWN_WALL_BANNER, "brown_wall_banner")
+    REGISTER_BLOCK(GREEN_WALL_BANNER, "green_wall_banner")
+    REGISTER_BLOCK(RED_WALL_BANNER, "red_wall_banner")
+    REGISTER_BLOCK(BLACK_WALL_BANNER, "black_wall_banner")
+    REGISTER_BLOCK(RED_SANDSTONE, "red_sandstone")
+    REGISTER_BLOCK(CHISELED_RED_SANDSTONE, "chiseled_red_sandstone")
+    REGISTER_BLOCK(CUT_RED_SANDSTONE, "cut_red_sandstone")
+    REGISTER_BLOCK(RED_SANDSTONE_STAIRS, "red_sandstone_stairs")
+    REGISTER_BLOCK(OAK_SLAB, "oak_slab")
+    REGISTER_BLOCK(SPRUCE_SLAB, "spruce_slab")
+    REGISTER_BLOCK(BIRCH_SLAB, "birch_slab")
+    REGISTER_BLOCK(JUNGLE_SLAB, "jungle_slab")
+    REGISTER_BLOCK(ACACIA_SLAB, "acacia_slab")
+    REGISTER_BLOCK(CHERRY_SLAB, "cherry_slab")
+    REGISTER_BLOCK(DARK_OAK_SLAB, "dark_oak_slab")
+    REGISTER_BLOCK(PALE_OAK_SLAB, "pale_oak_slab")
+    REGISTER_BLOCK(MANGROVE_SLAB, "mangrove_slab")
+    REGISTER_BLOCK(BAMBOO_SLAB, "bamboo_slab")
+    REGISTER_BLOCK(BAMBOO_MOSAIC_SLAB, "bamboo_mosaic_slab")
+    REGISTER_BLOCK(STONE_SLAB, "stone_slab")
+    REGISTER_BLOCK(SMOOTH_STONE_SLAB, "smooth_stone_slab")
+    REGISTER_BLOCK(SANDSTONE_SLAB, "sandstone_slab")
+    REGISTER_BLOCK(CUT_SANDSTONE_SLAB, "cut_sandstone_slab")
+    REGISTER_BLOCK(PETRIFIED_OAK_SLAB, "petrified_oak_slab")
+    REGISTER_BLOCK(COBBLESTONE_SLAB, "cobblestone_slab")
+    REGISTER_BLOCK(BRICK_SLAB, "brick_slab")
+    REGISTER_BLOCK(STONE_BRICK_SLAB, "stone_brick_slab")
+    REGISTER_BLOCK(MUD_BRICK_SLAB, "mud_brick_slab")
+    REGISTER_BLOCK(NETHER_BRICK_SLAB, "nether_brick_slab")
+    REGISTER_BLOCK(QUARTZ_SLAB, "quartz_slab")
+    REGISTER_BLOCK(RED_SANDSTONE_SLAB, "red_sandstone_slab")
+    REGISTER_BLOCK(CUT_RED_SANDSTONE_SLAB, "cut_red_sandstone_slab")
+    REGISTER_BLOCK(PURPUR_SLAB, "purpur_slab")
+    REGISTER_BLOCK(SMOOTH_STONE, "smooth_stone")
+    REGISTER_BLOCK(SMOOTH_SANDSTONE, "smooth_sandstone")
+    REGISTER_BLOCK(SMOOTH_QUARTZ, "smooth_quartz")
+    REGISTER_BLOCK(SMOOTH_RED_SANDSTONE, "smooth_red_sandstone")
+    REGISTER_BLOCK(SPRUCE_FENCE_GATE, "spruce_fence_gate")
+    REGISTER_BLOCK(BIRCH_FENCE_GATE, "birch_fence_gate")
+    REGISTER_BLOCK(JUNGLE_FENCE_GATE, "jungle_fence_gate")
+    REGISTER_BLOCK(ACACIA_FENCE_GATE, "acacia_fence_gate")
+    REGISTER_BLOCK(CHERRY_FENCE_GATE, "cherry_fence_gate")
+    REGISTER_BLOCK(DARK_OAK_FENCE_GATE, "dark_oak_fence_gate")
+    REGISTER_BLOCK(PALE_OAK_FENCE_GATE, "pale_oak_fence_gate")
+    REGISTER_BLOCK(MANGROVE_FENCE_GATE, "mangrove_fence_gate")
+    REGISTER_BLOCK(BAMBOO_FENCE_GATE, "bamboo_fence_gate")
+    REGISTER_BLOCK(SPRUCE_FENCE, "spruce_fence")
+    REGISTER_BLOCK(BIRCH_FENCE, "birch_fence")
+    REGISTER_BLOCK(JUNGLE_FENCE, "jungle_fence")
+    REGISTER_BLOCK(ACACIA_FENCE, "acacia_fence")
+    REGISTER_BLOCK(CHERRY_FENCE, "cherry_fence")
+    REGISTER_BLOCK(DARK_OAK_FENCE, "dark_oak_fence")
+    REGISTER_BLOCK(PALE_OAK_FENCE, "pale_oak_fence")
+    REGISTER_BLOCK(MANGROVE_FENCE, "mangrove_fence")
+    REGISTER_BLOCK(BAMBOO_FENCE, "bamboo_fence")
+    REGISTER_BLOCK(SPRUCE_DOOR, "spruce_door")
+    REGISTER_BLOCK(BIRCH_DOOR, "birch_door")
+    REGISTER_BLOCK(JUNGLE_DOOR, "jungle_door")
+    REGISTER_BLOCK(ACACIA_DOOR, "acacia_door")
+    REGISTER_BLOCK(CHERRY_DOOR, "cherry_door")
+    REGISTER_BLOCK(DARK_OAK_DOOR, "dark_oak_door")
+    REGISTER_BLOCK(PALE_OAK_DOOR, "pale_oak_door")
+    REGISTER_BLOCK(MANGROVE_DOOR, "mangrove_door")
+    REGISTER_BLOCK(BAMBOO_DOOR, "bamboo_door")
+    REGISTER_BLOCK(END_ROD, "end_rod")
+    REGISTER_BLOCK(CHORUS_PLANT, "chorus_plant")
+    REGISTER_BLOCK(CHORUS_FLOWER, "chorus_flower")
+    REGISTER_BLOCK(PURPUR_BLOCK, "purpur_block")
+    REGISTER_BLOCK(PURPUR_PILLAR, "purpur_pillar")
+    REGISTER_BLOCK(PURPUR_STAIRS, "purpur_stairs")
+    REGISTER_BLOCK(END_STONE_BRICKS, "end_stone_bricks")
+    REGISTER_BLOCK(TORCHFLOWER_CROP, "torchflower_crop")
+    REGISTER_BLOCK(PITCHER_CROP, "pitcher_crop")
+    REGISTER_BLOCK(PITCHER_PLANT, "pitcher_plant")
+    REGISTER_BLOCK(BEETROOTS, "beetroots")
+    REGISTER_BLOCK(DIRT_PATH, "dirt_path")
+    REGISTER_BLOCK(END_GATEWAY, "end_gateway")
+    REGISTER_BLOCK(REPEATING_COMMAND_BLOCK, "repeating_command_block")
+    REGISTER_BLOCK(CHAIN_COMMAND_BLOCK, "chain_command_block")
+    REGISTER_BLOCK(FROSTED_ICE, "frosted_ice")
+    REGISTER_BLOCK(MAGMA_BLOCK, "magma_block")
+    REGISTER_BLOCK(NETHER_WART_BLOCK, "nether_wart_block")
+    REGISTER_BLOCK(RED_NETHER_BRICKS, "red_nether_bricks")
+    REGISTER_BLOCK(BONE_BLOCK, "bone_block")
+    REGISTER_BLOCK(STRUCTURE_VOID, "structure_void")
+    REGISTER_BLOCK(OBSERVER, "observer")
+    REGISTER_BLOCK(SHULKER_BOX, "shulker_box")
+    REGISTER_BLOCK(WHITE_SHULKER_BOX, "white_shulker_box")
+    REGISTER_BLOCK(ORANGE_SHULKER_BOX, "orange_shulker_box")
+    REGISTER_BLOCK(MAGENTA_SHULKER_BOX, "magenta_shulker_box")
+    REGISTER_BLOCK(LIGHT_BLUE_SHULKER_BOX, "light_blue_shulker_box")
+    REGISTER_BLOCK(YELLOW_SHULKER_BOX, "yellow_shulker_box")
+    REGISTER_BLOCK(LIME_SHULKER_BOX, "lime_shulker_box")
+    REGISTER_BLOCK(PINK_SHULKER_BOX, "pink_shulker_box")
+    REGISTER_BLOCK(GRAY_SHULKER_BOX, "gray_shulker_box")
+    REGISTER_BLOCK(LIGHT_GRAY_SHULKER_BOX, "light_gray_shulker_box")
+    REGISTER_BLOCK(CYAN_SHULKER_BOX, "cyan_shulker_box")
+    REGISTER_BLOCK(PURPLE_SHULKER_BOX, "purple_shulker_box")
+    REGISTER_BLOCK(BLUE_SHULKER_BOX, "blue_shulker_box")
+    REGISTER_BLOCK(BROWN_SHULKER_BOX, "brown_shulker_box")
+    REGISTER_BLOCK(GREEN_SHULKER_BOX, "green_shulker_box")
+    REGISTER_BLOCK(RED_SHULKER_BOX, "red_shulker_box")
+    REGISTER_BLOCK(BLACK_SHULKER_BOX, "black_shulker_box")
+    REGISTER_BLOCK(WHITE_GLAZED_TERRACOTTA, "white_glazed_terracotta")
+    REGISTER_BLOCK(ORANGE_GLAZED_TERRACOTTA, "orange_glazed_terracotta")
+    REGISTER_BLOCK(MAGENTA_GLAZED_TERRACOTTA, "magenta_glazed_terracotta")
+    REGISTER_BLOCK(LIGHT_BLUE_GLAZED_TERRACOTTA, "light_blue_glazed_terracotta")
+    REGISTER_BLOCK(YELLOW_GLAZED_TERRACOTTA, "yellow_glazed_terracotta")
+    REGISTER_BLOCK(LIME_GLAZED_TERRACOTTA, "lime_glazed_terracotta")
+    REGISTER_BLOCK(PINK_GLAZED_TERRACOTTA, "pink_glazed_terracotta")
+    REGISTER_BLOCK(GRAY_GLAZED_TERRACOTTA, "gray_glazed_terracotta")
+    REGISTER_BLOCK(LIGHT_GRAY_GLAZED_TERRACOTTA, "light_gray_glazed_terracotta")
+    REGISTER_BLOCK(CYAN_GLAZED_TERRACOTTA, "cyan_glazed_terracotta")
+    REGISTER_BLOCK(PURPLE_GLAZED_TERRACOTTA, "purple_glazed_terracotta")
+    REGISTER_BLOCK(BLUE_GLAZED_TERRACOTTA, "blue_glazed_terracotta")
+    REGISTER_BLOCK(BROWN_GLAZED_TERRACOTTA, "brown_glazed_terracotta")
+    REGISTER_BLOCK(GREEN_GLAZED_TERRACOTTA, "green_glazed_terracotta")
+    REGISTER_BLOCK(RED_GLAZED_TERRACOTTA, "red_glazed_terracotta")
+    REGISTER_BLOCK(BLACK_GLAZED_TERRACOTTA, "black_glazed_terracotta")
+    REGISTER_BLOCK(WHITE_CONCRETE, "white_concrete")
+    REGISTER_BLOCK(ORANGE_CONCRETE, "orange_concrete")
+    REGISTER_BLOCK(MAGENTA_CONCRETE, "magenta_concrete")
+    REGISTER_BLOCK(LIGHT_BLUE_CONCRETE, "light_blue_concrete")
+    REGISTER_BLOCK(YELLOW_CONCRETE, "yellow_concrete")
+    REGISTER_BLOCK(LIME_CONCRETE, "lime_concrete")
+    REGISTER_BLOCK(PINK_CONCRETE, "pink_concrete")
+    REGISTER_BLOCK(GRAY_CONCRETE, "gray_concrete")
+    REGISTER_BLOCK(LIGHT_GRAY_CONCRETE, "light_gray_concrete")
+    REGISTER_BLOCK(CYAN_CONCRETE, "cyan_concrete")
+    REGISTER_BLOCK(PURPLE_CONCRETE, "purple_concrete")
+    REGISTER_BLOCK(BLUE_CONCRETE, "blue_concrete")
+    REGISTER_BLOCK(BROWN_CONCRETE, "brown_concrete")
+    REGISTER_BLOCK(GREEN_CONCRETE, "green_concrete")
+    REGISTER_BLOCK(RED_CONCRETE, "red_concrete")
+    REGISTER_BLOCK(BLACK_CONCRETE, "black_concrete")
+    REGISTER_BLOCK(WHITE_CONCRETE_POWDER, "white_concrete_powder")
+    REGISTER_BLOCK(ORANGE_CONCRETE_POWDER, "orange_concrete_powder")
+    REGISTER_BLOCK(MAGENTA_CONCRETE_POWDER, "magenta_concrete_powder")
+    REGISTER_BLOCK(LIGHT_BLUE_CONCRETE_POWDER, "light_blue_concrete_powder")
+    REGISTER_BLOCK(YELLOW_CONCRETE_POWDER, "yellow_concrete_powder")
+    REGISTER_BLOCK(LIME_CONCRETE_POWDER, "lime_concrete_powder")
+    REGISTER_BLOCK(PINK_CONCRETE_POWDER, "pink_concrete_powder")
+    REGISTER_BLOCK(GRAY_CONCRETE_POWDER, "gray_concrete_powder")
+    REGISTER_BLOCK(LIGHT_GRAY_CONCRETE_POWDER, "light_gray_concrete_powder")
+    REGISTER_BLOCK(CYAN_CONCRETE_POWDER, "cyan_concrete_powder")
+    REGISTER_BLOCK(PURPLE_CONCRETE_POWDER, "purple_concrete_powder")
+    REGISTER_BLOCK(BLUE_CONCRETE_POWDER, "blue_concrete_powder")
+    REGISTER_BLOCK(BROWN_CONCRETE_POWDER, "brown_concrete_powder")
+    REGISTER_BLOCK(GREEN_CONCRETE_POWDER, "green_concrete_powder")
+    REGISTER_BLOCK(RED_CONCRETE_POWDER, "red_concrete_powder")
+    REGISTER_BLOCK(BLACK_CONCRETE_POWDER, "black_concrete_powder")
+    REGISTER_BLOCK(KELP, "kelp")
+    REGISTER_BLOCK(KELP_PLANT, "kelp_plant")
+    REGISTER_BLOCK(DRIED_KELP_BLOCK, "dried_kelp_block")
+    REGISTER_BLOCK(TURTLE_EGG, "turtle_egg")
+    REGISTER_BLOCK(SNIFFER_EGG, "sniffer_egg")
+    REGISTER_BLOCK(DEAD_TUBE_CORAL_BLOCK, "dead_tube_coral_block")
+    REGISTER_BLOCK(DEAD_BRAIN_CORAL_BLOCK, "dead_brain_coral_block")
+    REGISTER_BLOCK(DEAD_BUBBLE_CORAL_BLOCK, "dead_bubble_coral_block")
+    REGISTER_BLOCK(DEAD_FIRE_CORAL_BLOCK, "dead_fire_coral_block")
+    REGISTER_BLOCK(DEAD_HORN_CORAL_BLOCK, "dead_horn_coral_block")
+    REGISTER_BLOCK(TUBE_CORAL_BLOCK, "tube_coral_block")
+    REGISTER_BLOCK(BRAIN_CORAL_BLOCK, "brain_coral_block")
+    REGISTER_BLOCK(BUBBLE_CORAL_BLOCK, "bubble_coral_block")
+    REGISTER_BLOCK(FIRE_CORAL_BLOCK, "fire_coral_block")
+    REGISTER_BLOCK(HORN_CORAL_BLOCK, "horn_coral_block")
+    REGISTER_BLOCK(DEAD_TUBE_CORAL, "dead_tube_coral")
+    REGISTER_BLOCK(DEAD_BRAIN_CORAL, "dead_brain_coral")
+    REGISTER_BLOCK(DEAD_BUBBLE_CORAL, "dead_bubble_coral")
+    REGISTER_BLOCK(DEAD_FIRE_CORAL, "dead_fire_coral")
+    REGISTER_BLOCK(DEAD_HORN_CORAL, "dead_horn_coral")
+    REGISTER_BLOCK(TUBE_CORAL, "tube_coral")
+    REGISTER_BLOCK(BRAIN_CORAL, "brain_coral")
+    REGISTER_BLOCK(BUBBLE_CORAL, "bubble_coral")
+    REGISTER_BLOCK(FIRE_CORAL, "fire_coral")
+    REGISTER_BLOCK(HORN_CORAL, "horn_coral")
+    REGISTER_BLOCK(DEAD_TUBE_CORAL_FAN, "dead_tube_coral_fan")
+    REGISTER_BLOCK(DEAD_BRAIN_CORAL_FAN, "dead_brain_coral_fan")
+    REGISTER_BLOCK(DEAD_BUBBLE_CORAL_FAN, "dead_bubble_coral_fan")
+    REGISTER_BLOCK(DEAD_FIRE_CORAL_FAN, "dead_fire_coral_fan")
+    REGISTER_BLOCK(DEAD_HORN_CORAL_FAN, "dead_horn_coral_fan")
+    REGISTER_BLOCK(TUBE_CORAL_FAN, "tube_coral_fan")
+    REGISTER_BLOCK(BRAIN_CORAL_FAN, "brain_coral_fan")
+    REGISTER_BLOCK(BUBBLE_CORAL_FAN, "bubble_coral_fan")
+    REGISTER_BLOCK(FIRE_CORAL_FAN, "fire_coral_fan")
+    REGISTER_BLOCK(HORN_CORAL_FAN, "horn_coral_fan")
+    REGISTER_BLOCK(DEAD_TUBE_CORAL_WALL_FAN, "dead_tube_coral_wall_fan")
+    REGISTER_BLOCK(DEAD_BRAIN_CORAL_WALL_FAN, "dead_brain_coral_wall_fan")
+    REGISTER_BLOCK(DEAD_BUBBLE_CORAL_WALL_FAN, "dead_bubble_coral_wall_fan")
+    REGISTER_BLOCK(DEAD_FIRE_CORAL_WALL_FAN, "dead_fire_coral_wall_fan")
+    REGISTER_BLOCK(DEAD_HORN_CORAL_WALL_FAN, "dead_horn_coral_wall_fan")
+    REGISTER_BLOCK(TUBE_CORAL_WALL_FAN, "tube_coral_wall_fan")
+    REGISTER_BLOCK(BRAIN_CORAL_WALL_FAN, "brain_coral_wall_fan")
+    REGISTER_BLOCK(BUBBLE_CORAL_WALL_FAN, "bubble_coral_wall_fan")
+    REGISTER_BLOCK(FIRE_CORAL_WALL_FAN, "fire_coral_wall_fan")
+    REGISTER_BLOCK(HORN_CORAL_WALL_FAN, "horn_coral_wall_fan")
+    REGISTER_BLOCK(SEA_PICKLE, "sea_pickle")
+    REGISTER_BLOCK(BLUE_ICE, "blue_ice")
+    REGISTER_BLOCK(CONDUIT, "conduit")
+    REGISTER_BLOCK(BAMBOO_SAPLING, "bamboo_sapling")
+    REGISTER_BLOCK(BAMBOO, "bamboo")
+    REGISTER_BLOCK(POTTED_BAMBOO, "potted_bamboo")
+    REGISTER_BLOCK(VOID_AIR, "void_air")
+    REGISTER_BLOCK(CAVE_AIR, "cave_air")
+    REGISTER_BLOCK(BUBBLE_COLUMN, "bubble_column")
+    REGISTER_BLOCK(POLISHED_GRANITE_STAIRS, "polished_granite_stairs")
+    REGISTER_BLOCK(SMOOTH_RED_SANDSTONE_STAIRS, "smooth_red_sandstone_stairs")
+    REGISTER_BLOCK(MOSSY_STONE_BRICK_STAIRS, "mossy_stone_brick_stairs")
+    REGISTER_BLOCK(POLISHED_DIORITE_STAIRS, "polished_diorite_stairs")
+    REGISTER_BLOCK(MOSSY_COBBLESTONE_STAIRS, "mossy_cobblestone_stairs")
+    REGISTER_BLOCK(END_STONE_BRICK_STAIRS, "end_stone_brick_stairs")
+    REGISTER_BLOCK(STONE_STAIRS, "stone_stairs")
+    REGISTER_BLOCK(SMOOTH_SANDSTONE_STAIRS, "smooth_sandstone_stairs")
+    REGISTER_BLOCK(SMOOTH_QUARTZ_STAIRS, "smooth_quartz_stairs")
+    REGISTER_BLOCK(GRANITE_STAIRS, "granite_stairs")
+    REGISTER_BLOCK(ANDESITE_STAIRS, "andesite_stairs")
+    REGISTER_BLOCK(RED_NETHER_BRICK_STAIRS, "red_nether_brick_stairs")
+    REGISTER_BLOCK(POLISHED_ANDESITE_STAIRS, "polished_andesite_stairs")
+    REGISTER_BLOCK(DIORITE_STAIRS, "diorite_stairs")
+    REGISTER_BLOCK(POLISHED_GRANITE_SLAB, "polished_granite_slab")
+    REGISTER_BLOCK(SMOOTH_RED_SANDSTONE_SLAB, "smooth_red_sandstone_slab")
+    REGISTER_BLOCK(MOSSY_STONE_BRICK_SLAB, "mossy_stone_brick_slab")
+    REGISTER_BLOCK(POLISHED_DIORITE_SLAB, "polished_diorite_slab")
+    REGISTER_BLOCK(MOSSY_COBBLESTONE_SLAB, "mossy_cobblestone_slab")
+    REGISTER_BLOCK(END_STONE_BRICK_SLAB, "end_stone_brick_slab")
+    REGISTER_BLOCK(SMOOTH_SANDSTONE_SLAB, "smooth_sandstone_slab")
+    REGISTER_BLOCK(SMOOTH_QUARTZ_SLAB, "smooth_quartz_slab")
+    REGISTER_BLOCK(GRANITE_SLAB, "granite_slab")
+    REGISTER_BLOCK(ANDESITE_SLAB, "andesite_slab")
+    REGISTER_BLOCK(RED_NETHER_BRICK_SLAB, "red_nether_brick_slab")
+    REGISTER_BLOCK(POLISHED_ANDESITE_SLAB, "polished_andesite_slab")
+    REGISTER_BLOCK(DIORITE_SLAB, "diorite_slab")
+    REGISTER_BLOCK(BRICK_WALL, "brick_wall")
+    REGISTER_BLOCK(PRISMARINE_WALL, "prismarine_wall")
+    REGISTER_BLOCK(RED_SANDSTONE_WALL, "red_sandstone_wall")
+    REGISTER_BLOCK(MOSSY_STONE_BRICK_WALL, "mossy_stone_brick_wall")
+    REGISTER_BLOCK(GRANITE_WALL, "granite_wall")
+    REGISTER_BLOCK(STONE_BRICK_WALL, "stone_brick_wall")
+    REGISTER_BLOCK(MUD_BRICK_WALL, "mud_brick_wall")
+    REGISTER_BLOCK(NETHER_BRICK_WALL, "nether_brick_wall")
+    REGISTER_BLOCK(ANDESITE_WALL, "andesite_wall")
+    REGISTER_BLOCK(RED_NETHER_BRICK_WALL, "red_nether_brick_wall")
+    REGISTER_BLOCK(SANDSTONE_WALL, "sandstone_wall")
+    REGISTER_BLOCK(END_STONE_BRICK_WALL, "end_stone_brick_wall")
+    REGISTER_BLOCK(DIORITE_WALL, "diorite_wall")
+    REGISTER_BLOCK(SCAFFOLDING, "scaffolding")
+    REGISTER_BLOCK(LOOM, "loom")
+    REGISTER_BLOCK(BARREL, "barrel")
+    REGISTER_BLOCK(SMOKER, "smoker")
+    REGISTER_BLOCK(BLAST_FURNACE, "blast_furnace")
+    REGISTER_BLOCK(CARTOGRAPHY_TABLE, "cartography_table")
+    REGISTER_BLOCK(FLETCHING_TABLE, "fletching_table")
+    REGISTER_BLOCK(GRINDSTONE, "grindstone")
+    REGISTER_BLOCK(LECTERN, "lectern")
+    REGISTER_BLOCK(SMITHING_TABLE, "smithing_table")
+    REGISTER_BLOCK(STONECUTTER, "stonecutter")
+    REGISTER_BLOCK(BELL, "bell")
+    REGISTER_BLOCK(LANTERN, "lantern")
+    REGISTER_BLOCK(SOUL_LANTERN, "soul_lantern")
+    REGISTER_BLOCK(CAMPFIRE, "campfire")
+    REGISTER_BLOCK(SOUL_CAMPFIRE, "soul_campfire")
+    REGISTER_BLOCK(SWEET_BERRY_BUSH, "sweet_berry_bush")
+    REGISTER_BLOCK(WARPED_STEM, "warped_stem")
+    REGISTER_BLOCK(STRIPPED_WARPED_STEM, "stripped_warped_stem")
+    REGISTER_BLOCK(WARPED_HYPHAE, "warped_hyphae")
+    REGISTER_BLOCK(STRIPPED_WARPED_HYPHAE, "stripped_warped_hyphae")
+    REGISTER_BLOCK(WARPED_NYLIUM, "warped_nylium")
+    REGISTER_BLOCK(WARPED_FUNGUS, "warped_fungus")
+    REGISTER_BLOCK(WARPED_WART_BLOCK, "warped_wart_block")
+    REGISTER_BLOCK(WARPED_ROOTS, "warped_roots")
+    REGISTER_BLOCK(NETHER_SPROUTS, "nether_sprouts")
+    REGISTER_BLOCK(CRIMSON_STEM, "crimson_stem")
+    REGISTER_BLOCK(STRIPPED_CRIMSON_STEM, "stripped_crimson_stem")
+    REGISTER_BLOCK(CRIMSON_HYPHAE, "crimson_hyphae")
+    REGISTER_BLOCK(STRIPPED_CRIMSON_HYPHAE, "stripped_crimson_hyphae")
+    REGISTER_BLOCK(CRIMSON_NYLIUM, "crimson_nylium")
+    REGISTER_BLOCK(CRIMSON_FUNGUS, "crimson_fungus")
+    REGISTER_BLOCK(SHROOMLIGHT, "shroomlight")
+    REGISTER_BLOCK(WEEPING_VINES, "weeping_vines")
+    REGISTER_BLOCK(WEEPING_VINES_PLANT, "weeping_vines_plant")
+    REGISTER_BLOCK(TWISTING_VINES, "twisting_vines")
+    REGISTER_BLOCK(TWISTING_VINES_PLANT, "twisting_vines_plant")
+    REGISTER_BLOCK(CRIMSON_ROOTS, "crimson_roots")
+    REGISTER_BLOCK(CRIMSON_PLANKS, "crimson_planks")
+    REGISTER_BLOCK(WARPED_PLANKS, "warped_planks")
+    REGISTER_BLOCK(CRIMSON_SLAB, "crimson_slab")
+    REGISTER_BLOCK(WARPED_SLAB, "warped_slab")
+    REGISTER_BLOCK(CRIMSON_PRESSURE_PLATE, "crimson_pressure_plate")
+    REGISTER_BLOCK(WARPED_PRESSURE_PLATE, "warped_pressure_plate")
+    REGISTER_BLOCK(CRIMSON_FENCE, "crimson_fence")
+    REGISTER_BLOCK(WARPED_FENCE, "warped_fence")
+    REGISTER_BLOCK(CRIMSON_TRAPDOOR, "crimson_trapdoor")
+    REGISTER_BLOCK(WARPED_TRAPDOOR, "warped_trapdoor")
+    REGISTER_BLOCK(CRIMSON_FENCE_GATE, "crimson_fence_gate")
+    REGISTER_BLOCK(WARPED_FENCE_GATE, "warped_fence_gate")
+    REGISTER_BLOCK(CRIMSON_STAIRS, "crimson_stairs")
+    REGISTER_BLOCK(WARPED_STAIRS, "warped_stairs")
+    REGISTER_BLOCK(CRIMSON_BUTTON, "crimson_button")
+    REGISTER_BLOCK(WARPED_BUTTON, "warped_button")
+    REGISTER_BLOCK(CRIMSON_DOOR, "crimson_door")
+    REGISTER_BLOCK(WARPED_DOOR, "warped_door")
+    REGISTER_BLOCK(CRIMSON_SIGN, "crimson_sign")
+    REGISTER_BLOCK(WARPED_SIGN, "warped_sign")
+    REGISTER_BLOCK(CRIMSON_WALL_SIGN, "crimson_wall_sign")
+    REGISTER_BLOCK(WARPED_WALL_SIGN, "warped_wall_sign")
+    REGISTER_BLOCK(STRUCTURE_BLOCK, "structure_block")
+    REGISTER_BLOCK(JIGSAW, "jigsaw")
+    REGISTER_BLOCK(TEST_BLOCK, "test_block")
+    REGISTER_BLOCK(TEST_INSTANCE_BLOCK, "test_instance_block")
+    REGISTER_BLOCK(COMPOSTER, "composter")
+    REGISTER_BLOCK(TARGET, "target")
+    REGISTER_BLOCK(BEE_NEST, "bee_nest")
+    REGISTER_BLOCK(BEEHIVE, "beehive")
+    REGISTER_BLOCK(HONEY_BLOCK, "honey_block")
+    REGISTER_BLOCK(HONEYCOMB_BLOCK, "honeycomb_block")
+    REGISTER_BLOCK(NETHERITE_BLOCK, "netherite_block")
+    REGISTER_BLOCK(ANCIENT_DEBRIS, "ancient_debris")
+    REGISTER_BLOCK(CRYING_OBSIDIAN, "crying_obsidian")
+    REGISTER_BLOCK(RESPAWN_ANCHOR, "respawn_anchor")
+    REGISTER_BLOCK(POTTED_CRIMSON_FUNGUS, "potted_crimson_fungus")
+    REGISTER_BLOCK(POTTED_WARPED_FUNGUS, "potted_warped_fungus")
+    REGISTER_BLOCK(POTTED_CRIMSON_ROOTS, "potted_crimson_roots")
+    REGISTER_BLOCK(POTTED_WARPED_ROOTS, "potted_warped_roots")
+    REGISTER_BLOCK(LODESTONE, "lodestone")
+    REGISTER_BLOCK(BLACKSTONE, "blackstone")
+    REGISTER_BLOCK(BLACKSTONE_STAIRS, "blackstone_stairs")
+    REGISTER_BLOCK(BLACKSTONE_WALL, "blackstone_wall")
+    REGISTER_BLOCK(BLACKSTONE_SLAB, "blackstone_slab")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE, "polished_blackstone")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_BRICKS, "polished_blackstone_bricks")
+    REGISTER_BLOCK(CRACKED_POLISHED_BLACKSTONE_BRICKS, "cracked_polished_blackstone_bricks")
+    REGISTER_BLOCK(CHISELED_POLISHED_BLACKSTONE, "chiseled_polished_blackstone")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_BRICK_SLAB, "polished_blackstone_brick_slab")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_BRICK_STAIRS, "polished_blackstone_brick_stairs")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_BRICK_WALL, "polished_blackstone_brick_wall")
+    REGISTER_BLOCK(GILDED_BLACKSTONE, "gilded_blackstone")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_STAIRS, "polished_blackstone_stairs")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_SLAB, "polished_blackstone_slab")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_PRESSURE_PLATE, "polished_blackstone_pressure_plate")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_BUTTON, "polished_blackstone_button")
+    REGISTER_BLOCK(POLISHED_BLACKSTONE_WALL, "polished_blackstone_wall")
+    REGISTER_BLOCK(CHISELED_NETHER_BRICKS, "chiseled_nether_bricks")
+    REGISTER_BLOCK(CRACKED_NETHER_BRICKS, "cracked_nether_bricks")
+    REGISTER_BLOCK(QUARTZ_BRICKS, "quartz_bricks")
+    REGISTER_BLOCK(CANDLE, "candle")
+    REGISTER_BLOCK(WHITE_CANDLE, "white_candle")
+    REGISTER_BLOCK(ORANGE_CANDLE, "orange_candle")
+    REGISTER_BLOCK(MAGENTA_CANDLE, "magenta_candle")
+    REGISTER_BLOCK(LIGHT_BLUE_CANDLE, "light_blue_candle")
+    REGISTER_BLOCK(YELLOW_CANDLE, "yellow_candle")
+    REGISTER_BLOCK(LIME_CANDLE, "lime_candle")
+    REGISTER_BLOCK(PINK_CANDLE, "pink_candle")
+    REGISTER_BLOCK(GRAY_CANDLE, "gray_candle")
+    REGISTER_BLOCK(LIGHT_GRAY_CANDLE, "light_gray_candle")
+    REGISTER_BLOCK(CYAN_CANDLE, "cyan_candle")
+    REGISTER_BLOCK(PURPLE_CANDLE, "purple_candle")
+    REGISTER_BLOCK(BLUE_CANDLE, "blue_candle")
+    REGISTER_BLOCK(BROWN_CANDLE, "brown_candle")
+    REGISTER_BLOCK(GREEN_CANDLE, "green_candle")
+    REGISTER_BLOCK(RED_CANDLE, "red_candle")
+    REGISTER_BLOCK(BLACK_CANDLE, "black_candle")
+    REGISTER_BLOCK(CANDLE_CAKE, "candle_cake")
+    REGISTER_BLOCK(WHITE_CANDLE_CAKE, "white_candle_cake")
+    REGISTER_BLOCK(ORANGE_CANDLE_CAKE, "orange_candle_cake")
+    REGISTER_BLOCK(MAGENTA_CANDLE_CAKE, "magenta_candle_cake")
+    REGISTER_BLOCK(LIGHT_BLUE_CANDLE_CAKE, "light_blue_candle_cake")
+    REGISTER_BLOCK(YELLOW_CANDLE_CAKE, "yellow_candle_cake")
+    REGISTER_BLOCK(LIME_CANDLE_CAKE, "lime_candle_cake")
+    REGISTER_BLOCK(PINK_CANDLE_CAKE, "pink_candle_cake")
+    REGISTER_BLOCK(GRAY_CANDLE_CAKE, "gray_candle_cake")
+    REGISTER_BLOCK(LIGHT_GRAY_CANDLE_CAKE, "light_gray_candle_cake")
+    REGISTER_BLOCK(CYAN_CANDLE_CAKE, "cyan_candle_cake")
+    REGISTER_BLOCK(PURPLE_CANDLE_CAKE, "purple_candle_cake")
+    REGISTER_BLOCK(BLUE_CANDLE_CAKE, "blue_candle_cake")
+    REGISTER_BLOCK(BROWN_CANDLE_CAKE, "brown_candle_cake")
+    REGISTER_BLOCK(GREEN_CANDLE_CAKE, "green_candle_cake")
+    REGISTER_BLOCK(RED_CANDLE_CAKE, "red_candle_cake")
+    REGISTER_BLOCK(BLACK_CANDLE_CAKE, "black_candle_cake")
+    REGISTER_BLOCK(AMETHYST_BLOCK, "amethyst_block")
+    REGISTER_BLOCK(BUDDING_AMETHYST, "budding_amethyst")
+    REGISTER_BLOCK(AMETHYST_CLUSTER, "amethyst_cluster")
+    REGISTER_BLOCK(LARGE_AMETHYST_BUD, "large_amethyst_bud")
+    REGISTER_BLOCK(MEDIUM_AMETHYST_BUD, "medium_amethyst_bud")
+    REGISTER_BLOCK(SMALL_AMETHYST_BUD, "small_amethyst_bud")
+    REGISTER_BLOCK(TUFF, "tuff")
+    REGISTER_BLOCK(TUFF_SLAB, "tuff_slab")
+    REGISTER_BLOCK(TUFF_STAIRS, "tuff_stairs")
+    REGISTER_BLOCK(TUFF_WALL, "tuff_wall")
+    REGISTER_BLOCK(POLISHED_TUFF, "polished_tuff")
+    REGISTER_BLOCK(POLISHED_TUFF_SLAB, "polished_tuff_slab")
+    REGISTER_BLOCK(POLISHED_TUFF_STAIRS, "polished_tuff_stairs")
+    REGISTER_BLOCK(POLISHED_TUFF_WALL, "polished_tuff_wall")
+    REGISTER_BLOCK(CHISELED_TUFF, "chiseled_tuff")
+    REGISTER_BLOCK(TUFF_BRICKS, "tuff_bricks")
+    REGISTER_BLOCK(TUFF_BRICK_SLAB, "tuff_brick_slab")
+    REGISTER_BLOCK(TUFF_BRICK_STAIRS, "tuff_brick_stairs")
+    REGISTER_BLOCK(TUFF_BRICK_WALL, "tuff_brick_wall")
+    REGISTER_BLOCK(CHISELED_TUFF_BRICKS, "chiseled_tuff_bricks")
+    REGISTER_BLOCK(CALCITE, "calcite")
+    REGISTER_BLOCK(TINTED_GLASS, "tinted_glass")
+    REGISTER_BLOCK(POWDER_SNOW, "powder_snow")
+    REGISTER_BLOCK(SCULK_SENSOR, "sculk_sensor")
+    REGISTER_BLOCK(CALIBRATED_SCULK_SENSOR, "calibrated_sculk_sensor")
+    REGISTER_BLOCK(SCULK, "sculk")
+    REGISTER_BLOCK(SCULK_VEIN, "sculk_vein")
+    REGISTER_BLOCK(SCULK_CATALYST, "sculk_catalyst")
+    REGISTER_BLOCK(SCULK_SHRIEKER, "sculk_shrieker")
+    REGISTER_BLOCK(COPPER_BLOCK, "copper_block")
+    REGISTER_BLOCK(EXPOSED_COPPER, "exposed_copper")
+    REGISTER_BLOCK(WEATHERED_COPPER, "weathered_copper")
+    REGISTER_BLOCK(OXIDIZED_COPPER, "oxidized_copper")
+    REGISTER_BLOCK(COPPER_ORE, "copper_ore")
+    REGISTER_BLOCK(DEEPSLATE_COPPER_ORE, "deepslate_copper_ore")
+    REGISTER_BLOCK(OXIDIZED_CUT_COPPER, "oxidized_cut_copper")
+    REGISTER_BLOCK(WEATHERED_CUT_COPPER, "weathered_cut_copper")
+    REGISTER_BLOCK(EXPOSED_CUT_COPPER, "exposed_cut_copper")
+    REGISTER_BLOCK(CUT_COPPER, "cut_copper")
+    REGISTER_BLOCK(OXIDIZED_CHISELED_COPPER, "oxidized_chiseled_copper")
+    REGISTER_BLOCK(WEATHERED_CHISELED_COPPER, "weathered_chiseled_copper")
+    REGISTER_BLOCK(EXPOSED_CHISELED_COPPER, "exposed_chiseled_copper")
+    REGISTER_BLOCK(CHISELED_COPPER, "chiseled_copper")
+    REGISTER_BLOCK(WAXED_OXIDIZED_CHISELED_COPPER, "waxed_oxidized_chiseled_copper")
+    REGISTER_BLOCK(WAXED_WEATHERED_CHISELED_COPPER, "waxed_weathered_chiseled_copper")
+    REGISTER_BLOCK(WAXED_EXPOSED_CHISELED_COPPER, "waxed_exposed_chiseled_copper")
+    REGISTER_BLOCK(WAXED_CHISELED_COPPER, "waxed_chiseled_copper")
+    REGISTER_BLOCK(OXIDIZED_CUT_COPPER_STAIRS, "oxidized_cut_copper_stairs")
+    REGISTER_BLOCK(WEATHERED_CUT_COPPER_STAIRS, "weathered_cut_copper_stairs")
+    REGISTER_BLOCK(EXPOSED_CUT_COPPER_STAIRS, "exposed_cut_copper_stairs")
+    REGISTER_BLOCK(CUT_COPPER_STAIRS, "cut_copper_stairs")
+    REGISTER_BLOCK(OXIDIZED_CUT_COPPER_SLAB, "oxidized_cut_copper_slab")
+    REGISTER_BLOCK(WEATHERED_CUT_COPPER_SLAB, "weathered_cut_copper_slab")
+    REGISTER_BLOCK(EXPOSED_CUT_COPPER_SLAB, "exposed_cut_copper_slab")
+    REGISTER_BLOCK(CUT_COPPER_SLAB, "cut_copper_slab")
+    REGISTER_BLOCK(WAXED_COPPER_BLOCK, "waxed_copper_block")
+    REGISTER_BLOCK(WAXED_WEATHERED_COPPER, "waxed_weathered_copper")
+    REGISTER_BLOCK(WAXED_EXPOSED_COPPER, "waxed_exposed_copper")
+    REGISTER_BLOCK(WAXED_OXIDIZED_COPPER, "waxed_oxidized_copper")
+    REGISTER_BLOCK(WAXED_OXIDIZED_CUT_COPPER, "waxed_oxidized_cut_copper")
+    REGISTER_BLOCK(WAXED_WEATHERED_CUT_COPPER, "waxed_weathered_cut_copper")
+    REGISTER_BLOCK(WAXED_EXPOSED_CUT_COPPER, "waxed_exposed_cut_copper")
+    REGISTER_BLOCK(WAXED_CUT_COPPER, "waxed_cut_copper")
+    REGISTER_BLOCK(WAXED_OXIDIZED_CUT_COPPER_STAIRS, "waxed_oxidized_cut_copper_stairs")
+    REGISTER_BLOCK(WAXED_WEATHERED_CUT_COPPER_STAIRS, "waxed_weathered_cut_copper_stairs")
+    REGISTER_BLOCK(WAXED_EXPOSED_CUT_COPPER_STAIRS, "waxed_exposed_cut_copper_stairs")
+    REGISTER_BLOCK(WAXED_CUT_COPPER_STAIRS, "waxed_cut_copper_stairs")
+    REGISTER_BLOCK(WAXED_OXIDIZED_CUT_COPPER_SLAB, "waxed_oxidized_cut_copper_slab")
+    REGISTER_BLOCK(WAXED_WEATHERED_CUT_COPPER_SLAB, "waxed_weathered_cut_copper_slab")
+    REGISTER_BLOCK(WAXED_EXPOSED_CUT_COPPER_SLAB, "waxed_exposed_cut_copper_slab")
+    REGISTER_BLOCK(WAXED_CUT_COPPER_SLAB, "waxed_cut_copper_slab")
+    REGISTER_BLOCK(COPPER_DOOR, "copper_door")
+    REGISTER_BLOCK(EXPOSED_COPPER_DOOR, "exposed_copper_door")
+    REGISTER_BLOCK(OXIDIZED_COPPER_DOOR, "oxidized_copper_door")
+    REGISTER_BLOCK(WEATHERED_COPPER_DOOR, "weathered_copper_door")
+    REGISTER_BLOCK(WAXED_COPPER_DOOR, "waxed_copper_door")
+    REGISTER_BLOCK(WAXED_EXPOSED_COPPER_DOOR, "waxed_exposed_copper_door")
+    REGISTER_BLOCK(WAXED_OXIDIZED_COPPER_DOOR, "waxed_oxidized_copper_door")
+    REGISTER_BLOCK(WAXED_WEATHERED_COPPER_DOOR, "waxed_weathered_copper_door")
+    REGISTER_BLOCK(COPPER_TRAPDOOR, "copper_trapdoor")
+    REGISTER_BLOCK(EXPOSED_COPPER_TRAPDOOR, "exposed_copper_trapdoor")
+    REGISTER_BLOCK(OXIDIZED_COPPER_TRAPDOOR, "oxidized_copper_trapdoor")
+    REGISTER_BLOCK(WEATHERED_COPPER_TRAPDOOR, "weathered_copper_trapdoor")
+    REGISTER_BLOCK(WAXED_COPPER_TRAPDOOR, "waxed_copper_trapdoor")
+    REGISTER_BLOCK(WAXED_EXPOSED_COPPER_TRAPDOOR, "waxed_exposed_copper_trapdoor")
+    REGISTER_BLOCK(WAXED_OXIDIZED_COPPER_TRAPDOOR, "waxed_oxidized_copper_trapdoor")
+    REGISTER_BLOCK(WAXED_WEATHERED_COPPER_TRAPDOOR, "waxed_weathered_copper_trapdoor")
+    REGISTER_BLOCK(COPPER_GRATE, "copper_grate")
+    REGISTER_BLOCK(EXPOSED_COPPER_GRATE, "exposed_copper_grate")
+    REGISTER_BLOCK(WEATHERED_COPPER_GRATE, "weathered_copper_grate")
+    REGISTER_BLOCK(OXIDIZED_COPPER_GRATE, "oxidized_copper_grate")
+    REGISTER_BLOCK(WAXED_COPPER_GRATE, "waxed_copper_grate")
+    REGISTER_BLOCK(WAXED_EXPOSED_COPPER_GRATE, "waxed_exposed_copper_grate")
+    REGISTER_BLOCK(WAXED_WEATHERED_COPPER_GRATE, "waxed_weathered_copper_grate")
+    REGISTER_BLOCK(WAXED_OXIDIZED_COPPER_GRATE, "waxed_oxidized_copper_grate")
+    REGISTER_BLOCK(COPPER_BULB, "copper_bulb")
+    REGISTER_BLOCK(EXPOSED_COPPER_BULB, "exposed_copper_bulb")
+    REGISTER_BLOCK(WEATHERED_COPPER_BULB, "weathered_copper_bulb")
+    REGISTER_BLOCK(OXIDIZED_COPPER_BULB, "oxidized_copper_bulb")
+    REGISTER_BLOCK(WAXED_COPPER_BULB, "waxed_copper_bulb")
+    REGISTER_BLOCK(WAXED_EXPOSED_COPPER_BULB, "waxed_exposed_copper_bulb")
+    REGISTER_BLOCK(WAXED_WEATHERED_COPPER_BULB, "waxed_weathered_copper_bulb")
+    REGISTER_BLOCK(WAXED_OXIDIZED_COPPER_BULB, "waxed_oxidized_copper_bulb")
+    REGISTER_BLOCK(LIGHTNING_ROD, "lightning_rod")
+    REGISTER_BLOCK(POINTED_DRIPSTONE, "pointed_dripstone")
+    REGISTER_BLOCK(DRIPSTONE_BLOCK, "dripstone_block")
+    REGISTER_BLOCK(CAVE_VINES, "cave_vines")
+    REGISTER_BLOCK(CAVE_VINES_PLANT, "cave_vines_plant")
+    REGISTER_BLOCK(SPORE_BLOSSOM, "spore_blossom")
+    REGISTER_BLOCK(AZALEA, "azalea")
+    REGISTER_BLOCK(FLOWERING_AZALEA, "flowering_azalea")
+    REGISTER_BLOCK(MOSS_CARPET, "moss_carpet")
+    REGISTER_BLOCK(PINK_PETALS, "pink_petals")
+    REGISTER_BLOCK(WILDFLOWERS, "wildflowers")
+    REGISTER_BLOCK(LEAF_LITTER, "leaf_litter")
+    REGISTER_BLOCK(MOSS_BLOCK, "moss_block")
+    REGISTER_BLOCK(BIG_DRIPLEAF, "big_dripleaf")
+    REGISTER_BLOCK(BIG_DRIPLEAF_STEM, "big_dripleaf_stem")
+    REGISTER_BLOCK(SMALL_DRIPLEAF, "small_dripleaf")
+    REGISTER_BLOCK(HANGING_ROOTS, "hanging_roots")
+    REGISTER_BLOCK(ROOTED_DIRT, "rooted_dirt")
+    REGISTER_BLOCK(MUD, "mud")
+    REGISTER_BLOCK(DEEPSLATE, "deepslate")
+    REGISTER_BLOCK(COBBLED_DEEPSLATE, "cobbled_deepslate")
+    REGISTER_BLOCK(COBBLED_DEEPSLATE_STAIRS, "cobbled_deepslate_stairs")
+    REGISTER_BLOCK(COBBLED_DEEPSLATE_SLAB, "cobbled_deepslate_slab")
+    REGISTER_BLOCK(COBBLED_DEEPSLATE_WALL, "cobbled_deepslate_wall")
+    REGISTER_BLOCK(POLISHED_DEEPSLATE, "polished_deepslate")
+    REGISTER_BLOCK(POLISHED_DEEPSLATE_STAIRS, "polished_deepslate_stairs")
+    REGISTER_BLOCK(POLISHED_DEEPSLATE_SLAB, "polished_deepslate_slab")
+    REGISTER_BLOCK(POLISHED_DEEPSLATE_WALL, "polished_deepslate_wall")
+    REGISTER_BLOCK(DEEPSLATE_TILES, "deepslate_tiles")
+    REGISTER_BLOCK(DEEPSLATE_TILE_STAIRS, "deepslate_tile_stairs")
+    REGISTER_BLOCK(DEEPSLATE_TILE_SLAB, "deepslate_tile_slab")
+    REGISTER_BLOCK(DEEPSLATE_TILE_WALL, "deepslate_tile_wall")
+    REGISTER_BLOCK(DEEPSLATE_BRICKS, "deepslate_bricks")
+    REGISTER_BLOCK(DEEPSLATE_BRICK_STAIRS, "deepslate_brick_stairs")
+    REGISTER_BLOCK(DEEPSLATE_BRICK_SLAB, "deepslate_brick_slab")
+    REGISTER_BLOCK(DEEPSLATE_BRICK_WALL, "deepslate_brick_wall")
+    REGISTER_BLOCK(CHISELED_DEEPSLATE, "chiseled_deepslate")
+    REGISTER_BLOCK(CRACKED_DEEPSLATE_BRICKS, "cracked_deepslate_bricks")
+    REGISTER_BLOCK(CRACKED_DEEPSLATE_TILES, "cracked_deepslate_tiles")
+    REGISTER_BLOCK(INFESTED_DEEPSLATE, "infested_deepslate")
+    REGISTER_BLOCK(SMOOTH_BASALT, "smooth_basalt")
+    REGISTER_BLOCK(RAW_IRON_BLOCK, "raw_iron_block")
+    REGISTER_BLOCK(RAW_COPPER_BLOCK, "raw_copper_block")
+    REGISTER_BLOCK(RAW_GOLD_BLOCK, "raw_gold_block")
+    REGISTER_BLOCK(POTTED_AZALEA_BUSH, "potted_azalea_bush")
+    REGISTER_BLOCK(POTTED_FLOWERING_AZALEA_BUSH, "potted_flowering_azalea_bush")
+    REGISTER_BLOCK(OCHRE_FROGLIGHT, "ochre_froglight")
+    REGISTER_BLOCK(VERDANT_FROGLIGHT, "verdant_froglight")
+    REGISTER_BLOCK(PEARLESCENT_FROGLIGHT, "pearlescent_froglight")
+    REGISTER_BLOCK(FROGSPAWN, "frogspawn")
+    REGISTER_BLOCK(REINFORCED_DEEPSLATE, "reinforced_deepslate")
+    REGISTER_BLOCK(DECORATED_POT, "decorated_pot")
+    REGISTER_BLOCK(CRAFTER, "crafter")
+    REGISTER_BLOCK(TRIAL_SPAWNER, "trial_spawner")
+    REGISTER_BLOCK(VAULT, "vault")
+    REGISTER_BLOCK(HEAVY_CORE, "heavy_core")
+    REGISTER_BLOCK(PALE_MOSS_BLOCK, "pale_moss_block")
+    REGISTER_BLOCK(PALE_MOSS_CARPET, "pale_moss_carpet")
+    REGISTER_BLOCK(PALE_HANGING_MOSS, "pale_hanging_moss")
+    REGISTER_BLOCK(OPEN_EYEBLOSSOM, "open_eyeblossom")
+    REGISTER_BLOCK(CLOSED_EYEBLOSSOM, "closed_eyeblossom")
+    REGISTER_BLOCK(POTTED_OPEN_EYEBLOSSOM, "potted_open_eyeblossom")
+    REGISTER_BLOCK(POTTED_CLOSED_EYEBLOSSOM, "potted_closed_eyeblossom")
+    REGISTER_BLOCK(FIREFLY_BUSH, "firefly_bush")
 } // namespace stratos::block

@@ -69,6 +69,8 @@ def generate_block_registry(output_header, output_source, blocks_dump):
 namespace stratos::block {
 Block* registerBlock(const utils::Identifier& id, Block* block);
 
+class Blocks {
+public:
 """)
         f.write("// AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND\n\n")
 
@@ -79,8 +81,8 @@ Block* registerBlock(const utils::Identifier& id, Block* block);
             if len(parts) != 2:
                 raise ValueError(f"Invalid block format: {block}. Expected format is 'namespace:block_name'.")
             namespace, block_name = parts[0].strip(), parts[1].strip()
-            f.write(f"extern const Block* {block_name.upper()};\n")
-        f.write("\n} // namespace stratos::block\n\n#endif // BLOCKS_H\n")
+            f.write(f"    static const Block* {block_name.upper()}();\n")
+        f.write("\n};\n} // namespace stratos::block\n\n#endif // BLOCKS_H\n")
 
     # Open the output source file for writing
     with open(output_source, 'w') as f:
@@ -107,6 +109,17 @@ Block* registerBlock(const utils::Identifier& id, Block* block);
 #include "Blocks.h"
 #include "Block.h"
 
+#define REGISTER_BLOCK(codeName, name) \
+    const Block* Blocks::codeName() { \
+        static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block()); \
+        return block; \
+    }
+#define REGISTER_BLOCK(codeName, name, stateBuilder...) \
+    const Block* Blocks::codeName() { \
+        static const Block* block = registerBlock(utils::Identifier("minecraft", name), new Block(BlockStateManager::Builder()stateBuilder)); \
+        return block; \
+    }
+
 namespace stratos::block {
 
 Block* registerBlock(const utils::Identifier& id, Block* block) {
@@ -122,7 +135,7 @@ Block* registerBlock(const utils::Identifier& id, Block* block) {
             if len(parts) != 2:
                 raise ValueError(f"Invalid block format: {block}. Expected format is 'namespace:block_name'.")
             namespace, block_name = parts[0].strip(), parts[1].strip()
-            f.write(f"const Block* {block_name.upper()} = registerBlock(utils::Identifier(\"minecraft\", \"{block_name}\"), new Block());\n")
+            f.write(f"    REGISTER_BLOCK({block_name.upper()}, \"{block_name}\")\n")
         f.write("} // namespace stratos::block\n")
 
 generate_block_registry(args.output_header, args.output_source, args.blocks)
