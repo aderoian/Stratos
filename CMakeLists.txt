@@ -82,6 +82,7 @@ set(HEADERS
         network/protocol/PacketCodec.h
         registry/Registries.h
         registry/Registry.h
+        utils/collection/IdList.h
         utils/collection/Iterable.h
         utils/collection/PalettedStorage.h
         utils/config/Config.h
