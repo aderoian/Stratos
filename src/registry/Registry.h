@@ -48,7 +48,7 @@ template <typename T> class Registry final : public utils::IndexedIterable<T> {
     T   get(const RegistryKey& key) const;
     [[nodiscard]] int size() const override;
 
-    void registerEntry(const RegistryKey& key, T* value);
+    void registerEntry(const RegistryKey& key, T value);
 
     typename utils::IndexedIterable<T>::iterator       begin() override;
     typename utils::IndexedIterable<T>::const_iterator begin() const override;
@@ -59,31 +59,31 @@ template <typename T> class Registry final : public utils::IndexedIterable<T> {
     int nextId = 0;
     RegistryKey key;
 
-    std::vector<T*>                     rawIdToValue;
-    std::unordered_map<utils::Identifier, T*>  idToValue;
-    std::unordered_map<RegistryKey, T*> keyToValue;
-    std::unordered_map<T*, int>        valueToRawId;
+    std::vector<T>                     rawIdToValue;
+    std::unordered_map<utils::Identifier, T>  idToValue;
+    std::unordered_map<RegistryKey, T> keyToValue;
+    std::unordered_map<T, int>        valueToRawId;
 };
 template <typename T> const RegistryKey& Registry<T>::getKey() const {
     return key;
 }
 template <typename T> int Registry<T>::getRawIndex(T value) const {
-    auto el = valueToRawId.find(&value);
+    auto el = valueToRawId.find(value);
     return el != valueToRawId.end() ? el->second : -1;
 }
 template <typename T> T Registry<T>::get(int index) const {
-    return *rawIdToValue[index];
+    return rawIdToValue[index];
 }
 template <typename T> T Registry<T>::get(utils::Identifier key) const {
-    return *idToValue[getRawIndex(key)];
+    return idToValue[getRawIndex(key)];
 }
 template <typename T> T Registry<T>::get(const RegistryKey& key) const {
-    return *keyToValue[key];
+    return keyToValue[key];
 }
 template <typename T> int Registry<T>::size() const {
     return rawIdToValue.size();
 }
-template <typename T> void Registry<T>::registerEntry(const RegistryKey& key, T* value) {
+template <typename T> void Registry<T>::registerEntry(const RegistryKey& key, T value) {
     if (key.registry != this->key.value)
         throw std::invalid_argument("Registry key mismatch: expected " + this->key.value.toString() + ", got " + key.registry.toString());
     int id = nextId++;
