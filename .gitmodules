@@ -15,3 +15,6 @@
 [submodule "vendor/zlib"]
 	path = vendor/zlib
 	url = https://github.com/madler/zlib.git
+[submodule "vendor/magic_enum"]
+	path = vendor/magic_enum
+	url = https://github.com/Neargye/magic_enum

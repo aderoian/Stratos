@@ -86,12 +86,12 @@ BlockStateManager::BlockStateManager(const Block* owner, const std::map<std::str
 
     for (const auto& combination : combinations) {
         size_t hash = 0;
-        std::map<const IProperty*, std::any> propertyMap;
+        std::unordered_map<const IProperty*, std::any> propertyMap;
         for (const auto& [prop, val] : combination) {
             propertyMap[prop] = val;
             hash ^= prop->hashCode() ^ prop->hashValue(val) << 1;
         }
-        const auto state = new BlockState(owner, std::move(propertyMap));
+        const auto state = new BlockState(owner, &this->properties, std::move(propertyMap));
         states.push_back(state);
         stateMap[hash] = state;
     }

@@ -21,6 +21,8 @@
 #define BLOCKSTATE_H
 #include <any>
 #include <map>
+#include <string>
+#include <unordered_map>
 
 namespace stratos::block {
 class IProperty;
@@ -31,13 +33,16 @@ class Block;
  */
 class BlockState {
 public:
-    BlockState(const Block* block, std::map<const IProperty*, std::any>&& properties);
+    BlockState(const Block* block, const std::map<std::string, const IProperty*>* properties, std::unordered_map<const IProperty*, std::any>&& propertyValues);
     bool operator==(const BlockState& other) const {
         return true;
     }
+
+    [[nodiscard]] std::string toString() const;
 private:
     const Block* owner;
-    std::map<const IProperty*, std::any> properties;
+    const std::map<std::string, const IProperty*>* properties;
+    std::unordered_map<const IProperty*, std::any> propertyValues;
 };
 } // namespace stratos::block
 

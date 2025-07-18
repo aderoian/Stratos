@@ -26,6 +26,7 @@ struct Identifier {
     std::string namespaceName;
     std::string name;
 
+    Identifier() = default;
     Identifier(std::string ns, std::string n) : namespaceName(std::move(ns)), name(std::move(n)) {}
 
     [[nodiscard]] std::string toString() const;

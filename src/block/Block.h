@@ -29,24 +29,25 @@ public:
     explicit Block(const BlockStateManager::Builder& stateBuilder);
     ~Block() = default;
 
+    [[nodiscard]] std::string getName() const;
     [[nodiscard]] const BlockStateManager* getStateManager() const;
 private:
     BlockStateManager* stateManager;
 };
 
 enum class Orientation {
-    DownEast,
-    DownNorth,
-    DownSouth,
-    DownWest,
-    UpEast,
-    UpNorth,
-    UpSouth,
-    UpWest,
-    WestUp,
-    EastUp,
-    NorthUp,
-    SouthUp
+    Down_East,
+    Down_North,
+    Down_South,
+    Down_West,
+    Up_East,
+    Up_North,
+    Up_South,
+    Up_West,
+    West_Up,
+    East_Up,
+    North_Up,
+    South_Up
 };
 
 enum class BlockFace {
@@ -58,8 +59,8 @@ enum class BlockFace {
 enum class Attachment {
     Floor,
     Ceiling,
-    SingleWall,
-    DoubleWall
+    Single_Wall,
+    Double_Wall
 };
 
 enum class WallConnection {
@@ -85,16 +86,16 @@ enum class BlockHalf {
 };
 
 enum class RailConnection {
-    NorthSouth,
-    EastWest,
-    AscendingEast,
-    AscendingWest,
-    AscendingNorth,
-    AscendingSouth,
-    SouthEast,
-    SouthWest,
-    NorthWest,
-    NorthEast
+    North_South,
+    East_West,
+    Ascending_East,
+    Ascending_West,
+    Ascending_North,
+    Ascending_South,
+    South_East,
+    South_West,
+    North_West,
+    North_East
 };
 
 enum class BedPart {
@@ -120,7 +121,7 @@ enum class DoorHinge {
 
 enum class NoteBlockInstrument {
     Harp,
-    BassDrum,
+    BaseDrum,
     Snare,
     Hat,
     Bass,
@@ -129,8 +130,8 @@ enum class NoteBlockInstrument {
     Guitar,
     Chime,
     Xylophone,
-    IronXylophone,
-    CowBell,
+    Iron_Xylophone,
+    Cow_Bell,
     Didgeridoo,
     Bit,
     Banjo,
@@ -139,13 +140,13 @@ enum class NoteBlockInstrument {
     Skeleton,
     Creeper,
     Dragon,
-    WitherSkeleton,
+    Wither_Skeleton,
     Piglin,
-    CustomHead
+    Custom_Head
 };
 
 enum class PistonType {
-    Default,
+    Normal,
     Sticky
 };
 
@@ -157,10 +158,10 @@ enum class SlabType {
 
 enum class StairShape {
     Straight,
-    InnerLeft,
-    InnerRight,
-    OuterLeft,
-    OuterRight
+    Inner_Left,
+    Inner_Right,
+    Outer_Left,
+    Outer_Right
 };
 
 enum class StructureBlockMode {
@@ -184,7 +185,7 @@ enum class Tilt {
 };
 
 enum class Thickness {
-    TipMerge,
+    Tip_Merge,
     Tip,
     Frustum,
     Middle,
@@ -199,10 +200,10 @@ enum class SculkSensorPhase {
 
 enum class TrialSpawnerState {
     Inactive,
-    WaitingForPlayers,
+    Waiting_For_Players,
     Active,
-    WaitingForRewardEjection,
-    EjectingReward,
+    Waiting_For_Reward_Ejection,
+    Ejecting_Reward,
     Cooldown
 };
 

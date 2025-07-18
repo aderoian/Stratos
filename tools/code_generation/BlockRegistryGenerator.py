@@ -31,7 +31,7 @@ def get_corrected_blockstate_codename(block, block_state_name):
         else:
             return "AXIS"
     elif block_state_name == "facing":
-        if block in ["amethyst_cluster", "large_amethyst_bud", "medium_amethyst_bud", "small_amethyst_bud", "barrel", "end_rod", "lightning_rod", "observer", "piston", "sticky_piston", "moving_piston", "piston_head", "dispenser", "command_block", "dropper"] or "_shulker_box" in block:
+        if block in ["amethyst_cluster", "large_amethyst_bud", "medium_amethyst_bud", "small_amethyst_bud", "barrel", "end_rod", "lightning_rod", "observer", "piston", "sticky_piston", "moving_piston", "piston_head", "dispenser", "command_block", "dropper", "repeating_command_block", "chain_command_block", "shulker_box"] or "_shulker_box" in block:
             return "FACING_ANY"
         elif block == "hopper":
             return "FACING_HOPPER"
@@ -44,7 +44,7 @@ def get_corrected_blockstate_codename(block, block_state_name):
         else:
             if block == "redstone_wire":
                 return block_state_name.upper() + "_WIRE_CONNECTION"
-            elif block.endswith("_wall"):
+            elif block.endswith("_wall") or block == "pale_moss_carpet":
                 return block_state_name.upper() + "_WALL_SHAPE"
             else:
                 return "DIRECTION_" + block_state_name.upper()
@@ -59,6 +59,8 @@ def get_corrected_blockstate_codename(block, block_state_name):
     elif "_bed" in block and block_state_name == "part":
         return "BED_PART"
     elif "rail" in block and block_state_name == "shape":
+        if block in ["powered_rail", "detector_rail", "activator_rail"]:
+            return "STRAIGHT_RAIL_SHAPE"
         return "RAIL_SHAPE"
     elif block in ["tall_seagrass", "sunflower", "lilac", "rose_bush", "peony", "tall_grass", "large_fern", "pitcher_crop", "pitcher_plant", "small_dripleaf"] and block_state_name == "half":
         return "DOUBLE_BLOCK_HALF"
@@ -75,8 +77,10 @@ def get_corrected_blockstate_codename(block, block_state_name):
             return block_state_name.upper()
     elif (block == "chest" or block == "trapped_chest") and block_state_name == "type":
         return "CHEST_TYPE"
-    elif block in ["wheat", "pumpkin_stem", "melon_stem", "carrots", "potatoes", "beetroots", "torchflower_crop"] and block_state_name == "age":
+    elif block in ["wheat", "pumpkin_stem", "melon_stem", "carrots", "potatoes"] and block_state_name == "age":
         return "AGE_7"
+    elif block == "torchflower_crop" and block_state_name == "age":
+        return "AGE_1"
     elif "_door" in block:
         if block_state_name == "half":
             return "DOUBLE_BLOCK_HALF"
@@ -94,7 +98,7 @@ def get_corrected_blockstate_codename(block, block_state_name):
         return "BLOCK_HALF"
     elif "_slab" in block and block_state_name == "type":
         return "SLAB_TYPE"
-    elif block in ["nether_wart", "frosted_ice", "sweet_berry_bush"] and block_state_name == "age":
+    elif block in ["nether_wart", "frosted_ice", "sweet_berry_bush", "beetroots"] and block_state_name == "age":
         return "AGE_3"
     elif (block == "water_cauldron" or block == "powder_snow_cauldron") and block_state_name == "level":
         return "LEVEL_3"
@@ -294,6 +298,15 @@ utils::IdList<const BlockState*> Blocks::STATES;
             parts = block.split(':', 1)
             namespace, name = parts[0].strip(), parts[1].strip()
             f.write(f"    {name.upper()}();\n")
+
+        f.write("""
+    STATES = utils::IdList<const BlockState*>();
+    for (const Block* block : *registry::Registries::BLOCKS()) {
+        for (const BlockState* state : block->getStateManager()->getStates()) {
+            STATES.add(state);
+        }
+    }
+""")
         f.write("}\n\n")
         f.write("} // namespace stratos::block\n")
 

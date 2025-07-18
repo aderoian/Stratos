@@ -22,10 +22,13 @@
 namespace stratos::block {
 bool IntProperty::testValue(const int& value) const {
     const int intValue = std::any_cast<int>(value);
-    return intValue >= min && intValue < max;
+    return intValue >= min && intValue <= max;
 }
 size_t IntProperty::hashValue(const std::any& value) const {
     return std::hash<int>()(std::any_cast<int>(value));
+}
+std::string  IntProperty::toString(const std::any& value) const {
+    return std::to_string(std::any_cast<int>(value));
 }
 IntProperty* IntProperty::create(std::string name, const int min, const int max) {
     if (min < 0) throw std::invalid_argument("Minimum value must be non-negative.");
@@ -36,12 +39,15 @@ std::size_t IntProperty::computeHashCode() const {
     return Property::computeHashCode() ^ utils::hash(values) << 1;
 }
 IntProperty::IntProperty(std::string name, const int min, const int max) : Property(std::move(name), typeid(int).name()), min(min), max(max) {
-    values = std::vector<int>(max - min);
-    for (int i = min; i < max; ++i) values[i - min] = i;
+    values = std::vector<int>(max - min + 1);
+    for (int i = min; i <= max; ++i) values[i - min] = i;
 }
 std::vector<bool> BooleanProperty::values = {true, false};
-size_t BooleanProperty::hashValue(const std::any& value) const {
+size_t            BooleanProperty::hashValue(const std::any& value) const {
     return std::hash<bool>()(std::any_cast<bool>(value));
+}
+std::string      BooleanProperty::toString(const std::any& value) const {
+    return std::any_cast<bool>(value) ? "true" : "false";
 }
 BooleanProperty* BooleanProperty::create(std::string name) {
     return new BooleanProperty(std::move(name));

@@ -19,7 +19,9 @@
 
 #ifndef STATEPROPERTY_H
 #define STATEPROPERTY_H
+#include "magic_enum.hpp"
 #include "utils/Hash.h"
+#include "utils/StringUtils.h"
 
 #include <algorithm>
 #include <any>
@@ -36,6 +38,7 @@ public:
     [[nodiscard]] virtual std::string getName() const = 0;
     [[nodiscard]] virtual std::vector<std::any> getValuesAsAny() const = 0;
     [[nodiscard]] virtual size_t hashValue(const std::any& value) const = 0;
+    [[nodiscard]] virtual std::string toString(const std::any& value) const = 0;
 
     class IValue {
     public:
@@ -86,6 +89,7 @@ public:
     [[nodiscard]] bool testValue(const int& value) const override;
     [[nodiscard]] std::vector<int> getValues() const override { return values; }
     [[nodiscard]] size_t hashValue(const std::any& value) const override;
+    [[nodiscard]] std::string toString(const std::any& value) const override;
     static IntProperty* create(std::string name, int min, int max);
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
@@ -102,6 +106,7 @@ public:
     [[nodiscard]] bool testValue(const bool& value) const override { return true; }
     [[nodiscard]] std::vector<bool> getValues() const override { return values; }
     [[nodiscard]] size_t hashValue(const std::any& value) const override;
+    [[nodiscard]] std::string toString(const std::any& value) const override;
     static BooleanProperty* create(std::string name);
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
@@ -116,6 +121,7 @@ public:
     [[nodiscard]] bool testValue(const T& value) const override;
     [[nodiscard]] std::vector<T> getValues() const override { return values; }
     [[nodiscard]] size_t hashValue(const std::any& value) const override;
+    [[nodiscard]] std::string toString(const std::any& value) const override;
     static EnumProperty* create(const std::string& name, const std::initializer_list<T>& values);
 protected:
     [[nodiscard]] std::size_t computeHashCode() const override;
@@ -149,8 +155,11 @@ template <typename T> std::size_t Property<T>::computeHashCode() const {
 template <typename T> bool EnumProperty<T>::testValue(const T& value) const {
     return std::ranges::find(values, value) != values.end();
 }
-template <typename T> size_t           EnumProperty<T>::hashValue(const std::any& value) const {
+template <typename T> size_t EnumProperty<T>::hashValue(const std::any& value) const {
     return std::hash<int>()(static_cast<int>(std::any_cast<T>(value)));
+}
+template <typename T> std::string      EnumProperty<T>::toString(const std::any& value) const {
+    return toLower(std::string(magic_enum::enum_name(std::any_cast<T>(value))));
 }
 template <typename T> EnumProperty<T>* EnumProperty<T>::create(const std::string& name, const std::initializer_list<T>& values) {
     if constexpr (sizeof(values) == 0) throw std::invalid_argument("EnumProperty must have at least one value.");

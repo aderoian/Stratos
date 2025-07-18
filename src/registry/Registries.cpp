@@ -22,8 +22,8 @@
 #include "block/Block.h"
 
 namespace stratos::registry {
-Registry<block::Block*> * Registries::BLOCKS() {
-    static auto * registry = new Registry<block::Block*>({utils::Identifier("minecraft", "root"), utils::Identifier("minecraft", "block")});
+Registry<const block::Block*> * Registries::BLOCKS() {
+    static auto * registry = new Registry<const block::Block*>({utils::Identifier("minecraft", "root"), utils::Identifier("minecraft", "block")});
     return registry;
 }
 } // namespace stratos::registry

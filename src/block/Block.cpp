@@ -19,10 +19,15 @@
 
 #include "Block.h"
 
+#include "registry/Registries.h"
+
 namespace stratos::block {
 Block::Block() {
     stateManager = BlockStateManager::Builder().build(this);
 }
 Block::Block(const BlockStateManager::Builder& stateBuilder) : stateManager(stateBuilder.build(this)) {}
+std::string Block::getName() const {
+    return registry::Registries::BLOCKS()->getEntry(this).toString();
+}
 const BlockStateManager* Block::getStateManager() const { return stateManager;}
 };

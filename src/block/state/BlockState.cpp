@@ -19,7 +19,21 @@
 
 #include "BlockState.h"
 
+#include "block/Block.h"
+#include "registry/Registries.h"
+
 namespace stratos::block {
 
-BlockState::BlockState(const Block* block, std::map<const IProperty*, std::any>&& properties) : owner(block), properties(std::move(properties)) {}
+BlockState::BlockState(const Block* block, const std::map<std::string, const IProperty*>* properties, std::unordered_map<const IProperty*, std::any>&& propertyValues) : owner(block), properties(properties), propertyValues(std::move(propertyValues)) {}
+std::string BlockState::toString() const {
+    std::string result = "Block{"+owner->getName()+"}";
+    if (properties->empty()) return result;
+    result += "[";
+    for (const auto& [name, property] : *properties) {
+        result += name + "=" + property->toString(propertyValues.at(property)) + ",";
+    }
+    result.pop_back();
+    result += "]";
+    return result;
+}
 } // namespace stratos::block

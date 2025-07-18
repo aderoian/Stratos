@@ -30,7 +30,7 @@ namespace registry {
 
 class Registries {
 public:
-    static Registry<block::Block*>* BLOCKS();
+    static Registry<const block::Block*>* BLOCKS();
 };
 } // namespace registry
 } // namespace stratos

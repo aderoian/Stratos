@@ -179,6 +179,8 @@ add_subdirectory(vendor/zlib)
 target_link_libraries(${LOCAL_PROJECT_NAME} PRIVATE zlibstatic)
 target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE vendor/zlib)
 
+# Magic Enum
+target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE vendor/magic_enum/include/magic_enum)
 
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 

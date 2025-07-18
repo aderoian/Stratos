@@ -46,6 +46,7 @@ template <typename T> class Registry final : public utils::IndexedIterable<T> {
     T   get(int index) const override;
     T   get(utils::Identifier key) const;
     T   get(const RegistryKey& key) const;
+    utils::Identifier getEntry(T value) const;
     [[nodiscard]] int size() const override;
 
     void registerEntry(const RegistryKey& key, T value);
@@ -63,6 +64,7 @@ template <typename T> class Registry final : public utils::IndexedIterable<T> {
     std::unordered_map<utils::Identifier, T>  idToValue;
     std::unordered_map<RegistryKey, T> keyToValue;
     std::unordered_map<T, int>        valueToRawId;
+    std::unordered_map<T, utils::Identifier> valueToEntry;
 };
 template <typename T> const RegistryKey& Registry<T>::getKey() const {
     return key;
@@ -80,6 +82,9 @@ template <typename T> T Registry<T>::get(utils::Identifier key) const {
 template <typename T> T Registry<T>::get(const RegistryKey& key) const {
     return keyToValue[key];
 }
+template <typename T> utils::Identifier Registry<T>::getEntry(T value) const {
+    return valueToEntry.at(value);
+}
 template <typename T> int Registry<T>::size() const {
     return rawIdToValue.size();
 }
@@ -91,6 +96,7 @@ template <typename T> void Registry<T>::registerEntry(const RegistryKey& key, T 
     idToValue[key.value] = value;
     keyToValue[key] = value;
     valueToRawId[rawIdToValue[id]] = id;
+    valueToEntry[value] = key.value;
 }
 template <typename T> typename utils::IndexedIterable<T>::iterator Registry<T>::begin() {
     return rawIdToValue.begin();
