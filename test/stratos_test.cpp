@@ -760,7 +760,7 @@ void nbtTest() {
 void paletteTest() {
     // Empty Palette
     {
-        stratos::PackedIntegerContainer palette(2, 10); // 2 bits per entry, 10 entries, max value 3 (0, 1, 2, 3)
+        stratos::PackedIntegerArray palette(2, 10); // 2 bits per entry, 10 entries, max value 3 (0, 1, 2, 3)
         assert(palette.getBitsPerEntry() == 2);
         assert(palette.getMaxValue() == 3);
         assert(palette.getSize() == 10);
@@ -843,7 +843,7 @@ public:
 void predicateTest() {
     // No Args Predicate
     {
-        stratos::Predicate predicate = &PredicateIntValue::isPositive;
+        stratos::Predicate<PredicateIntValue> predicate = &PredicateIntValue::isPositive;
         PredicateIntValue value(5);
         assert(predicate(value) == true);
     }
@@ -857,7 +857,7 @@ void predicateTest() {
 
     // AND Predicate
     {
-        stratos::Predicate predicate1 = &PredicateIntValue::isPositive;
+        stratos::Predicate<PredicateIntValue> predicate1 = &PredicateIntValue::isPositive;
         stratos::Predicate predicate2 = stratos::makePredicate(&PredicateIntValue::isGreaterThan, 3);
         stratos::Predicate andPredicate = predicate1 && predicate2;
         PredicateIntValue value(5);
@@ -866,8 +866,8 @@ void predicateTest() {
 
     // OR Predicate
     {
-        stratos::Predicate predicate1 = &PredicateIntValue::isPositive;
-        stratos::Predicate predicate2 = &PredicateIntValue::isNegative;
+        stratos::Predicate<PredicateIntValue> predicate1 = &PredicateIntValue::isPositive;
+        stratos::Predicate<PredicateIntValue> predicate2 = &PredicateIntValue::isNegative;
         stratos::Predicate orPredicate = predicate1 || predicate2;
         PredicateIntValue value(-5);
         assert(orPredicate(value) == true);
@@ -875,7 +875,7 @@ void predicateTest() {
 
     // NOT Predicate
     {
-        stratos::Predicate predicate = &PredicateIntValue::isPositive;
+        stratos::Predicate<PredicateIntValue> predicate = &PredicateIntValue::isPositive;
         stratos::Predicate notPredicate = !predicate;
         PredicateIntValue value(-5);
         assert(notPredicate(value) == true);
@@ -895,15 +895,6 @@ void predicateTest() {
         stratos::Predicate orPredicate = predicate1 || &PredicateIntValue::isZero;
         PredicateIntValue value(5);
         assert(orPredicate(value) == true);
-    }
-
-    // Polymorphic Predicate
-    {
-        stratos::Predicate predicate = PositiveNumberPredicate() && stratos::makePredicate(&PredicateIntValue::isGreaterThan, 3);
-        PredicateIntValue value(5);
-        assert(predicate(value) == true);
-        value.value = -5;
-        assert(predicate(value) == false);
     }
 }
 

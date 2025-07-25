@@ -49,6 +49,7 @@ set(SOURCES
         utils/Identifier.cpp
         utils/StringUtils.cpp
         world/format/chunk/Chunk.cpp
+        world/format/chunk/Palette.cpp
         world/format/io/Region.cpp
 )
 
@@ -217,8 +218,9 @@ else ()
     endif ()
 endif()
 target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE cpr::cpr)
-target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE zlib)
+target_link_libraries("${LOCAL_PROJECT_NAME}Test" PRIVATE zlibstatic)
 target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE vendor/zlib)
+target_include_directories("${LOCAL_PROJECT_NAME}Test" PRIVATE vendor/magic_enum/include/magic_enum)
 
 set_target_properties("${LOCAL_PROJECT_NAME}Test" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "bin")
 

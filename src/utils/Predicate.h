@@ -26,24 +26,23 @@ namespace stratos {
 template <typename T> class Predicate {
   public:
     Predicate() = default;
-    Predicate(bool (T::*funcPtr)() const) : func([funcPtr](const T& obj) { return (obj.*funcPtr)(); }) {}
-    template <typename... BoundArgs, typename... MemberArgs>
-    Predicate(bool (T::*funcPtr)(MemberArgs...) const, BoundArgs&&...boundArgs) : func([funcPtr, ...capturedArgs = std::forward<BoundArgs>(boundArgs)](const T& obj) { return (obj.*funcPtr)(capturedArgs...); }) {}
+    Predicate(bool (std::remove_pointer_t<T>::*funcPtr)() const);
+    template <typename... BoundArgs, typename... MemberArgs> Predicate(bool (std::remove_pointer_t<T>::*funcPtr)(MemberArgs...) const, BoundArgs&&... boundArgs);
     explicit Predicate(bool value) : func([value](const T& obj) { return value; }) {}
-    template <typename Callable, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Callable>, Predicate>>>
-    explicit Predicate(Callable&& callable) : func(std::forward<Callable>(callable)) {}
+    template <typename Callable, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Callable>, Predicate>>> explicit Predicate(Callable&& callable)
+        : func(std::forward<Callable>(callable)) {}
 
     bool test(const T& object) const;
 
-    Predicate& operator=(const bool (T::*funcPtr)() const);
+    Predicate& operator=(const bool (std::remove_pointer_t<T>::*funcPtr)() const);
     Predicate& operator=(bool value);
 
-    bool operator()(const T& object) const;
+    bool      operator()(const T& object) const;
     Predicate operator!() const;
     Predicate operator&&(const Predicate& other) const;
     Predicate operator||(const Predicate& other) const;
-    Predicate operator&&(bool (T::*funcPtr)() const) const;
-    Predicate operator||(bool (T::*funcPtr)() const) const;
+    Predicate operator&&(bool (std::remove_pointer_t<T>::*funcPtr)() const) const;
+    Predicate operator||(bool (std::remove_pointer_t<T>::*funcPtr)() const) const;
 
     Predicate operator&&(bool other) const;
     Predicate operator||(bool other) const;
@@ -54,11 +53,35 @@ template <typename T> class Predicate {
     std::function<bool(const T&)> func;
 };
 
+template <typename T> Predicate<T>::Predicate(bool (std::remove_pointer_t<T>::*funcPtr)() const) {
+    func = [funcPtr](const T& obj) {
+        if constexpr (std::is_pointer_v<T>) {
+            return (obj->*funcPtr)();
+        } else {
+            return (obj.*funcPtr)();
+        }
+    };
+}
+template <typename T> template <typename... BoundArgs, typename... MemberArgs> Predicate<T>::Predicate(bool (std::remove_pointer_t<T>::*funcPtr)(MemberArgs...) const, BoundArgs&&... boundArgs) {
+    func = [funcPtr, ... capturedArgs = std::forward<BoundArgs>(boundArgs)](const T& obj) {
+        if constexpr (std::is_pointer_v<T>) {
+            return (obj->*funcPtr)(capturedArgs...);
+        } else {
+            return (obj.*funcPtr)(capturedArgs...);
+        }
+    };
+}
 template <typename T> bool Predicate<T>::test(const T& object) const {
     return func(object);
 }
-template <typename T> Predicate<T>& Predicate<T>::operator=(const bool (T::*funcPtr)() const) {
-    func = [funcPtr](const T& obj) { return (obj.*funcPtr)(); };
+template <typename T> Predicate<T>& Predicate<T>::operator=(const bool (std::remove_pointer_t<T>::*funcPtr)() const) {
+    func = [funcPtr](const T& obj) {
+        if constexpr (std::is_pointer_v<T>) {
+            return (obj->*funcPtr)();
+        } else {
+            return (obj.*funcPtr)();
+        }
+    };
     return *this;
 }
 template <typename T> Predicate<T>& Predicate<T>::operator=(bool value) {
@@ -81,11 +104,23 @@ template <typename T> Predicate<T> Predicate<T>::operator&&(const Predicate& oth
 template <typename T> Predicate<T> Predicate<T>::operator||(const Predicate& other) const {
     return Predicate([f1 = [this](const T& obj) { return this->test(obj); }, f2 = [&other](const T& obj) { return other.test(obj); }](const T& obj) { return f1(obj) || f2(obj); });
 }
-template <typename T> Predicate<T> Predicate<T>::operator&&(bool (T::*funcPtr)() const) const {
-    return Predicate([f = [this](const T& obj) { return this->test(obj); }, funcPtr](const T& obj) { return f(obj) && (obj.*funcPtr)(); });
+template <typename T> Predicate<T> Predicate<T>::operator&&(bool (std::remove_pointer_t<T>::*funcPtr)() const) const {
+    return Predicate([f = [this](const T& obj) { return this->test(obj); }, funcPtr](const T& obj) {
+        if constexpr (std::is_pointer_v<T>) {
+            return f(obj) && (obj->*funcPtr)();
+        } else {
+            return f(obj) && (obj.*funcPtr)();
+        }
+    });
 }
-template <typename T> Predicate<T> Predicate<T>::operator||(bool (T::*funcPtr)() const) const {
-    return Predicate([f = [this](const T& obj) { return this->test(obj); }, funcPtr](const T& obj) { return f(obj) || (obj.*funcPtr)(); });
+template <typename T> Predicate<T> Predicate<T>::operator||(bool (std::remove_pointer_t<T>::*funcPtr)() const) const {
+    return Predicate([f = [this](const T& obj) { return this->test(obj); }, funcPtr](const T& obj) {
+        if constexpr (std::is_pointer_v<T>) {
+            return f(obj) || (obj->*funcPtr)();
+        } else {
+            return f(obj) || (obj.*funcPtr)();
+        }
+    });
 }
 template <typename T> Predicate<T> Predicate<T>::operator&&(bool other) const {
     return Predicate([f = [this](const T& obj) { return this->test(obj); }, other](const T& obj) { return f(obj) && other; });
