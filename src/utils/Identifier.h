@@ -19,6 +19,7 @@
 
 #ifndef IDENTIFIER_H
 #define IDENTIFIER_H
+#include <stdexcept>
 #include <string>
 
 namespace stratos::utils {
@@ -33,6 +34,8 @@ struct Identifier {
 
     bool operator==(const Identifier& other) const;
     bool operator!=(const Identifier& other) const;
+
+    static Identifier of(const std::string& identifier);
 };
 } // namespace stratos::utils
 

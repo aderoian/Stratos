@@ -30,4 +30,10 @@ bool Identifier::operator==(const Identifier& other) const {
 bool Identifier::operator!=(const Identifier& other) const {
     return !(*this == other);
 }
+Identifier Identifier::of(const std::string& identifier) {
+    const size_t pos = identifier.find(':');
+    if (pos == std::string::npos)
+        throw std::invalid_argument("Invalid identifier format, expected 'namespace:name'");
+    return {identifier.substr(0, pos), identifier.substr(pos + 1)};
+}
 } // namespace stratos::utils
