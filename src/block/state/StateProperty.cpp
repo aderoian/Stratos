@@ -25,7 +25,7 @@ bool IntProperty::testValue(const int& value) const {
     return intValue >= min && intValue <= max;
 }
 size_t IntProperty::hashValue(const std::any& value) const {
-    return std::hash<int>()(std::any_cast<int>(value));
+    return std::hash<std::string>()(toString(value));
 }
 std::string  IntProperty::toString(const std::any& value) const {
     return std::to_string(std::any_cast<int>(value));
@@ -35,25 +35,19 @@ IntProperty* IntProperty::create(std::string name, const int min, const int max)
     if (min >= max) throw std::invalid_argument("Minimum value must be less than maximum value.");
     return new IntProperty(std::move(name), min, max);
 }
-std::size_t IntProperty::computeHashCode() const {
-    return Property::computeHashCode() ^ utils::hash(values) << 1;
-}
 IntProperty::IntProperty(std::string name, const int min, const int max) : Property(std::move(name), typeid(int).name()), min(min), max(max) {
     values = std::vector<int>(max - min + 1);
     for (int i = min; i <= max; ++i) values[i - min] = i;
 }
 std::vector<bool> BooleanProperty::values = {true, false};
 size_t            BooleanProperty::hashValue(const std::any& value) const {
-    return std::hash<bool>()(std::any_cast<bool>(value));
+    return std::hash<std::string>()(toString(value));
 }
 std::string      BooleanProperty::toString(const std::any& value) const {
     return std::any_cast<bool>(value) ? "true" : "false";
 }
 BooleanProperty* BooleanProperty::create(std::string name) {
     return new BooleanProperty(std::move(name));
-}
-std::size_t BooleanProperty::computeHashCode() const {
-    return Property::computeHashCode() ^ utils::hash(values) << 1;
 }
 BooleanProperty::BooleanProperty(std::string name) : Property(std::move(name), typeid(bool).name()) {}
 size_t hashPropertyValue(const std::any& value) {

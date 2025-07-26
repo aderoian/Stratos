@@ -28,32 +28,12 @@ namespace stratos::block {
 class Block;
 class BlockState;
 
-class PropertyMap {
-public:
-    PropertyMap() = default;
-
-    bool operator==(const PropertyMap& other) const;
-    bool operator!=(const PropertyMap& other) const;
-
-    [[nodiscard]] const std::map<const IProperty*, IProperty::IValue*>& getValues() const;
-    [[nodiscard]] IProperty::IValue* get(const IProperty& property) const;
-    [[nodiscard]] bool contains(const IProperty& property) const;
-    [[nodiscard]] bool isEmpty() const;
-    [[nodiscard]] size_t size() const;
-    [[nodiscard]] std::string toString() const;
-
-    [[nodiscard]] size_t hashCode() const;
-
-    void set(const IProperty& property, IProperty::IValue* value);
-private:
-    std::map<const IProperty*, IProperty::IValue*> values;
-};
-
 class BlockStateManager {
 public:
     BlockStateManager(const Block* owner, const std::map<std::string, const IProperty*>& properties);
 
     [[nodiscard]] const std::vector<const BlockState*>& getStates() const { return states; }
+    [[nodiscard]] const std::unordered_map<size_t, const BlockState*>& getStateMap() const { return stateMap; }
 
     class Builder {
     public:

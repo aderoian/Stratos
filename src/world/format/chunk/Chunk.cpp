@@ -19,9 +19,35 @@
 
 #include "Chunk.h"
 
-namespace stratos {
+#include "block/Blocks.h"
+#include "nbt/CompoundTag.h"
+#include "nbt/ListTag.h"
+#include "nbt/PrimitiveTag.h"
 
-Chunk* Chunk::fromNBT(const nbt::CompoundTag& nbt) {
-    return nullptr;
+namespace stratos::world {
+
+void ChunkSection::readNBT(nbt::CompoundTag& nbt) {
+    y = nbt["Y"].as<nbt::ByteTag>().get();
+    auto& blockStatesTag = nbt["block_states"].as<nbt::CompoundTag>();
+    blocks = read(&block::Blocks::STATES,
+        BLOCK_STATE,
+        readBlockStatePalette(blockStatesTag),
+        blockStatesTag.hasKey("data") ? blockStatesTag["data"].as<nbt::LongArrayTag>().get() : std::vector<int64_t>()
+        );
+}
+void Chunk::readNBT(nbt::CompoundTag& nbt) {
+    x = nbt["xPos"].as<nbt::IntTag>().get();
+    z = nbt["zPos"].as<nbt::IntTag>().get();
+    lowY = nbt["yPos"].as<nbt::IntTag>().get();
+
+    auto& sectionsTag = nbt["sections"].as<nbt::ListTag>();
+    sections.resize(sectionsTag.size());
+    for (size_t i = 0; i < sectionsTag.size(); i++) {
+        auto& sectionTag = sectionsTag[i].as<nbt::CompoundTag>();
+        auto* section = new ChunkSection();
+        section->readNBT(sectionTag);
+        sections[i] = section;
+    }
+
 }
 } // namespace stratos

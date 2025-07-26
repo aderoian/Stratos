@@ -27,44 +27,6 @@
 
 namespace stratos::block {
 
-bool PropertyMap::operator==(const PropertyMap& other) const {
-    return hashCode() == other.hashCode();
-}
-bool PropertyMap::operator!=(const PropertyMap& other) const {
-    return !(*this == other);
-}
-const std::map<const IProperty*, IProperty::IValue*>& PropertyMap::getValues() const {
-    return values;
-}
-IProperty::IValue* PropertyMap::get(const IProperty& property) const {
-    if (const auto it = values.find(&property); it != values.end()) return it->second;
-    return nullptr;
-}
-bool PropertyMap::contains(const IProperty& property) const {
-    return values.contains(&property);
-}
-bool PropertyMap::isEmpty() const {
-    return values.empty();
-}
-size_t PropertyMap::size() const {
-    return values.size();
-}
-std::string PropertyMap::toString() const {
-    return "[" + std::accumulate(values.begin(), values.end(), std::string(),
-        [](const std::string& acc, const auto& pair) {
-            return acc + pair.second->toString() + ",";
-        }) + "]";
-}
-size_t PropertyMap::hashCode() const {
-    size_t hash = 0;
-    for (auto& [property, value] : values)
-        hash ^= property->hashCode() ^ value->hashCode() << 1;
-    return hash;
-}
-void PropertyMap::set(const IProperty& property, IProperty::IValue* value) {
-    if (const auto it = values.find(&property); it != values.end()) delete it->second;
-    values[&property] = value;
-}
 BlockStateManager::BlockStateManager(const Block* owner, const std::map<std::string, const IProperty*>& properties) : owner(owner), properties(properties) {
     using PropertyPair = std::pair<const IProperty*, std::any>;
     using PropertyCombination = std::vector<PropertyPair>;

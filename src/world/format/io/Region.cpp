@@ -19,16 +19,17 @@
 
 #include "Region.h"
 
-#include "nbt/io/NBTBuffer.h"
 #include "nbt/CompoundTag.h"
+#include "nbt/io/NBTBuffer.h"
 #include "utils/io/CompressionUtils.h"
 #include "world/format/chunk/Chunk.h"
 
 #include <format>
 
-namespace stratos {
+namespace stratos::world {
 
 constexpr int HEADER_TABLE_BYTES = 1024 * 4;
+constexpr int HEADER_SIZE = HEADER_TABLE_BYTES * 2;
 constexpr int SECTOR_BYTES = 4096;
 
 Region::Region(int x, int y, Path regionRoot) : x(x), z(y), file(open(regionRoot.resolve(std::format("r.{}.{}.mca", x, z)), std::ios::in | std::ios::out | std::ios::binary)) {
@@ -53,7 +54,7 @@ void Region::loadHeader() {
     {
         ByteBuffer locations(readBytes(file, HEADER_TABLE_BYTES));
         for (int i = 0; i < 1024; i++) {
-            const int offset = locations.readInt24() * SECTOR_BYTES;
+            const int offset = locations.readInt24();
             const int size   = locations.readByte();
             entries[i]       = {offset, size, 0};
         }
@@ -71,14 +72,17 @@ Chunk* Region::loadChunk(const int chunkX, const int chunkZ) {
     if (!isChunkGenerated(chunkX, chunkZ)) return nullptr;
     const ChunkEntry entry = entries[index(chunkX, chunkZ)];
 
-    ByteVec       buffer = readBytes(file, entry.size * SECTOR_BYTES, entry.offset * SECTOR_BYTES);
+    ByteVec       buffer = readBytes(file, entry.size * SECTOR_BYTES, HEADER_SIZE + entry.offset * SECTOR_BYTES);
     ByteBuffer    byteBuffer(std::move(buffer));
     const int     length          = byteBuffer.readInt();
     const uint8_t compressionType = byteBuffer.readByte();
 
-    nbt::NBTBuffer chunkNBT(compressionType != 3 ? decompress(byteBuffer.readByteArray(length - 5)) : byteBuffer.readByteArray(length - 5));
+    nbt::NBTBuffer chunkNBT(compressionType != 3 ? decompress(byteBuffer.readByteArray(length - 1)) : byteBuffer.readByteArray(length - 1));
 
-    Chunk* chunk = Chunk::fromNBT(chunkNBT.readTag().second->as<nbt::CompoundTag>());
+    auto [name, tag] = chunkNBT.readTag<nbt::CompoundTag>();
+    if (!tag) throw std::runtime_error("Failed to read chunk NBT data");
+    auto* chunk = new Chunk();
+    chunk->readNBT(*tag);
     chunks[index(chunkX, chunkZ)] = chunk;
     return chunk;
 }

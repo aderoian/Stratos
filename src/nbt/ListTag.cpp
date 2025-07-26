@@ -74,8 +74,9 @@ void ListTag::reset(const TagType type) {
 void ListTag::read(NBTBuffer& buffer) {
     clear();
     tagType = static_cast<TagType>(buffer.readByte());
-    if (tagType == TagType::End) return;
+
     int length = buffer.readInt();
+    if (tagType == TagType::End) return; // Still have to consume length integer
     while (length--) {
         auto tag = Tag::create(tagType);
         tag->read(buffer);

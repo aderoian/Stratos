@@ -30,7 +30,7 @@ template <typename T> T round(const T value, const int precision) {
 }
 
 inline int ceilLog2(const int value) {
-    if (value == 0) return 0;
+    if (value <= 1) return 0;
     return 32 - __builtin_clz(value - 1);
 }
 

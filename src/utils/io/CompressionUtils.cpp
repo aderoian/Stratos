@@ -34,6 +34,9 @@ ByteBuffer decompress(const ByteBuffer& buffer) {
 }
 ByteVec decompress(const ByteVec& buffer) {
     z_stream strm{};
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
     strm.next_in  = const_cast<Bytef*>(buffer.data());
     strm.avail_in = static_cast<uInt>(buffer.size());
 
@@ -41,24 +44,28 @@ ByteVec decompress(const ByteVec& buffer) {
         throw std::runtime_error("inflateInit2 failed");
 
     ByteVec output(16 * 1024);
-    while (true) {
-        strm.next_out  = output.data() + strm.total_out;
-        strm.avail_out = static_cast<uInt>(output.size() - strm.total_out);
+    std::size_t out_offset = 0;
 
-        const int ret = inflate(&strm, Z_NO_FLUSH);
+    while (true) {
+        if (out_offset >= output.size()) {
+            output.resize(output.size() * 2);
+        }
+
+        strm.next_out = output.data() + out_offset;
+        strm.avail_out = static_cast<uInt>(output.size() - out_offset);
+
+        int ret = inflate(&strm, Z_NO_FLUSH);
+        out_offset = output.size() - strm.avail_out;
+
         if (ret == Z_STREAM_END) break;
         if (ret != Z_OK) {
-            const std::string err = strm.msg ? strm.msg : "unknown";
+            std::string err = strm.msg ? strm.msg : "unknown";
             inflateEnd(&strm);
             throw std::runtime_error("inflate failed: " + std::to_string(ret) + " (" + err + ")");
         }
-
-        if (strm.avail_out == 0) {
-            output.resize(output.size() * 2);
-        }
     }
 
-    output.resize(strm.total_out);
+    output.resize(out_offset);
     inflateEnd(&strm);
     return output;
 }

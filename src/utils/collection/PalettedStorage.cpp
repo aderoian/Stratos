@@ -112,6 +112,18 @@ void PackedIntegerArray::writeIndices(std::vector<int>& data) const {
         }
     }
 }
+EmptyPalettedStorage::EmptyPalettedStorage(const int size) : size(size) {
+    empty.resize(0);
+}
+int                         EmptyPalettedStorage::getBitsPerEntry() const { return 0; }
+int                         EmptyPalettedStorage::getSize() const { return size; }
+int                         EmptyPalettedStorage::getMaxValue() const { return 0; }
+const std::vector<int64_t>& EmptyPalettedStorage::getData() const { return empty; }
+std::vector<int64_t>&       EmptyPalettedStorage::getData() { return empty; }
+int                         EmptyPalettedStorage::get(int index) const { return 0;}
+void                        EmptyPalettedStorage::set(int index, int value) {}
+int                         EmptyPalettedStorage::swap(int index, int value) { return 0;}
+void                        EmptyPalettedStorage::writeIndices(std::vector<int>& data) const { return data.resize(size, 0); }
 std::vector<int64_t>& PackedIntegerArray::getData() {
     return data;
 }

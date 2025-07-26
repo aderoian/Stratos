@@ -62,7 +62,7 @@ template <typename T> std::pair<std::string, std::unique_ptr<T>> NBTBuffer::read
     std::string name = readModifiedUTF8String();
     auto tag = internal::makeUnique<T>();
     tag->read(*this);
-    return {std::move(name), std::unique_ptr<T>(tag.release())};
+    return {std::move(name), std::move(tag)};
 }
 } // namespace stratos::nbt
 

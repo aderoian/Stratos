@@ -24,7 +24,7 @@
 namespace stratos::nbt {
 class CompoundTag;
 }
-namespace stratos {
+namespace stratos::world {
 
 class ChunkSection {
 public:
@@ -33,7 +33,7 @@ public:
     void readNBT(nbt::CompoundTag& nbt);
 private:
     int y;
-    PalettedContainer<block::BlockState>* blocks;
+    const PalettedContainer<const block::BlockState*>* blocks;
     PalettedContainer<Biome>* biomes;
     // TODO: Block light
     // TODO: Sky light
@@ -52,7 +52,7 @@ private:
     int z;
     int lowY;
 
-    ChunkSection** sections;
+    std::vector<ChunkSection*> sections;
 };
 
 } // namespace stratos

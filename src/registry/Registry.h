@@ -44,7 +44,7 @@ template <typename T> class Registry final : public utils::IndexedIterable<T> {
 
     int getRawIndex(T value) const override;
     T   get(int index) const override;
-    T   get(utils::Identifier key) const;
+    T   get(const utils::Identifier& key) const;
     T   get(const RegistryKey& key) const;
     utils::Identifier getEntry(T value) const;
     [[nodiscard]] int size() const override;
@@ -74,13 +74,13 @@ template <typename T> int Registry<T>::getRawIndex(T value) const {
     return el != valueToRawId.end() ? el->second : -1;
 }
 template <typename T> T Registry<T>::get(int index) const {
-    return rawIdToValue[index];
+    return rawIdToValue.at(index);
 }
-template <typename T> T Registry<T>::get(utils::Identifier key) const {
-    return idToValue[getRawIndex(key)];
+template <typename T> T Registry<T>::get(const utils::Identifier& key) const {
+    return idToValue.at(key);
 }
 template <typename T> T Registry<T>::get(const RegistryKey& key) const {
-    return keyToValue[key];
+    return keyToValue.at(key);
 }
 template <typename T> utils::Identifier Registry<T>::getEntry(T value) const {
     return valueToEntry.at(value);

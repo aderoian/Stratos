@@ -112,6 +112,26 @@ private:
     std::vector<int64_t> data;
 };
 
+class EmptyPalettedStorage final : public PalettedStorage {
+public:
+    explicit EmptyPalettedStorage(int size);
+
+    [[nodiscard]] int getBitsPerEntry() const override;
+    [[nodiscard]] int getSize() const override;
+    [[nodiscard]] int getMaxValue() const override;
+    [[nodiscard]] const std::vector<int64_t>& getData() const override;
+    [[nodiscard]] std::vector<int64_t>& getData();
+
+    [[nodiscard]] int get(int index) const override;
+    void set(int index, int value) override;
+    [[nodiscard]] int swap(int index, int value) override;
+
+    void writeIndices(std::vector<int>& data) const override;
+private:
+    int size;
+    std::vector<int64_t> empty;
+};
+
 } // namespace stratos
 
 #endif //PALETTESTORAGE_H

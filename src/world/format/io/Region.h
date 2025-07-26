@@ -21,7 +21,7 @@
 #define REGION_H
 #include "utils/io/FileUtils.h"
 
-namespace stratos {
+namespace stratos::world {
 class Chunk;
 struct ChunkEntry {
     int offset;
