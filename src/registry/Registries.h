@@ -26,11 +26,15 @@ namespace stratos {
 namespace block {
 class Block;
 } // namespace block
+namespace world {
+class Biome;
+} // namespace world
 namespace registry {
 
 class Registries {
 public:
     static Registry<const block::Block*>* BLOCKS();
+    static Registry<const world::Biome*>* BIOMES();
 };
 } // namespace registry
 } // namespace stratos

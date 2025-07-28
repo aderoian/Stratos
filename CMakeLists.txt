@@ -48,6 +48,7 @@ set(SOURCES
         utils/io/FileUtils.cpp
         utils/Identifier.cpp
         utils/StringUtils.cpp
+        world/biome/Biomes.cpp
         world/format/chunk/Chunk.cpp
         world/format/chunk/Palette.cpp
         world/format/io/Region.cpp
@@ -101,10 +102,11 @@ set(HEADERS
         utils/Types.h
         utils/UUID.h
         utils/Validate.h
+        world/biome/Biome.h
+        world/biome/Biomes.h
         world/format/chunk/Chunk.h
         world/format/chunk/Palette.h
         world/format/io/Region.h
-        world/format/Biome.h
 )
 
 # Project

@@ -22,13 +22,11 @@
 #include "block/state/BlockState.h"
 #include "nbt/io/NBTBuffer.h"
 #include "nbt/ListTag.h"
-#include "nbt/PrimitiveTag.h"
 #include "utils/collection/Iterable.h"
 #include "utils/collection/PalettedStorage.h"
 #include "utils/io/ByteBuffer.h"
 #include "utils/MathUtils.h"
 #include "utils/Predicate.h"
-#include "world/format/Biome.h"
 
 #include <format>
 #include <optional>
@@ -39,6 +37,7 @@ namespace nbt {
 class CompoundTag;
 }
 namespace world {
+class Biome;
 
 template <typename T> class Palette {
 public:
