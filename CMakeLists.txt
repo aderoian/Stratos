@@ -39,6 +39,7 @@ set(SOURCES
         network/protocol/PacketCodec.cpp
         registry/Registries.cpp
         registry/Registry.cpp
+        utils/collection/BitSet.cpp
         utils/collection/PalettedStorage.cpp
         utils/config/Config.cpp
         utils/crypto/CryptoUtils.cpp
@@ -84,6 +85,7 @@ set(HEADERS
         network/protocol/PacketCodec.h
         registry/Registries.h
         registry/Registry.h
+        utils/collection/BitSet.h
         utils/collection/IdList.h
         utils/collection/Iterable.h
         utils/collection/PalettedStorage.h
