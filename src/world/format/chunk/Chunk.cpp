@@ -23,6 +23,7 @@
 #include "nbt/CompoundTag.h"
 #include "nbt/ListTag.h"
 #include "nbt/PrimitiveTag.h"
+#include "registry/Registries.h"
 
 namespace stratos::world {
 
@@ -34,6 +35,13 @@ void ChunkSection::readNBT(nbt::CompoundTag& nbt) {
         readBlockStatePalette(blockStatesTag),
         blockStatesTag.hasKey("data") ? blockStatesTag["data"].as<nbt::LongArrayTag>().get() : std::vector<int64_t>()
         );
+
+    auto& biomesTag = nbt["biomes"].as<nbt::CompoundTag>();
+    biomes = read(registry::Registries::BIOMES(),
+        BIOME,
+        readBiomePalette(biomesTag),
+        biomesTag["data"].as<nbt::LongArrayTag>().get()
+    );
 }
 void Chunk::readNBT(nbt::CompoundTag& nbt) {
     x = nbt["xPos"].as<nbt::IntTag>().get();

@@ -187,6 +187,7 @@ constexpr PalettedContainer<const block::BlockState*>::PaletteProvider BLOCK_STA
 constexpr PalettedContainer<const Biome*>::PaletteProvider BIOME = { biomeDataFactory, 2 };
 
 std::vector<const block::BlockState*> readBlockStatePalette(nbt::CompoundTag& tag);
+std::vector<const Biome*> readBiomePalette(nbt::CompoundTag& tag);
 template <typename T>
 const PalettedContainer<T>* read(const utils::IndexedIterable<T>* idList, typename PalettedContainer<T>::template PaletteProvider<T> provider, const std::vector<T>& entries, const std::vector<int64_t>& longs);
 

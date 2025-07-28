@@ -34,7 +34,7 @@ public:
 private:
     int y;
     const PalettedContainer<const block::BlockState*>* blocks;
-    PalettedContainer<Biome>* biomes;
+    const PalettedContainer<const Biome*>* biomes;
     // TODO: Block light
     // TODO: Sky light
 

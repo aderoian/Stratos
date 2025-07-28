@@ -40,11 +40,10 @@ PalettedContainer<const Biome*>::DataProvider<const Biome*> biomeDataFactory(con
 std::vector<const block::BlockState*> readBlockStatePalette(nbt::CompoundTag& tag) {
     std::vector<const block::BlockState*> result;
     for (auto& palette = tag["palette"].as<nbt::ListTag>(); auto& entry : palette) {
-        if (entry.getType() != nbt::TagType::Compound)
-            throw std::runtime_error("Invalid palette entry type, expected CompoundTag");
+        if (entry.getType() != nbt::TagType::Compound) throw std::runtime_error("Invalid palette entry type, expected CompoundTag");
 
-        auto& compound = entry.as<nbt::CompoundTag>();
-        const block::Block* block = registry::Registries::BLOCKS()->get(utils::Identifier::of(compound["Name"].as<nbt::StringTag>().get()));
+        auto&               compound = entry.as<nbt::CompoundTag>();
+        const block::Block* block    = registry::Registries::BLOCKS()->get(utils::Identifier::of(compound["Name"].as<nbt::StringTag>().get()));
 
         if (compound.hasKey("Properties", nbt::TagType::Compound)) {
             size_t index = 0;
@@ -54,6 +53,18 @@ std::vector<const block::BlockState*> readBlockStatePalette(nbt::CompoundTag& ta
         } else {
             result.emplace_back(block->getStateManager()->getStates()[0]);
         }
+    }
+    return result;
+}
+std::vector<const Biome*> readBiomePalette(nbt::CompoundTag& tag) {
+    auto& palette = tag["palette"].as<nbt::ListTag>();
+    std::vector<const Biome*> result(palette.size(), nullptr);
+    const registry::Registry<const Biome*>* registry = registry::Registries::BIOMES();
+    for (size_t i = 0; i < palette.size(); ++i) {
+        nbt::TagValue& entry = palette[i];
+        auto* biome = registry->get(utils::Identifier::of(entry.as<nbt::StringTag>().get()));
+        if (!biome) throw std::runtime_error(std::format("Biome '{}' not found in registry", entry.as<nbt::StringTag>().get()));
+        result[i] = biome;
     }
     return result;
 }
