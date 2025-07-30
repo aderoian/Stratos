@@ -20,6 +20,7 @@
 #include "Chunk.h"
 
 #include "block/Blocks.h"
+#include "Heightmap.h"
 #include "nbt/CompoundTag.h"
 #include "nbt/ListTag.h"
 #include "nbt/PrimitiveTag.h"
@@ -27,6 +28,7 @@
 
 namespace stratos::world {
 
+ChunkSection::ChunkSection(const Chunk* chunk) : chunk(chunk) {}
 void ChunkSection::readNBT(nbt::CompoundTag& nbt) {
     y = nbt["Y"].as<nbt::ByteTag>().get();
     auto& blockStatesTag = nbt["block_states"].as<nbt::CompoundTag>();
@@ -40,8 +42,13 @@ void ChunkSection::readNBT(nbt::CompoundTag& nbt) {
     biomes = read(registry::Registries::BIOMES(),
         BIOME,
         readBiomePalette(biomesTag),
-        biomesTag["data"].as<nbt::LongArrayTag>().get()
+        biomesTag.hasKey("data") ? biomesTag["data"].as<nbt::LongArrayTag>().get() : std::vector<int64_t>()
     );
+
+    if (nbt.hasKey("BlockLight"))
+        blockLight = new std::vector(nbt["BlockLight"].as<nbt::ByteArrayTag>().get());
+    if (nbt.hasKey("SkyLight"))
+        skyLight = new std::vector(nbt["SkyLight"].as<nbt::ByteArrayTag>().get());
 }
 void Chunk::readNBT(nbt::CompoundTag& nbt) {
     x = nbt["xPos"].as<nbt::IntTag>().get();
@@ -52,10 +59,19 @@ void Chunk::readNBT(nbt::CompoundTag& nbt) {
     sections.resize(sectionsTag.size());
     for (size_t i = 0; i < sectionsTag.size(); i++) {
         auto& sectionTag = sectionsTag[i].as<nbt::CompoundTag>();
-        auto* section = new ChunkSection();
+        auto* section = new ChunkSection(this);
         section->readNBT(sectionTag);
         sections[i] = section;
     }
 
+    auto& heightmapsTag = nbt["Heightmaps"].as<nbt::CompoundTag>();
+    if (heightmapsTag.hasKey("MOTION_BLOCKING"))
+        motionBlocking = new Heightmap(this, MOTION_BLOCKING, 9, heightmapsTag["MOTION_BLOCKING"].as<nbt::LongArrayTag>().get());
+    if (heightmapsTag.hasKey("MOTION_BLOCKING_NO_LEAVES"))
+        motionBlockingNoLeaves = new Heightmap(this, MOTION_BLOCKING_NO_LEAVES, 9, heightmapsTag["MOTION_BLOCKING_NO_LEAVES"].as<nbt::LongArrayTag>().get());
+    if (heightmapsTag.hasKey("OCEAN_FLOOR"))
+        oceanFloor = new Heightmap(this, OCEAN_FLOOR, 9, heightmapsTag["OCEAN_FLOOR"].as<nbt::LongArrayTag>().get());
+    if (heightmapsTag.hasKey("WORLD_SURFACE"))
+        worldSurface = new Heightmap(this, WORLD_SURFACE, 9, heightmapsTag["WORLD_SURFACE"].as<nbt::LongArrayTag>().get());
 }
 } // namespace stratos

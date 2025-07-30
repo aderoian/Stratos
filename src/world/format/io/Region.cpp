@@ -21,6 +21,7 @@
 
 #include "nbt/CompoundTag.h"
 #include "nbt/io/NBTBuffer.h"
+#include "Server.h"
 #include "utils/io/CompressionUtils.h"
 #include "world/format/chunk/Chunk.h"
 
@@ -72,12 +73,14 @@ Chunk* Region::loadChunk(const int chunkX, const int chunkZ) {
     if (!isChunkGenerated(chunkX, chunkZ)) return nullptr;
     const ChunkEntry entry = entries[index(chunkX, chunkZ)];
 
-    ByteVec       buffer = readBytes(file, entry.size * SECTOR_BYTES, HEADER_SIZE + entry.offset * SECTOR_BYTES);
+    ByteVec       buffer = readBytes(file, entry.size * SECTOR_BYTES, entry.offset * SECTOR_BYTES);
     ByteBuffer    byteBuffer(std::move(buffer));
     const int     length          = byteBuffer.readInt();
     const uint8_t compressionType = byteBuffer.readByte();
 
     nbt::NBTBuffer chunkNBT(compressionType != 3 ? decompress(byteBuffer.readByteArray(length - 1)) : byteBuffer.readByteArray(length - 1));
+
+    writeAllBytes(Path("chunk_dump.dat"), chunkNBT.data());
 
     auto [name, tag] = chunkNBT.readTag<nbt::CompoundTag>();
     if (!tag) throw std::runtime_error("Failed to read chunk NBT data");

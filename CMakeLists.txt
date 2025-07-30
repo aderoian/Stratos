@@ -51,6 +51,7 @@ set(SOURCES
         utils/StringUtils.cpp
         world/biome/Biomes.cpp
         world/format/chunk/Chunk.cpp
+        world/format/chunk/Heightmap.cpp
         world/format/chunk/Palette.cpp
         world/format/io/Region.cpp
 )
@@ -107,6 +108,7 @@ set(HEADERS
         world/biome/Biome.h
         world/biome/Biomes.h
         world/format/chunk/Chunk.h
+        world/format/chunk/Heightmap.h
         world/format/chunk/Palette.h
         world/format/io/Region.h
 )
