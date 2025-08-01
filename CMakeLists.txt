@@ -34,9 +34,20 @@ set(SOURCES
         network/session/NetworkClient.cpp
         network/session/SessionAuth.cpp
         network/io/Socket.cpp
-        network/protocol/PacketSerialization.cpp
-        network/protocol/Packet.cpp
-        network/protocol/PacketCodec.cpp
+        network/protocol/codec/PacketCodec.cpp
+        network/protocol/codec/PacketRegistry.cpp
+        network/protocol/definition/PacketConfiguration.cpp
+        network/protocol/definition/PacketHandshake.cpp
+        network/protocol/definition/PacketLogin.cpp
+        network/protocol/definition/PacketPlay.cpp
+        network/protocol/definition/PacketStatus.cpp
+        network/protocol/handler/PacketConfigurationHandler.cpp
+        network/protocol/handler/PacketHandshakeHandler.cpp
+        network/protocol/handler/PacketLoginHandler.cpp
+        network/protocol/handler/PacketPlayHandler.cpp
+        network/protocol/handler/PacketStatusHandler.cpp
+        network/protocol/serialization/PacketBuffer.cpp
+        network/protocol/serialization/PacketSerialization.cpp
         registry/Registries.cpp
         registry/Registry.cpp
         utils/collection/BitSet.cpp
@@ -81,9 +92,21 @@ set(HEADERS
         network/session/NetworkClient.h
         network/session/SessionAuth.h
         network/io/Socket.h
-        network/protocol/PacketSerialization.h
+        network/protocol/codec/PacketCodec.h
+        network/protocol/codec/PacketRegistry.h
+        network/protocol/definition/PacketConfiguration.h
+        network/protocol/definition/PacketHandshake.h
+        network/protocol/definition/PacketLogin.h
+        network/protocol/definition/PacketPlay.h
+        network/protocol/definition/PacketStatus.h
+        network/protocol/handler/PacketConfigurationHandler.h
+        network/protocol/handler/PacketHandshakeHandler.h
+        network/protocol/handler/PacketLoginHandler.h
+        network/protocol/handler/PacketPlayHandler.h
+        network/protocol/handler/PacketStatusHandler.h
+        network/protocol/serialization/PacketBuffer.h
+        network/protocol/serialization/PacketSerialization.h
         network/protocol/Packet.h
-        network/protocol/PacketCodec.h
         registry/Registries.h
         registry/Registry.h
         utils/collection/BitSet.h

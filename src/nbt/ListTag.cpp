@@ -71,7 +71,7 @@ void ListTag::reset(const TagType type) {
     clear();
     tagType = type;
 }
-void ListTag::read(NBTBuffer& buffer) {
+void ListTag::read(const NBTBuffer& buffer) {
     clear();
     tagType = static_cast<TagType>(buffer.readByte());
 

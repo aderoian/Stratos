@@ -28,7 +28,9 @@
 
 namespace stratos {
 class PropertiesConfig;
+namespace network {
 class NetworkManager;
+}
 
 class Server final {
 
@@ -42,6 +44,8 @@ public:
 
     [[nodiscard]] std::shared_ptr<spdlog::logger> getLogger() const;
     [[nodiscard]] bool isRunning() const;
+
+    [[nodiscard]] const network::NetworkManager* getNetwork() const;
 
     [[nodiscard]] unsigned int getTick() const;
     [[nodiscard]] float getCurrentTPS() const;
@@ -72,7 +76,7 @@ private:
     Path root;
     std::unique_ptr<PropertiesConfig> serverConfig;
 
-    std::unique_ptr<NetworkManager> network;
+    network::NetworkManager* network;
 
     std::atomic<bool> running = false;
     long startTime;

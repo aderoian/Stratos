@@ -17,39 +17,16 @@
  *
  */
 
-#ifndef PACKETSERIALIZATION_H
-#define PACKETSERIALIZATION_H
+#ifndef PACKETBUFFER_H
+#define PACKETBUFFER_H
 #include "math/Angle.h"
 #include "math/Position.h"
 #include "nbt/io/NBTBuffer.h"
 #include "utils/Identifier.h"
 #include "utils/Types.h"
+#include "utils/UUID.h"
 
-#include <array>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
-namespace stratos {
-using ByteVec = std::vector<unsigned char>;
-using UUID = std::array<uint8_t, 16>;
-
-int8_t readByte(const ByteVec& buffer, size_t& offset);
-uint8_t readUnsignedByte(const ByteVec& buffer, size_t& offset);
-int readVarInt(const ByteVec& buffer, size_t& offset);
-
-class PacketSerializationException final : public std::logic_error {
-  public:
-    explicit PacketSerializationException(const char* message) : logic_error(message) {};
-    explicit PacketSerializationException(const std::string& message) : logic_error(message) {};
-};
-
-// Helper functions
-inline bool isReadable(const ByteVec& buffer, const size_t& offset, const size_t& bytes) {
-    if (offset + bytes > buffer.size()) throw PacketSerializationException("Buffer overflow: Tried reading beyond buffer size.");
-
-    return true;
-}
+namespace stratos::network {
 
 class PacketBuffer final : public nbt::NBTBuffer {
   public:
@@ -63,27 +40,26 @@ class PacketBuffer final : public nbt::NBTBuffer {
     PacketBuffer(PacketBuffer&&) = default;
     PacketBuffer& operator=(PacketBuffer&&) = default;
 
-    std::string           readStringUTF16BE();
+    std::string           readStringUTF16BE() const;
     // TODO: readTextComponent
     // TODO: readJSONTextComponent
-    stratos::utils::Identifier readIdentifier();
+    utils::Identifier readIdentifier() const;
     // TODO: readEntityMetaData
     // TODO: readSlot
     // TODO: readHashedSlot
-    // TODO: readNBT
-    math::Position        readPosition();
-    math::Angle           readAngle();
-    UUID                  readUUID();
+    math::Position        readPosition() const;
+    math::Angle           readAngle() const;
+    UUID                  readUUID() const;
     template <typename T, typename ReadFunc>
-    T readVarIntEnum(const ReadFunc& enumMapper) { return enumMapper(readVarInt()); }
-    std::vector<uint8_t> readPrefixedByteArray();
-    std::vector<LoginProperty> readLoginProperty();
-    std::optional<std::string> readPrefixedOptionalString(int maxChars);
-    std::vector<uint8_t> readInferredByteArray();
-    ResourcePackHeader readResourcePackHeader();
-    std::optional<std::vector<uint8_t>> readPrefixedOptionalInferredByteArray();
-    std::optional<std::vector<uint8_t>> readPrefixedOptionalPrefixedByteArray();
-    std::vector<ResourcePackHeader> readPrefixedResourcePackHeaderArray();
+    T readVarIntEnum(const ReadFunc& enumMapper) const { return enumMapper(readVarInt()); }
+    std::vector<uint8_t> readPrefixedByteArray() const;
+    std::vector<LoginProperty> readLoginProperty() const;
+    std::optional<std::string> readPrefixedOptionalString(int maxChars) const;
+    std::vector<uint8_t> readInferredByteArray() const;
+    ResourcePackHeader readResourcePackHeader() const;
+    std::optional<std::vector<uint8_t>> readPrefixedOptionalInferredByteArray() const;
+    std::optional<std::vector<uint8_t>> readPrefixedOptionalPrefixedByteArray() const;
+    std::vector<ResourcePackHeader> readPrefixedResourcePackHeaderArray() const;
 
     void writeStringUTF16BE(const std::string& value);
     // TODO: writeTextComponent
@@ -92,7 +68,6 @@ class PacketBuffer final : public nbt::NBTBuffer {
     // TODO: writeEntityMetaData
     // TODO: writeSlot
     // TODO: writeHashedSlot
-    // TODO: writeNBT
     void writePosition(const math::Position& position);
     void writeAngle(const math::Angle& angle);
     void writeUUID(const UUID& uuid);
@@ -115,12 +90,10 @@ class PacketBuffer final : public nbt::NBTBuffer {
     void writePrefixedServerLinkArray(const std::vector<ServerLink>& serverLinks);
 
     [[nodiscard]] const ByteVec& getBuffer() const { return buffer; }
-    [[nodiscard]] size_t         getOffset() const { return offset; }
     [[nodiscard]] size_t         getSize() const { return buffer.size(); }
     [[nodiscard]] bool           isEmpty() const { return buffer.empty(); }
-    [[nodiscard]] bool           isReadable() const { return offset < buffer.size(); }
-    [[nodiscard]] bool           isReadable(const size_t& bytes) const { return offset + bytes < buffer.size(); }
 };
-} // namespace stratos
 
-#endif
+} // namespace stratos::network
+
+#endif //PACKETBUFFER_H

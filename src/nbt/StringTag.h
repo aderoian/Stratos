@@ -50,7 +50,7 @@ class StringTag final : public CRTPTag<StringTag> {
     void set(const std::string& str) { value = str; }
     void set(std::string&& str) { value = std::move(str); }
 
-    void read(NBTBuffer& buffer) override;
+    void read(const NBTBuffer& buffer) override;
     void write(NBTBuffer& buffer) const override;
 
   private:

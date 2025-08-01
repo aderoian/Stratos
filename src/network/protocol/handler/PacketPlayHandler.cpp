@@ -17,20 +17,8 @@
  *
  */
 
-#ifndef SESSIONAUTH_H
-#define SESSIONAUTH_H
-#include "cpr/cprtypes.h"
-#include "utils/crypto/CryptoUtils.h"
-
-#include <string>
-#include <vector>
+#include "PacketPlayHandler.h"
 
 namespace stratos::network {
-class NetworkConnection;
 
-void authenticate(NetworkConnection* connection, const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey);
-cpr::Url getAuthenticationUrl(const std::string& username, const std::string& loginHash, const std::string& serverIp);
-std::string generateMinecraftSha1HexDigest(const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey);
-}// namespace stratos::network
-
-#endif //SESSIONAUTH_H
+} // namespace stratos::network

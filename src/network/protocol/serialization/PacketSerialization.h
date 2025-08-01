@@ -17,20 +17,26 @@
  *
  */
 
-#ifndef SESSIONAUTH_H
-#define SESSIONAUTH_H
-#include "cpr/cprtypes.h"
-#include "utils/crypto/CryptoUtils.h"
+#ifndef PACKETSERIALIZATION_H
+#define PACKETSERIALIZATION_H
 
-#include <string>
+#include <cstdint>
+#include <stdexcept>
 #include <vector>
 
 namespace stratos::network {
-class NetworkConnection;
+using ByteVec = std::vector<unsigned char>;
+using UUID = std::array<uint8_t, 16>;
 
-void authenticate(NetworkConnection* connection, const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey);
-cpr::Url getAuthenticationUrl(const std::string& username, const std::string& loginHash, const std::string& serverIp);
-std::string generateMinecraftSha1HexDigest(const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey);
-}// namespace stratos::network
+int8_t readByte(const ByteVec& buffer, size_t& offset);
+uint8_t readUnsignedByte(const ByteVec& buffer, size_t& offset);
+int readVarInt(const ByteVec& buffer, size_t& offset);
 
-#endif //SESSIONAUTH_H
+class PacketSerializationException final : public std::logic_error {
+  public:
+    explicit PacketSerializationException(const char* message) : logic_error(message) {};
+    explicit PacketSerializationException(const std::string& message) : logic_error(message) {};
+};
+} // namespace stratos::network
+
+#endif

@@ -21,7 +21,7 @@
 #define NETWORK_H
 #include "concurrentqueue.h"
 #include "io/Socket.h"
-#include "protocol/PacketCodec.h"
+#include "protocol/codec/PacketCodec.h"
 #include "utils/crypto/CryptoUtils.h"
 
 #include <memory>
@@ -31,14 +31,16 @@
 #include <unordered_map>
 #include <vector>
 
+namespace stratos {
+class Server;
+}
 namespace spdlog {
 class logger;
 }
-namespace stratos {
+namespace stratos::network {
 class NetworkConnection;
 class WorkerThread;
 class BossThread;
-class Server;
 class NetworkSession;
 
 using byte      = unsigned char;
@@ -64,6 +66,7 @@ class NetworkManager final {
     [[nodiscard]] const std::string& getAddress() const { return socketServer.getAddress(); }
     [[nodiscard]] int getPort() const { return socketServer.getPort(); }
 
+    [[nodiscard]] const PacketCodec& getPacketCodec() const { return packetCodec; }
     [[nodiscard]] bool useEncryption() const { return encryptionEnabled; }
     [[nodiscard]] const EVPKeyPtr& getEncryptionKey() const { return encryptionKey; }
 
@@ -83,6 +86,7 @@ class NetworkManager final {
     std::atomic<bool> running;
     std::unique_ptr<BossThread> bossThread;
 
+    PacketCodec packetCodec;
     bool encryptionEnabled = false;
     EVPKeyPtr encryptionKey = EVPKeyPtr(nullptr, &EVP_PKEY_free);
 
@@ -156,6 +160,6 @@ class WorkerThread final : public NetworkThread {
     void processIncomingConnections();
     void processSendNotifications();
 };
-} // namespace stratos
+} // namespace stratos::network
 
 #endif // NETWORK_H

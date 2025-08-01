@@ -63,23 +63,23 @@ class ByteBuffer {
     ByteBuffer& operator=(ByteBuffer&&)      = default;
     virtual ~ByteBuffer()                    = default;
 
-    bool                  readBoolean();
-    int8_t                readByte();
-    uint8_t               readUnsignedByte();
-    short                 readShort();
-    uint16_t              readUnsignedShort();
-    int                   readInt();
-    int                   readInt24();
-    int64_t               readLong();
-    float                 readFloat();
-    double                readDouble();
-    std::string           readString(int maxChars);
-    int                   readVarInt();
-    int64_t               readVarLong();
-    std::vector<uint64_t> readBitSet();
-    std::vector<bool>     readFixedBitSet(size_t length);
-    ByteVec               readByteArray(size_t length);
-    void                  readFixedLongArray(std::vector<int64_t>& longs);
+    bool                  readBoolean() const;
+    int8_t                readByte() const;
+    uint8_t               readUnsignedByte() const;
+    short                 readShort() const;
+    uint16_t              readUnsignedShort() const;
+    int                   readInt() const;
+    int                   readInt24() const;
+    int64_t               readLong() const;
+    float                 readFloat() const;
+    double                readDouble() const;
+    std::string           readString(int maxChars) const;
+    int                   readVarInt() const;
+    int64_t               readVarLong() const;
+    std::vector<uint64_t> readBitSet() const;
+    std::vector<bool>     readFixedBitSet(size_t length) const;
+    ByteVec               readByteArray(size_t length) const;
+    void                  readFixedLongArray(std::vector<int64_t>& longs) const;
 
     void writeBoolean(bool value);
     void writeByte(int8_t value);
@@ -125,7 +125,7 @@ class ByteBuffer {
     uint8_t& operator[](size_t index);
 
   protected:
-    size_t            offset;
+    mutable size_t offset;
     std::vector<byte> buffer;
 
     /**

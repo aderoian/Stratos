@@ -51,7 +51,7 @@ public:
     PrimitiveTag& operator=(T val) { value = val; return *this; }
     void set(T val) { value = val; }
 
-    void read(NBTBuffer& buffer) override;
+    void read(const NBTBuffer& buffer) override;
     void write(NBTBuffer& buffer) const override;
 private:
     T value;
@@ -68,7 +68,7 @@ typedef PrimitiveTag<float> FloatTag;
 typedef PrimitiveTag<double> DoubleTag;
 
 template <class T>
-void PrimitiveTag<T>::read(NBTBuffer& buffer) {
+void PrimitiveTag<T>::read(const NBTBuffer& buffer) {
     if constexpr (std::is_same_v<T, int8_t>) {\
         value = buffer.readByte();
     } else if constexpr (std::is_same_v<T, int16_t>) {

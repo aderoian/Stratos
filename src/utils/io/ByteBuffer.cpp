@@ -47,36 +47,36 @@ int countCodeUnits(const std::string& utf8) {
     return count;
 }
 
-bool stratos::ByteBuffer::readBoolean() {
+bool stratos::ByteBuffer::readBoolean() const {
     checkRead(sizeof(bool));
     return this->buffer[this->offset++] != 0;
 }
 
-int8_t stratos::ByteBuffer::readByte() {
+int8_t stratos::ByteBuffer::readByte() const {
     checkRead(sizeof(int8_t));
     return static_cast<int8_t>(this->buffer[offset++]);
 }
 
-uint8_t stratos::ByteBuffer::readUnsignedByte() {
+uint8_t stratos::ByteBuffer::readUnsignedByte() const {
     checkRead(sizeof(uint8_t));
     return static_cast<uint8_t>(this->buffer[offset++]);
 }
 
-short stratos::ByteBuffer::readShort() {
+short stratos::ByteBuffer::readShort() const {
     checkRead(sizeof(short));
     const auto high = static_cast<int16_t>(buffer[offset++]);
     const auto low  = static_cast<int16_t>(buffer[offset++]);
     return static_cast<short>(high << 8 | low & 0xFF);
 }
 
-uint16_t stratos::ByteBuffer::readUnsignedShort() {
+uint16_t stratos::ByteBuffer::readUnsignedShort() const {
     checkRead(sizeof(uint16_t));
     const auto high = static_cast<uint16_t>(buffer[offset++]);
     const auto low  = static_cast<uint16_t>(buffer[offset++]);
     return static_cast<uint16_t>(high << 8 | low & 0xFF);
 }
 
-int stratos::ByteBuffer::readInt() {
+int stratos::ByteBuffer::readInt() const {
     checkRead(sizeof(int));
     const auto b1 = static_cast<int32_t>(buffer[offset++]);
     const auto b2 = static_cast<int32_t>(buffer[offset++]);
@@ -84,7 +84,7 @@ int stratos::ByteBuffer::readInt() {
     const auto b4 = static_cast<int32_t>(buffer[offset++]);
     return b1 << 24 | b2 << 16 | b3 << 8 | b4 & 0xFF;
 }
-int stratos::ByteBuffer::readInt24() {
+int stratos::ByteBuffer::readInt24() const {
     checkRead(3);
     const auto b1 = static_cast<int32_t>(buffer[offset++]);
     const auto b2 = static_cast<int32_t>(buffer[offset++]);
@@ -92,7 +92,7 @@ int stratos::ByteBuffer::readInt24() {
     return b1 << 16 | b2 << 8 | b3 & 0xFF;
 }
 
-int64_t stratos::ByteBuffer::readLong() {
+int64_t stratos::ByteBuffer::readLong() const {
     checkRead(sizeof(int64_t));
     int64_t result = 0;
     for (int i = 0; i < 8; ++i) {
@@ -101,7 +101,7 @@ int64_t stratos::ByteBuffer::readLong() {
     return result;
 }
 
-float stratos::ByteBuffer::readFloat() {
+float stratos::ByteBuffer::readFloat() const {
     checkRead(sizeof(float));
     const uint32_t bits =
         static_cast<uint32_t>(buffer[offset]) << 24 |
@@ -114,7 +114,7 @@ float stratos::ByteBuffer::readFloat() {
     return value;
 }
 
-double stratos::ByteBuffer::readDouble() {
+double stratos::ByteBuffer::readDouble() const {
     checkRead(sizeof(double));
     uint64_t bits = 0;
     for (int i = 0; i < 8; ++i) {
@@ -125,7 +125,7 @@ double stratos::ByteBuffer::readDouble() {
     return value;
 }
 
-std::string stratos::ByteBuffer::readString(int maxChars) {
+std::string stratos::ByteBuffer::readString(const int maxChars) const {
     const uint32_t length = readVarInt();
     if (length > maxChars * 3) {
         throw BufferOverflowException("String length exceeds maximum allowed characters.");
@@ -143,7 +143,7 @@ std::string stratos::ByteBuffer::readString(int maxChars) {
     return str;
 }
 
-int stratos::ByteBuffer::readVarInt() {
+int stratos::ByteBuffer::readVarInt() const {
     int value    = 0;
     int position = 0;
     while (true) {
@@ -158,7 +158,7 @@ int stratos::ByteBuffer::readVarInt() {
     return value;
 }
 
-int64_t stratos::ByteBuffer::readVarLong() {
+int64_t stratos::ByteBuffer::readVarLong() const {
     int64_t value    = 0;
     int     position = 0;
     while (true) {
@@ -173,7 +173,7 @@ int64_t stratos::ByteBuffer::readVarLong() {
     return value;
 }
 
-std::vector<uint64_t> stratos::ByteBuffer::readBitSet() {
+std::vector<uint64_t> stratos::ByteBuffer::readBitSet() const {
     const uint32_t        length = readVarInt();
     std::vector<uint64_t> longs(length);
     for (uint32_t i = 0; i < length; ++i) {
@@ -187,7 +187,7 @@ std::vector<uint64_t> stratos::ByteBuffer::readBitSet() {
     return longs;
 }
 
-std::vector<bool> stratos::ByteBuffer::readFixedBitSet(size_t length) {
+std::vector<bool> stratos::ByteBuffer::readFixedBitSet(size_t length) const {
     const size_t byteLength = (length + 7) / 8;
     if (offset + byteLength > buffer.size()) {
         throw BufferUnderflowException("Not enough data to read FixedBitSet.");
@@ -201,7 +201,7 @@ std::vector<bool> stratos::ByteBuffer::readFixedBitSet(size_t length) {
     return bits;
 }
 
-ByteVec stratos::ByteBuffer::readByteArray(size_t length) {
+ByteVec stratos::ByteBuffer::readByteArray(size_t length) const {
     ByteVec result;
     result.reserve(length);
     for (size_t i = 0; i < length; ++i) {
@@ -209,7 +209,7 @@ ByteVec stratos::ByteBuffer::readByteArray(size_t length) {
     }
     return result;
 }
-void stratos::ByteBuffer::readFixedLongArray(std::vector<int64_t>& longs) {
+void stratos::ByteBuffer::readFixedLongArray(std::vector<int64_t>& longs) const {
     for (size_t i = 0; i < longs.size(); ++i)
         longs[i] = readLong();
 }

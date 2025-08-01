@@ -17,20 +17,25 @@
  *
  */
 
-#ifndef SESSIONAUTH_H
-#define SESSIONAUTH_H
-#include "cpr/cprtypes.h"
-#include "utils/crypto/CryptoUtils.h"
-
-#include <string>
-#include <vector>
+#ifndef PACKETHANDSHAKEHANDLER_H
+#define PACKETHANDSHAKEHANDLER_H
+#include "network/protocol/Packet.h"
 
 namespace stratos::network {
 class NetworkConnection;
+class ClientHandshake;
+class LegacyServerListPing;
 
-void authenticate(NetworkConnection* connection, const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey);
-cpr::Url getAuthenticationUrl(const std::string& username, const std::string& loginHash, const std::string& serverIp);
-std::string generateMinecraftSha1HexDigest(const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey);
-}// namespace stratos::network
+class PacketHandshakeHandler final : public PacketHandler {
+public:
+    using PacketHandler::handle;
+    explicit PacketHandshakeHandler(NetworkConnection* connection) : connection(connection) {}
+    bool handle(const ClientHandshake* packet) override;
+    bool handle(const LegacyServerListPing* packet) override;
+protected:
+    NetworkConnection* connection;
+};
 
-#endif //SESSIONAUTH_H
+} // namespace stratos::network
+
+#endif //PACKETHANDSHAKEHANDLER_H

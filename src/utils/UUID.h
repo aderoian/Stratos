@@ -22,7 +22,8 @@
 #include "hash/MD5.h"
 
 #include <array>
-#include <cstdint>
+#include <iomanip>
+#include <sstream>
 #include <string>
 
 namespace stratos {

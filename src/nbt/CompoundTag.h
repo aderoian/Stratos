@@ -62,7 +62,7 @@ public:
     [[nodiscard]] ConstantIterator cbegin() const { return tags.cbegin(); }
     [[nodiscard]] ConstantIterator cend() const   { return tags.cend(); }
 
-    void read(NBTBuffer& buffer) override;
+    void read(const NBTBuffer& buffer) override;
     void write(NBTBuffer& buffer) const override;
 
     friend bool operator==(const CompoundTag& lhs, const CompoundTag& rhs);

@@ -17,15 +17,11 @@
  *
  */
 
-#include "StringTag.h"
+#ifndef WORLD_H
+#define WORLD_H
 
-#include "io/NBTBuffer.h"
+class World {
 
-namespace stratos::nbt {
-void StringTag::read(const NBTBuffer& buffer) {
-    value = buffer.readModifiedUTF8String();
-}
-void StringTag::write(NBTBuffer& buffer) const {
-    buffer.writeModifiedUTF8String(value);
-}
-} // namespace stratos::nbt
+};
+
+#endif //WORLD_H

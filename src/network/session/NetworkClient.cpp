@@ -25,11 +25,19 @@
 #include "nbt/PrimitiveTag.h"
 #include "nbt/StringTag.h"
 #include "network/Network.h"
-#include "network/protocol/PacketSerialization.h"
+#include "network/protocol/definition/PacketConfiguration.h"
+#include "network/protocol/definition/PacketHandshake.h"
+#include "network/protocol/definition/PacketLogin.h"
+#include "network/protocol/definition/PacketPlay.h"
+#include "network/protocol/handler/PacketHandshakeHandler.h"
+#include "network/protocol/handler/PacketLoginHandler.h"
+#include "network/protocol/handler/PacketStatusHandler.h"
+#include "network/protocol/serialization/PacketBuffer.h"
+#include "network/protocol/serialization/PacketSerialization.h"
 #include "Server.h"
 #include "spdlog/logger.h"
 
-namespace stratos {
+namespace stratos::network {
 void NetworkSession::tick() {
     if (!isConnected()) return;
 
@@ -255,17 +263,17 @@ void NetworkSession::beginConfiguration() const {
     RegistryEntry wolfVariantEntry{utils::Identifier{"minecraft", "ashen"}, std::make_optional(nbt::writeNetworkNBT(wolfVariant))};
     RegistryEntry wolfSoundVariantEntry{utils::Identifier{"minecraft", "angry"}, std::make_optional(nbt::writeNetworkNBT(wolfSoundVariant))};
 
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "dimension_type"}, std::vector{std::move(dimensionTypeEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "worldgen/biome"}, std::vector{std::move(plainsBiomeEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "cat_variant"}, std::vector{std::move(catVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "cow_variant"}, std::vector{std::move(cowVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "chicken_variant"}, std::vector{std::move(chickenVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "frog_variant"}, std::vector{std::move(frogVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "painting_variant"}, std::vector{std::move(paintingVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "pig_variant"}, std::vector{std::move(pigVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "wolf_variant"}, std::vector{std::move(wolfVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "wolf_sound_variant"}, std::vector{std::move(wolfSoundVariantEntry)}));
-    send(RegistryDataPacket(utils::Identifier{"minecraft", "damage_type"}, std::vector{
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "dimension_type"}, std::vector{std::move(dimensionTypeEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "worldgen/biome"}, std::vector{std::move(plainsBiomeEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "cat_variant"}, std::vector{std::move(catVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "cow_variant"}, std::vector{std::move(cowVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "chicken_variant"}, std::vector{std::move(chickenVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "frog_variant"}, std::vector{std::move(frogVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "painting_variant"}, std::vector{std::move(paintingVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "pig_variant"}, std::vector{std::move(pigVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "wolf_variant"}, std::vector{std::move(wolfVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "wolf_sound_variant"}, std::vector{std::move(wolfSoundVariantEntry)}));
+    send(new RegistryDataPacket(utils::Identifier{"minecraft", "damage_type"}, std::vector{
         RegistryEntry{utils::Identifier{"minecraft", "in_fire"}, std::make_optional(nbt::writeNetworkNBT(inFireDamageEntry))},
         RegistryEntry{utils::Identifier{"minecraft", "campfire"}, std::make_optional(nbt::writeNetworkNBT(campfireDamageEntry))},
         RegistryEntry{utils::Identifier{"minecraft", "lightning_bolt"}, std::make_optional(nbt::writeNetworkNBT(lightningDamageEntry))},
@@ -292,13 +300,13 @@ void NetworkSession::beginConfiguration() const {
         RegistryEntry{utils::Identifier{"minecraft", "outside_border"}, std::make_optional(nbt::writeNetworkNBT(outsideBorderDamageEntry))},
         RegistryEntry{utils::Identifier{"minecraft", "generic_kill"}, std::make_optional(nbt::writeNetworkNBT(genericKillDamageEntry))}
     }));
-    send(FinishConfiguration());
+    send(new FinishConfiguration());
 }
 void NetworkSession::changeState(const ProtocolState newState) const {
     connection->changeState(newState);
 }
 void NetworkSession::loginPlayer() {
-    send(LoginPlay(
+    send(new LoginPlay(
         0,
         false,
         std::vector{utils::Identifier{"minecraft", "overworld"}},
@@ -323,32 +331,31 @@ void NetworkSession::loginPlayer() {
         true
         ));
 
-    send(SetDefaultSpawnPosition(math::Position{8, 64, 8}, 0)); // TODO: Spawn position should be determined by the server
-    send(SetCenterChunk(0, 0));
-    send(SynchronizePlayerPosition(0, 8, 64, 8, 0, 0, 0, 0, 0));
-    send(GameEventPacket(GameEvent::StartWaitingForChunks));
+    send(new SetDefaultSpawnPosition(math::Position{8, 64, 8}, 0)); // TODO: Spawn position should be determined by the server
+    send(new SetCenterChunk(0, 0));
+    send(new SynchronizePlayerPosition(0, 8, 64, 8, 0, 0, 0, 0, 0));
+    send(new GameEventPacket(GameEvent::StartWaitingForChunks));
 
 
 }
 void NetworkSession::processReceived() {
     while (true) {
-        std::optional<std::unique_ptr<ServerboundPacket>> optionalPacket = connection->receivePacket();
-        if (!optionalPacket) break; // No more packets to process
-        if (const auto packet = std::move(*optionalPacket); !packet->accept(*packetHandler)) {
+        const ServerboundPacket* packet = connection->receivePacket();
+        if (!packet) break; // No more packets to process
+        if (!packet->accept(*packetHandler)) {
             networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);
         }
+        delete packet;
     }
 }
-std::optional<std::unique_ptr<ServerboundPacket>> NetworkConnection::receivePacket() {
-    if (isDisconnected()) return std::nullopt;
-    if (std::unique_ptr<ServerboundPacket> packet; receiveQueue.try_dequeue(packet)) {
-        return std::move(packet);
-    }
-    return std::nullopt;
+const ServerboundPacket* NetworkConnection::receivePacket() {
+    if (isDisconnected()) return nullptr;
+    if (const ServerboundPacket* packet; receiveQueue.try_dequeue(packet)) return packet;
+    return nullptr;
 }
-void NetworkConnection::sendPacket(std::unique_ptr<ClientboundPacket>&& packet) {
+void NetworkConnection::sendPacket(const ClientboundPacket* packet) {
     if (isDisconnected()) return;
-    sendQueue.enqueue(std::move(packet));
+    sendQueue.enqueue(packet);
     if (bool expected = false; dirty.compare_exchange_strong(expected, true)) eventLoop->notifySend(socketFd);
 }
 int NetworkConnection::handleReceive() {
@@ -371,22 +378,16 @@ int NetworkConnection::handleReceive() {
 
             PacketBuffer packetBuffer(receiveBuf, offset);
             try {
-                const int  packetId  = packetBuffer.readVarInt();
-                auto       packetKey = PacketKey{state, Serverbound, packetId};
-                auto packet    = PacketRegistry::instance().create(packetKey);
+                const auto* packet = network->getPacketCodec().decode(packetBuffer, state, Serverbound);
                 if (!packet) {
-                    logger->error("Received unknown packet with ID {} from client {}:{}", packetId, address, port);
+                    logger->error("Received unknown packet from client {}:{} with length {} at offset {}", address, port, packetLength, offset);
                     receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + offset + packetLength);
                     return received;
                 }
 
-                packet->decrypt(packetBuffer);
-                if (!packet->accept(*packetHandler)) {
-                    std::unique_ptr<ServerboundPacket> casted{
-                        dynamic_cast<ServerboundPacket*>(packet.release())
-                    };
-                    receiveQueue.enqueue(std::move(casted)); // Enqueue the packet for further processing
-                }
+                if (!packet->accept(*packetHandler))
+                    receiveQueue.enqueue(dynamic_cast<const ServerboundPacket*>(packet)); // Enqueue the packet for further processing
+                else delete packet;
             } catch (const PacketSerializationException& e) {
                 logger->error("Failed to read packet from client {}:{}: {}", address, port, e.what());
             } catch (const std::exception& e) {
@@ -408,19 +409,19 @@ void NetworkConnection::changeState(const ProtocolState newState) {
     state = newState;
     switch (state) {
     case Handshaking:
-        packetHandler = std::make_unique<HandshakePacketHandler>(this);
+        packetHandler = std::make_unique<PacketHandshakeHandler>(this);
         receiveBuf.reserve(512);
         break;
     case Status:
-        packetHandler = std::make_unique<StatusPacketHandler>(this);
+        packetHandler = std::make_unique<PacketStatusHandler>(this);
         receiveBuf.reserve(512);
         break;
     case Login:
-        packetHandler = std::make_unique<LoginPacketHandler>(this);
+        packetHandler = std::make_unique<PacketLoginHandler>(this);
         receiveBuf.reserve(512);
         break;
     case Configuration:
-        packetHandler = std::make_unique<PacketHandler>(); // Network connection does not handle configuration packets directly
+        packetHandler = std::make_unique<PacketHandler>(); // Configuration state does not handle packets directly
         receiveBuf.reserve(1024);
         break;
     case Play:
@@ -435,7 +436,7 @@ bool NetworkConnection::disconnect() {
 bool NetworkConnection::disconnect(const std::string& reason) {
     if (bool expected = false; !disconnected.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) return false;
     if (state == Login)
-        sendPacket(std::make_unique<LoginDisconnect>(reason.data()));
+        sendPacket(new LoginDisconnect(reason.data()));
     return true;
 }
 bool NetworkConnection::close() {
@@ -445,10 +446,10 @@ bool NetworkConnection::close() {
 
         // Clear queues and buffers
         receiveBuf.clear();
-        std::unique_ptr<ServerboundPacket> receiveConsumer;
+        const ServerboundPacket* receiveConsumer;
         while (receiveQueue.try_dequeue(receiveConsumer)) {
         }
-        std::unique_ptr<ClientboundPacket> sendConsumer;
+        const ClientboundPacket* sendConsumer;
         while (sendQueue.try_dequeue(sendConsumer)) {
         }
         return true;
@@ -504,12 +505,11 @@ int NetworkConnection::flushReceive () {
 }
 int NetworkConnection::flushSend() {
     ByteVec                            sendBuffer;
-    std::unique_ptr<ClientboundPacket> packet;
+    const ClientboundPacket* packet;
     while (sendQueue.try_dequeue(packet)) {
         if (!packet) continue; // Skip empty packets
         PacketBuffer pkBuf;
-        pkBuf.writeVarInt(packet->getId());
-        packet->encrypt(pkBuf);
+        network->getPacketCodec().encode(pkBuf, packet);
 
         PacketBuffer framedBuf;
         framedBuf.writeVarInt(static_cast<int>(pkBuf.getSize()));
@@ -520,6 +520,7 @@ int NetworkConnection::flushSend() {
         } else {
             sendBuffer.insert(sendBuffer.end(), framedBuf.begin(), framedBuf.end());
         }
+        delete packet;
     }
 
     if (sendBuffer.empty()) return 0;
@@ -534,7 +535,7 @@ bool NetworkConnection::handleLegacyPing() {
             LegacyServerListPing packet;
             packet.decrypt(buffer);
 
-            packetHandler->handle(packet); // Handle legacy ping packet
+            packet.accept(*packetHandler); // Handle legacy ping packet
             const size_t newOffset = buffer.getOffset();
             receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + newOffset);
             return true; // Legacy ping handled
@@ -542,4 +543,4 @@ bool NetworkConnection::handleLegacyPing() {
     } catch (PacketSerializationException & ignored) {}
     return false; // No legacy ping found
 }
-} // stratos
+} // stratos::network

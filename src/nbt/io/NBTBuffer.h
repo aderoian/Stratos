@@ -44,16 +44,16 @@ class NBTBuffer : public ByteBuffer {
     NBTBuffer(NBTBuffer&&) = default;
     NBTBuffer& operator=(NBTBuffer&&) = default;
 
-    std::string readTagName();
-    std::pair<std::string, std::unique_ptr<Tag>> readTag();
-    template <typename T> std::pair<std::string, std::unique_ptr<T>> readTag();
-    std::string readModifiedUTF8String();
+    std::string readTagName() const;
+    std::pair<std::string, std::unique_ptr<Tag>> readTag() const;
+    template <typename T> std::pair<std::string, std::unique_ptr<T>> readTag() const;
+    std::string readModifiedUTF8String() const;
     void writeTagName(const std::string& tagName);
     void writeTag(const std::string& name, const std::unique_ptr<Tag>& tag);
     void                                                             writeModifiedUTF8String(const std::string& str);
 };
 
-template <typename T> std::pair<std::string, std::unique_ptr<T>> NBTBuffer::readTag() {
+template <typename T> std::pair<std::string, std::unique_ptr<T>> NBTBuffer::readTag() const {
     static_assert(std::is_base_of_v<Tag, T>, "T must be derived from Tag");
     auto const type = static_cast<TagType>(readByte());
     if (type != T::type)

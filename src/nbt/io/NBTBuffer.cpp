@@ -20,20 +20,19 @@
 #include "NBTBuffer.h"
 
 #include "nbt/ListTag.h"
-#include "network/protocol/PacketSerialization.h"
 
 namespace stratos::nbt {
-std::string                                  NBTBuffer::readTagName() {
+std::string                                  NBTBuffer::readTagName() const {
     return readModifiedUTF8String();
 }
-std::pair<std::string, std::unique_ptr<Tag>> NBTBuffer::readTag() {
+std::pair<std::string, std::unique_ptr<Tag>> NBTBuffer::readTag() const {
     auto tag = Tag::create(static_cast<TagType>(readByte()));
     if (!tag || tag->getType() == TagType::End) return {"", nullptr}; // End tag indicates no further tags
     std::string name = readModifiedUTF8String();
     tag->read(*this);
     return {std::move(name), std::unique_ptr<Tag>(tag.release())};
 }
-std::string NBTBuffer::readModifiedUTF8String() {
+std::string NBTBuffer::readModifiedUTF8String() const {
     const uint16_t length = readUnsignedShort();
     std::string result;
     result.reserve(length); // Approximation

@@ -20,6 +20,7 @@
 #include "Network.h"
 
 #include "openssl/ssl.h"
+#include "protocol/codec/PacketRegistry.h"
 #include "session/NetworkClient.h"
 #include "spdlog/logger.h"
 #include "utils/crypto/CryptoUtils.h"
@@ -29,9 +30,12 @@
 #include <sys/epoll.h>
 #endif
 
-bool stratos::NetworkManager::start() {
+namespace stratos::network {
+bool NetworkManager::start() {
     if (running) throw std::runtime_error("Attempted to start NetworkManager while it is already running");
     running = true;
+
+    PacketRegistry::instance(); // Ensure the packet registry is initialized
 
     encryptionEnabled = false; // TODO: settings from server config
     if (encryptionEnabled) {
@@ -57,7 +61,7 @@ bool stratos::NetworkManager::start() {
     bossThread->start();
     return true;
 }
-void stratos::NetworkManager::stop() {
+void NetworkManager::stop() {
     if (!running) throw std::runtime_error("Attempted to stop NetworkManager while it is not running");
     running = false;
 
@@ -70,7 +74,7 @@ void stratos::NetworkManager::stop() {
         logger->error("Socket Error: {}", e.what());
     }
 }
-void stratos::NetworkManager::tick() {
+void NetworkManager::tick() {
     processIncomingConnections();
 
     // Tick all sessions
@@ -87,14 +91,14 @@ void stratos::NetworkManager::tick() {
         sessions.erase(sessionId);
     }
 }
-stratos::Server*                         stratos::NetworkManager::getServer() const {
+Server*                         NetworkManager::getServer() const {
     return server;
 }
-std::shared_ptr<stratos::NetworkSession> stratos::NetworkManager::getSession(const SessionId& sessionId) {
+std::shared_ptr<NetworkSession> NetworkManager::getSession(const SessionId& sessionId) {
     if (const auto it = sessions.find(sessionId); it != sessions.end()) return it->second;
     return nullptr;
 }
-std::vector<std::shared_ptr<stratos::NetworkSession>> stratos::NetworkManager::getSessions() {
+std::vector<std::shared_ptr<NetworkSession>> NetworkManager::getSessions() {
     std::vector<std::shared_ptr<NetworkSession>> sessionList;
     sessionList.reserve(sessions.size());
     for (const auto& session : sessions | std::views::values) {
@@ -103,17 +107,17 @@ std::vector<std::shared_ptr<stratos::NetworkSession>> stratos::NetworkManager::g
     return sessionList;
 }
 
-void stratos::NetworkManager::createSession(std::shared_ptr<NetworkConnection> connection) {
+void NetworkManager::createSession(std::shared_ptr<NetworkConnection> connection) {
     sessionsQueue.enqueue(std::move(connection));
 }
-bool stratos::NetworkManager::removeSession(const SessionId& sessionId) {
+bool NetworkManager::removeSession(const SessionId& sessionId) {
     if (const auto it = sessions.find(sessionId); it != sessions.end()) {
         sessions.erase(it);
         return true;
     }
     return false;
 }
-void stratos::NetworkManager::processIncomingConnections() {
+void NetworkManager::processIncomingConnections() {
     std::shared_ptr<NetworkConnection> connection;
     while (sessionsQueue.try_dequeue(connection)) {
         if (connection) {
@@ -130,7 +134,7 @@ void stratos::NetworkManager::processIncomingConnections() {
         }
     }
 }
-void stratos::BossThread::start() {
+void BossThread::start() {
     if (running.exchange(true)) return;
 
     workers = std::vector<std::shared_ptr<WorkerThread>>();
@@ -180,7 +184,7 @@ void stratos::BossThread::start() {
         }
     });
 }
-void stratos::BossThread::stop() {
+void BossThread::stop() {
     if (running.exchange(false)) {
         // Notify all worker threads to stop
         for (const auto& worker : workers) {
@@ -193,7 +197,7 @@ void stratos::BossThread::stop() {
         }
     }
 }
-void stratos::WorkerThread::start() {
+void WorkerThread::start() {
 #ifdef __linux__
     epollFd = epoll_create1(0);
     if (epollFd == -1) throw std::runtime_error("epoll_create1 failed: " + std::string(strerror(errno)));
@@ -312,7 +316,7 @@ void stratos::WorkerThread::start() {
         });
     }
 }
-void stratos::WorkerThread::stop() {
+void WorkerThread::stop() {
     if (running.exchange(false)) {
         // Notify all connections to stop
         for (const auto& conn : connections | std::views::values) {
@@ -325,11 +329,11 @@ void stratos::WorkerThread::stop() {
         }
     }
 }
-void stratos::WorkerThread::addConnection(std::shared_ptr<NetworkConnection> connection) {
+void WorkerThread::addConnection(std::shared_ptr<NetworkConnection> connection) {
     inConnectionQueue.enqueue(std::move(connection));
 }
 
-void stratos::WorkerThread::removeConnection(const SocketFd connection) {
+void WorkerThread::removeConnection(const SocketFd connection) {
 #ifdef __linux__
     epoll_ctl(epollFd, EPOLL_CTL_DEL, connection, nullptr);
 #endif
@@ -338,15 +342,15 @@ void stratos::WorkerThread::removeConnection(const SocketFd connection) {
     connections.erase(connection);
     connectionCount--;
 }
-void stratos::WorkerThread::notifySend(const SocketFd& socketFd) {
+void WorkerThread::notifySend(const SocketFd& socketFd) {
     sendNotifyQueue.enqueue(socketFd);
 }
-std::shared_ptr<stratos::NetworkConnection> stratos::WorkerThread::getConnection(const SocketFd& socketFd) {
+std::shared_ptr<NetworkConnection> WorkerThread::getConnection(const SocketFd& socketFd) {
     if (const auto it = connections.find(socketFd); it != connections.end())
         return it->second;
     return nullptr;
 }
-void stratos::WorkerThread::processIncomingConnections() {
+void WorkerThread::processIncomingConnections() {
 
     std::lock_guard lock(connectionMutex);
     while (true) {
@@ -371,7 +375,7 @@ void stratos::WorkerThread::processIncomingConnections() {
     }
 }
 
-void stratos::WorkerThread::processSendNotifications() {
+void WorkerThread::processSendNotifications() {
     SocketFd socketFd;
 #ifdef _WIN32
     std::vector<SocketFd> sockets;
@@ -393,3 +397,4 @@ void stratos::WorkerThread::processSendNotifications() {
     }
 #endif
 }
+} // namespace stratos::network

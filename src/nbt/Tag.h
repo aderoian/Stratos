@@ -67,7 +67,7 @@ public:
 
     virtual Tag& assign(Tag&& rhs) = 0;
 
-    virtual void read(NBTBuffer& buffer) = 0;
+    virtual void read(const NBTBuffer& buffer) = 0;
     virtual void write(NBTBuffer& buffer) const = 0;
 
     static std::unique_ptr<Tag> create(TagType type);

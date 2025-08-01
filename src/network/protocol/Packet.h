@@ -22,10 +22,37 @@
 #include <functional>
 #include <memory>
 
-namespace stratos {
+#define SERVERBOUND_PACKET_FOOTER(clazz) \
+bool accept(PacketHandler& handler) const override { return handler.handle(static_cast<const clazz*>(this)); } \
+~clazz() override = default; \
+void decrypt(const PacketBuffer& buffer) override;
+#define CLIENTBOUND_PACKET_FOOTER(clazz) \
+~clazz() override = default; \
+void encrypt(PacketBuffer& buffer) const override;
+
+namespace stratos::network {
+class PingRequest;
+class StatusRequest;
+class LoginCookieResponse;
+class LoginAcknowledge;
+class LoginPluginResponse;
+class EncryptionResponse;
+class LoginStart;
+class LegacyServerListPing;
+class ClientHandshake;
+class ServerboundKnownPacks;
+class ConfigurationResourcePackResponse;
+class ConfigurationPong;
+class ConfigurationServerboundKeepAlive;
+class AcknowledgeFinishConfiguration;
+class ConfigurationServerPluginMessage;
+class ConfigurationCookieResponse;
+class ConfigurationClientInformation;
+class Packet;
 class PacketHandler;
-class NetworkSession;
 class PacketBuffer;
+
+typedef std::function<const Packet*()> PacketFactory;
 
 enum ProtocolState { Handshaking = 0x00, Status = 0x01, Login = 0x02, Configuration = 0x03, Play = 0x04 };
 enum PacketDirection { Clientbound = 0x00, Serverbound = 0x01 };
@@ -35,90 +62,103 @@ public:
     explicit Packet(const int id) : id(id) {}
     virtual ~Packet() = default;
 
-    int getId() const { return id; }
-    virtual void decrypt(PacketBuffer& buffer) = 0;
-    virtual void encrypt(PacketBuffer& buffer) = 0;
-    virtual bool accept(PacketHandler& handler) = 0;
+    [[nodiscard]] int getId() const { return id; }
+    [[nodiscard]] virtual PacketDirection getDirection() const = 0;
+    virtual void decrypt(const PacketBuffer& buffer) = 0;
+    virtual void encrypt(PacketBuffer& buffer) const = 0;
+    virtual bool accept(PacketHandler& handler) const = 0;
 
     int id;
 };
 
-
-
-class ClientboundPacket : virtual public Packet {
+class PacketHandler {
 public:
-    explicit ClientboundPacket(const int id) : Packet(id) {}
-    ~ClientboundPacket() override = default;
-    void decrypt(PacketBuffer& buffer) override {}
-    bool accept(PacketHandler& handler) override { return false; } // Clientbound packets are not handled by handlers
+    virtual ~PacketHandler() = default;
+    virtual bool handle(const Packet* packet) { return false; }
+    virtual bool handle(const ConfigurationClientInformation* packet) { return false; }
+    virtual bool handle(const ConfigurationCookieResponse* packet) { return false; }
+    virtual bool handle(const ConfigurationServerPluginMessage* packet) { return false; }
+    virtual bool handle(const AcknowledgeFinishConfiguration* packet) { return false; }
+    virtual bool handle(const ConfigurationServerboundKeepAlive* packet) { return false; }
+    virtual bool handle(const ConfigurationPong* packet) { return false; }
+    virtual bool handle(const ConfigurationResourcePackResponse* packet) { return false; }
+    virtual bool handle(const ServerboundKnownPacks* packet) { return false; }
+    virtual bool handle(const ClientHandshake* packet) { return false; }
+    virtual bool handle(const LegacyServerListPing* packet) { return false; }
+    virtual bool handle(const LoginStart* packet) { return false; }
+    virtual bool handle(const EncryptionResponse* packet) { return false; }
+    virtual bool handle(const LoginPluginResponse* packet) { return false; }
+    virtual bool handle(const LoginAcknowledge* packet) { return false; }
+    virtual bool handle(const LoginCookieResponse* packet) { return false; }
+    virtual bool handle(const StatusRequest* packet) { return false; }
+    virtual bool handle(const PingRequest* packet) { return false; }
 };
 
-class ServerboundPacket : virtual public Packet {
+// template <typename T>
+// class TypedPacket : public Packet {
+// public:
+//     explicit TypedPacket(const int id) : Packet(id) {}
+//     ~TypedPacket() override = default;
+//
+//     [[nodiscard]] T& as() { return static_cast<T&>(*this); }
+//     [[nodiscard]] const T& as() const { return static_cast<const T&>(*this); }
+//
+//     virtual bool accept(PacketHandler& handler) const override { return handler.handle(static_cast<const T*>(this)); }
+// };
+//
+// class IClientboundPacket {
+// public:
+//     virtual ~IClientboundPacket() = default;
+// };
+
+// template <typename T>
+class ClientboundPacket : public Packet {//public TypedPacket<T>, public IClientboundPacket {
+public:
+    explicit ClientboundPacket(const int id) : Packet(id){}
+    ~ClientboundPacket() override = default;
+    [[nodiscard]] PacketDirection getDirection() const override { return Clientbound; }
+    void decrypt(const PacketBuffer& buffer) override {}
+    bool accept(PacketHandler& handler) const override { return false; } // Clientbound packets are not handled by handlers
+};
+
+// class IServerboundPacket {
+// public:
+//     virtual ~IServerboundPacket() = default;
+//     [[nodiscard]] virtual int getId() const = 0;
+//     virtual bool accept(PacketHandler& handler) const = 0;
+// };
+
+// template <typename T>
+class ServerboundPacket : public Packet {//public TypedPacket<T>, public IServerboundPacket {
 public:
     explicit ServerboundPacket(const int id) : Packet(id) {}
     ~ServerboundPacket() override = default;
-    void encrypt(PacketBuffer& buffer) override {}
+    [[nodiscard]] PacketDirection getDirection() const override { return Serverbound; }
+    void encrypt(PacketBuffer& buffer) const override {}
 };
 
 struct PacketKey {
-    int state;
-    int direction;
+    ProtocolState state;
+    PacketDirection direction;
     int id;
 
-    bool operator==(const PacketKey& other) const;
+    bool operator==(const PacketKey& other) const {
+        return state == other.state && direction == other.direction && id == other.id;
+    }
 };
 
-inline bool PacketKey::operator==(const PacketKey& other) const {
-    return state == other.state && direction == other.direction && id == other.id;
-}
-}
+struct PacketDefinition {
+    int id;
+    PacketFactory factory;
+    ProtocolState state;
+    PacketDirection direction;
+};
+} // namespace stratos::network
 
 template <>
-struct std::hash<stratos::PacketKey> {
-    std::size_t operator()(const stratos::PacketKey& key) const noexcept {
-        const std::size_t h1 = std::hash<int>()(key.state);
-        const std::size_t h2 = std::hash<int>()(key.direction);
-        const std::size_t h3 = std::hash<int>()(key.id);
-
-        std::size_t seed = h1;
-        seed ^= h2 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        seed ^= h3 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        return seed;
+struct std::hash<stratos::network::PacketKey> {
+    std::size_t operator()(const stratos::network::PacketKey& key) const noexcept {
+        return std::hash<int>()(key.state) ^ std::hash<int>()(key.direction) ^ std::hash<int>()(key.id) << 1;
     }
 };
-
-namespace stratos {
-class PacketRegistry final {
-  public:
-    typedef std::function<std::unique_ptr<Packet>()> PacketFactory;
-
-    PacketRegistry();
-
-    static PacketRegistry& instance() {
-        static PacketRegistry registry;
-        return registry;
-    }
-
-    std::unique_ptr<Packet> create(const PacketKey& key);
-
-  private:
-    std::unordered_map<PacketKey, PacketFactory> factories ;
-
-    void setup();
-    void registerPacket(const PacketKey& key, PacketFactory factory);
-};
-
-inline PacketRegistry::PacketRegistry() : factories() {
-    setup();
-}
-inline std::unique_ptr<Packet> PacketRegistry::create(const PacketKey& key) {
-    if (const auto it = factories.find(key); it != factories.end()) return it->second();
-    return nullptr;
-}
-inline void PacketRegistry::registerPacket(const PacketKey& key, PacketFactory factory) {
-    factories[key] = std::move(factory);
-}
-
-} // namespace stratos
-
 #endif //PACKET_H

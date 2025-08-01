@@ -17,16 +17,26 @@
  *
  */
 
-#ifndef BIOME_H
-#define BIOME_H
+#ifndef PACKETSTATUSHANDLER_H
+#define PACKETSTATUSHANDLER_H
+#include "network/protocol/Packet.h"
 
-namespace stratos {
-class Biome {
+namespace stratos::network {
+class NetworkConnection;
+class PingRequest;
+class StatusRequest;
+
+class PacketStatusHandler final : public PacketHandler {
 public:
-    bool operator==(const Biome& other) const {
-        return true;
-    }
-};
-}
+    using PacketHandler::handle;
+    explicit PacketStatusHandler(NetworkConnection* connection) : connection(connection) {}
+    bool handle(const StatusRequest* packet) override;
+    bool handle(const PingRequest* packet) override;
 
-#endif //BIOME_H
+protected:
+    NetworkConnection* connection;
+};
+
+} // namespace stratos::network
+
+#endif //PACKETSTATUSHANDLER_H

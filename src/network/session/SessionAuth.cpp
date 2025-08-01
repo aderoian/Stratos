@@ -20,16 +20,18 @@
 #include "SessionAuth.h"
 
 #include "cpr/session.h"
-#include "network/Network.h"
+#include "network/protocol/definition/PacketLogin.h"
 #include "NetworkClient.h"
-#include "utils/UUID.h"
 #include "nlohmann/json.hpp"
+#include "spdlog/logger.h"
+#include "utils/UUID.h"
 using json = nlohmann::json;
 
 #include <iomanip>
 #include <openssl/sha.h>
 
-void stratos::authenticate(NetworkConnection* connection, const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey) {
+namespace stratos::network {
+void authenticate(NetworkConnection* connection, const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey) {
     const std::string loginHash = generateMinecraftSha1HexDigest(serverId, secret, pubKey);
 
     const auto session = std::make_shared<cpr::Session>();
@@ -50,7 +52,7 @@ void stratos::authenticate(NetworkConnection* connection, const std::string& ser
                 conn->updateSessionInfo({name, id});
                 conn->getLogger()->info("Successfully authenticated user {} with UUID {}", conn->getSessionInfo()->get().username, UUIDToString(id));
                 std::vector<LoginProperty> properties = {{body["properties"][0]["name"], body["properties"][0]["value"], body["properties"][0]["signature"]}};
-                conn->sendPacket(std::make_unique<LoginSuccess>(id, std::move(name), std::move(properties)));
+                conn->sendPacket(new LoginSuccess(id, std::move(name), std::move(properties)));
             } else {
                 conn->getLogger()->error("Failed to authenticate user {}: HTTP {} - {}", conn->getSessionInfo()->get().username, r.status_code, r.error.message);
                 conn->disconnect("Authentication failed");
@@ -58,10 +60,10 @@ void stratos::authenticate(NetworkConnection* connection, const std::string& ser
         }
     }).detach();
 }
-cpr::Url stratos::getAuthenticationUrl(const std::string& username, const std::string& loginHash, const std::string& serverIp) {
+cpr::Url getAuthenticationUrl(const std::string& username, const std::string& loginHash, const std::string& serverIp) {
     return {"https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + username + "&serverId=" + loginHash + "&ip=" + serverIp};
 }
-std::string stratos::generateMinecraftSha1HexDigest(const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey) {
+std::string generateMinecraftSha1HexDigest(const std::string& serverId, const std::vector<uint8_t>& secret, const EVPKeyPtr& pubKey) {
     SHA_CTX ctx;
     SHA1_Init(&ctx);
     SHA1_Update(&ctx, serverId.data(), serverId.size());
@@ -97,3 +99,4 @@ std::string stratos::generateMinecraftSha1HexDigest(const std::string& serverId,
 
     return oss.str();
 }
+} // namespace stratos::network

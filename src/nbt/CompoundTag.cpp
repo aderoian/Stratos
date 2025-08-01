@@ -47,7 +47,7 @@ bool                                   CompoundTag::hasKey(const std::string& ke
     const auto it = tags.find(key);
     return it != tags.end() && it->second.get().getType() == type;
 }
-void CompoundTag::read(NBTBuffer& buffer) {
+void CompoundTag::read(const NBTBuffer& buffer) {
     clear();
     while (true) {
         auto [name, tag] = buffer.readTag();

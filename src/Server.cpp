@@ -19,10 +19,14 @@
 
 #include "Server.h"
 
+#include "block/Blocks.h"
+#include "block/state/BlockState.h"
 #include "network/Network.h"
 #include "utils/config/Config.h"
 #include "utils/MathUtils.h"
 #include "utils/TimeUtils.h"
+#include "world/biome/Biomes.h"
+#include "world/format/io/Region.h"
 
 #define DEFAULT_SERVER_PROPERTIES R"(# Basic server settings
 server-name=
@@ -66,6 +70,11 @@ namespace stratos {
 std::unique_ptr<Server> server = nullptr;
 
 Server::Server(const std::shared_ptr<spdlog::logger>& logger, Path path) : logger(logger), root(std::move(path)) {
+    // Static initialization
+    // TODO: Is there a better way to handle this?
+    block::Blocks::registerBlocks();
+    world::Biomes::registerBiomes();
+
     averageTPS.fill(20.0f);
     averageUse.fill(1.0f);
 
@@ -91,11 +100,17 @@ Server::Server(const std::shared_ptr<spdlog::logger>& logger, Path path) : logge
 
     try {
         logger->info("Starting network...");
-        network = std::make_unique<NetworkManager>(this, logger, address, port);
+        network = new network::NetworkManager(this, logger, address, port);
     } catch (const std::exception& e) {
         logger->error("Failed to create NetworkManager: {}", e.what());
         throw;
     }
+
+    Path          worldRegion = root / "world" / "region";
+    world::Region region(0, 0, worldRegion);
+
+    world::Chunk* chunk = region.loadChunk(0, 0);
+
 }
 
 Server::~Server() {}
@@ -107,7 +122,9 @@ std::shared_ptr<spdlog::logger> Server::getLogger() const {
 bool Server::isRunning() const {
     return running.load();
 }
-
+const network::NetworkManager* Server::getNetwork() const {
+    return network;
+}
 unsigned int Server::getTick() const {
     return tickCounter;
 }

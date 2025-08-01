@@ -19,17 +19,22 @@
 
 #ifndef NETWORKCLIENT_H
 #define NETWORKCLIENT_H
-#include "../io/Socket.h"
-#include "../protocol/Packet.h"
-#include "../protocol/PacketCodec.h"
+
 #include "concurrentqueue.h"
-#include "spdlog/spdlog.h"
+#include "network/io/Socket.h"
+#include "network/protocol/handler/PacketConfigurationHandler.h"
+#include "network/protocol/Packet.h"
 #include "utils/crypto/CryptoUtils.h"
+#include "utils/Types.h"
 
 #include <memory>
-#include <optional>
 
-namespace stratos {
+namespace spdlog {
+class logger;
+}
+namespace stratos::network {
+class ClientboundPacket;
+class ServerboundPacket;
 class WorkerThread;
 using SessionId = ClientInfo;
 class NetworkManager;
@@ -47,8 +52,8 @@ class NetworkConnection final : public TCPConnection {
     NetworkConnection(const SocketFd socketFd, const std::string& address, const int& port, NetworkManager* network, std::shared_ptr<spdlog::logger> logger, const std::shared_ptr<WorkerThread>& eventLoop) : TCPConnection(socketFd, address, port), network(network), logger(std::move(logger)), eventLoop(eventLoop) { changeState(Handshaking); }
     ~NetworkConnection() override = default;
 
-    std::optional<std::unique_ptr<ServerboundPacket>> receivePacket();
-    void                                              sendPacket(std::unique_ptr<ClientboundPacket>&& packet);
+    const ServerboundPacket* receivePacket();
+    void                                              sendPacket(const ClientboundPacket* packet);
     int                                               handleReceive();
     void changeState(ProtocolState newState);
     bool                                              disconnect();
@@ -69,8 +74,8 @@ class NetworkConnection final : public TCPConnection {
     NetworkManager* network;
 
     ByteVec receiveBuf;
-    moodycamel::ConcurrentQueue<std::unique_ptr<ClientboundPacket>> sendQueue = moodycamel::ConcurrentQueue<std::unique_ptr<ClientboundPacket>>();
-    moodycamel::ConcurrentQueue<std::unique_ptr<ServerboundPacket>> receiveQueue = moodycamel::ConcurrentQueue<std::unique_ptr<ServerboundPacket>>();
+    moodycamel::ConcurrentQueue<const ClientboundPacket*> sendQueue = moodycamel::ConcurrentQueue<const ClientboundPacket*>();
+    moodycamel::ConcurrentQueue<const ServerboundPacket*> receiveQueue = moodycamel::ConcurrentQueue<const ServerboundPacket*>();
     std::atomic<bool> disconnected = false;
 
     ProtocolState state;
@@ -93,13 +98,13 @@ class NetworkConnection final : public TCPConnection {
     bool handleLegacyPing();
 
     friend class WorkerThread;
-    friend class LoginPacketHandler;
+    friend class PacketLoginHandler;
 };
 
 class NetworkSession {
   public:
     explicit NetworkSession(NetworkManager* networkManager, SessionId id, std::shared_ptr<NetworkConnection> connection)
-        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)), packetHandler(std::make_unique<ConfigurationPacketHandler>(this)) { beginConfiguration(); }
+        : networkManager(networkManager), sessionId(std::move(id)), connection(std::move(connection)), packetHandler(std::make_unique<PacketConfigurationHandler>(this)) { beginConfiguration(); }
     ~NetworkSession() = default;
 
     [[nodiscard]] std::string getIp() const { return sessionId.ip; }
@@ -112,8 +117,7 @@ class NetworkSession {
     void changeState(ProtocolState newState) const;
     void loginPlayer();
 
-    template <typename T> void send(T& packet) const { send(std::move(packet)); }
-    template <typename T> void send(T&& packet) const { connection->sendPacket(std::make_unique<T>(std::move(packet))); }
+    template <typename T> void send(const T* packet) const { connection->sendPacket(packet); }
 
   private:
     NetworkManager* networkManager;
@@ -129,6 +133,6 @@ class NetworkSession {
     friend class NetworkManager;
 };
 
-} // stratos
+} // stratos::network
 
 #endif //NETWORKCLIENT_H

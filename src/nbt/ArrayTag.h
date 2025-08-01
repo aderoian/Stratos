@@ -65,13 +65,13 @@ template <class T> class ArrayTag final : public CRTPTag<ArrayTag<T>> {
     constIterator cbegin() const { return data.cbegin(); }
     constIterator cend() const { return data.cend(); }
 
-    void read(NBTBuffer& buffer) override;
+    void read(const NBTBuffer& buffer) override;
     void write(NBTBuffer& buffer) const override;
 
   private:
     std::vector<T> data;
 };
-template <class T> void ArrayTag<T>::read(NBTBuffer& buffer) {
+template <class T> void ArrayTag<T>::read(const NBTBuffer& buffer) {
     clear();
     int size = buffer.readInt();
     data.reserve(size);
