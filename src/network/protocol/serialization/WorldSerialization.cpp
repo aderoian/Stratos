@@ -86,17 +86,16 @@ LightData LightData::fromChunk(const world::Chunk* chunk) {
 
     emptySkyLightMask.set(numSections+1);
     emptyBlockLightMask.set(numSections+1);
-    int i;
-    for (i = numSections; i >= 1; --i) {
-        const auto* section = sections[i-1];
+    for (int i = 0; i < numSections; ++i) {
+        const auto* section = sections[i];
         if (section->getSkyLight()) {
-            skyLightMask.set(numSections - i + 1);
-            skyLightData.push_back(*section->getSkyLight());
-        } else emptySkyLightMask.set(numSections - i + 1);
+            skyLightMask.set(i + 1);
+            skyLightData.emplace_back(*section->getSkyLight());
+        } else emptySkyLightMask.set(i + 1);
         if (section->getBlockLight()) {
-            blockLightMask.set(numSections - i + 1);
-            blockLightData.push_back(*section->getBlockLight());
-        } else emptyBlockLightMask.set(numSections - i + 1);
+            blockLightMask.set(i + 1);
+            blockLightData.emplace_back(*section->getBlockLight());
+        } else emptyBlockLightMask.set(i + 1);
     }
     emptySkyLightMask.set(0);
     emptyBlockLightMask.set(0);
