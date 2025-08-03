@@ -21,7 +21,7 @@
 
 namespace stratos::utils {
 BitSet::BitSet(const int size) : data(size) {}
-BitSet::BitSet(const std::vector<long>& data) : data(data) {}
+BitSet::BitSet(const std::vector<int64_t>& data) : data(data) {}
 bool BitSet::get(const int index) const {
     return (data[wordIndex(index)] & 1L << (index & BITS_PER_LONG - 1)) != 0;
 }
@@ -37,7 +37,7 @@ void BitSet::clear(const int index) {
 size_t BitSet::size() const {
     return data.size();
 }
-std::vector<long> BitSet::toVector() const {
+std::vector<int64_t> BitSet::toVector() const {
     return data;
 }
 int BitSet::wordIndex(const int index) {

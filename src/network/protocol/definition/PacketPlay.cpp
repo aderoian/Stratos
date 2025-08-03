@@ -72,4 +72,13 @@ void SetDefaultSpawnPosition::encrypt(PacketBuffer& buffer) const {
     buffer.writePosition(location);
     buffer.writeFloat(angle);
 }
+void ChunkDataAndLight::encrypt(PacketBuffer& buffer) const {
+    buffer.writeInt(chunkX);
+    buffer.writeInt(chunkZ);
+    chunkData.write(buffer);
+    lightData.write(buffer);
+}
+void SetRenderDistance::encrypt(PacketBuffer& buffer) const {
+    buffer.writeVarInt(distance);
+}
 } // namespace stratos::network

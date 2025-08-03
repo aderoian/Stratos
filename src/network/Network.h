@@ -49,8 +49,8 @@ using SessionId = ClientInfo;
 
 class NetworkManager final {
   public:
-    NetworkManager(Server* server, std::shared_ptr<spdlog::logger> logger, const std::string& address, const int& port)
-        : server(server), logger(std::move(logger)), socketServer(address, port) {}
+    NetworkManager(Server* server, const std::shared_ptr<spdlog::logger>& logger, const std::string& address, const int& port)
+        : server(server), logger(logger), socketServer(address, port), packetCodec(logger) {}
     NetworkManager(const NetworkManager&) = delete;
     ~NetworkManager()                     = default;
 

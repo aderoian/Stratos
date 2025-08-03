@@ -19,7 +19,9 @@
 
 #include "PacketCodec.h"
 
+#include "magic_enum.hpp"
 #include "network/protocol/serialization/PacketBuffer.h"
+#include "spdlog/logger.h"
 void stratos::network::PacketCodec::registerPacket(const PacketDefinition* definition) {
     registerPacket({definition->state, definition->direction, definition->id}, definition);
 }
@@ -41,10 +43,12 @@ const std::unordered_map<stratos::network::PacketKey, const stratos::network::Pa
 const stratos::network::Packet* stratos::network::PacketCodec::create(const PacketKey& key) const {
     return packetDefinitions.contains(key) ? packetDefinitions.at(key)->factory() : nullptr;
 }
-const stratos::network::Packet* stratos::network::PacketCodec::decode(const PacketBuffer& buffer, const ProtocolState state, const PacketDirection direction) const {
+const stratos::network::Packet* stratos::network::PacketCodec::decode(const PacketBuffer& buffer, const ProtocolState state, const PacketDirection direction, int length) const {
     const PacketDefinition* definition = getPacket({state, direction, buffer.readVarInt()});
-    if (!definition)
+    if (!definition) {
+        logger->error("Received unknown packet with ID {} in state {} and direction {}", buffer.readVarInt(), std::string(magic_enum::enum_name<ProtocolState>(state)), std::string(magic_enum::enum_name<PacketDirection>(direction)));
         return nullptr; // No packet definition found for the given key
+    }
 
     auto* packet = const_cast<Packet*>(definition->factory());
     if (!packet)
@@ -55,6 +59,12 @@ const stratos::network::Packet* stratos::network::PacketCodec::decode(const Pack
     } catch (const std::exception& e) {
         delete packet;
         throw;
+    }
+
+    if (length > 0 && buffer.getOffset() != length) {
+        logger->error("Packet length mismatch: expected {}, got {}", length, buffer.getOffset());
+        delete packet;
+        return nullptr;
     }
 
     return packet;

@@ -23,12 +23,6 @@
 #include "registry/Registries.h"
 #include "utils/Identifier.h"
 
-#define REGISTER_BIOME(codeName, name) \
-    const Biome* Biomes::codeName() { \
-        static const Biome* biome = registerBiome(utils::Identifier("minecraft", name), new Biome()); \
-        return biome; \
-    }
-
 namespace stratos::world {
 
 Biome* registerBiome(const utils::Identifier& id, Biome* biome) {
@@ -38,71 +32,331 @@ Biome* registerBiome(const utils::Identifier& id, Biome* biome) {
 
 // AUTOMATICALLY GENERATED -- DO NOT EDIT BY HAND
 
-REGISTER_BIOME(BADLANDS, "badlands")
-REGISTER_BIOME(BAMBOO_JUNGLE, "bamboo_jungle")
-REGISTER_BIOME(BASALT_DELTAS, "basalt_deltas")
-REGISTER_BIOME(BEACH, "beach")
-REGISTER_BIOME(BIRCH_FOREST, "birch_forest")
-REGISTER_BIOME(CHERRY_GROVE, "cherry_grove")
-REGISTER_BIOME(COLD_OCEAN, "cold_ocean")
-REGISTER_BIOME(CRIMSON_FOREST, "crimson_forest")
-REGISTER_BIOME(DARK_FOREST, "dark_forest")
-REGISTER_BIOME(DEEP_COLD_OCEAN, "deep_cold_ocean")
-REGISTER_BIOME(DEEP_DARK, "deep_dark")
-REGISTER_BIOME(DEEP_FROZEN_OCEAN, "deep_frozen_ocean")
-REGISTER_BIOME(DEEP_LUKEWARM_OCEAN, "deep_lukewarm_ocean")
-REGISTER_BIOME(DEEP_OCEAN, "deep_ocean")
-REGISTER_BIOME(DESERT, "desert")
-REGISTER_BIOME(DRIPSTONE_CAVES, "dripstone_caves")
-REGISTER_BIOME(END_BARRENS, "end_barrens")
-REGISTER_BIOME(END_HIGHLANDS, "end_highlands")
-REGISTER_BIOME(END_MIDLANDS, "end_midlands")
-REGISTER_BIOME(ERODED_BADLANDS, "eroded_badlands")
-REGISTER_BIOME(FLOWER_FOREST, "flower_forest")
-REGISTER_BIOME(FOREST, "forest")
-REGISTER_BIOME(FROZEN_OCEAN, "frozen_ocean")
-REGISTER_BIOME(FROZEN_PEAKS, "frozen_peaks")
-REGISTER_BIOME(FROZEN_RIVER, "frozen_river")
-REGISTER_BIOME(GROVE, "grove")
-REGISTER_BIOME(ICE_SPIKES, "ice_spikes")
-REGISTER_BIOME(JAGGED_PEAKS, "jagged_peaks")
-REGISTER_BIOME(JUNGLE, "jungle")
-REGISTER_BIOME(LUKEWARM_OCEAN, "lukewarm_ocean")
-REGISTER_BIOME(LUSH_CAVES, "lush_caves")
-REGISTER_BIOME(MANGROVE_SWAMP, "mangrove_swamp")
-REGISTER_BIOME(MEADOW, "meadow")
-REGISTER_BIOME(MUSHROOM_FIELDS, "mushroom_fields")
-REGISTER_BIOME(NETHER_WASTES, "nether_wastes")
-REGISTER_BIOME(OCEAN, "ocean")
-REGISTER_BIOME(OLD_GROWTH_BIRCH_FOREST, "old_growth_birch_forest")
-REGISTER_BIOME(OLD_GROWTH_PINE_TAIGA, "old_growth_pine_taiga")
-REGISTER_BIOME(OLD_GROWTH_SPRUCE_TAIGA, "old_growth_spruce_taiga")
-REGISTER_BIOME(PALE_GARDEN, "pale_garden")
-REGISTER_BIOME(PLAINS, "plains")
-REGISTER_BIOME(RIVER, "river")
-REGISTER_BIOME(SAVANNA, "savanna")
-REGISTER_BIOME(SAVANNA_PLATEAU, "savanna_plateau")
-REGISTER_BIOME(SMALL_END_ISLANDS, "small_end_islands")
-REGISTER_BIOME(SNOWY_BEACH, "snowy_beach")
-REGISTER_BIOME(SNOWY_PLAINS, "snowy_plains")
-REGISTER_BIOME(SNOWY_SLOPES, "snowy_slopes")
-REGISTER_BIOME(SNOWY_TAIGA, "snowy_taiga")
-REGISTER_BIOME(SOUL_SAND_VALLEY, "soul_sand_valley")
-REGISTER_BIOME(SPARSE_JUNGLE, "sparse_jungle")
-REGISTER_BIOME(STONY_PEAKS, "stony_peaks")
-REGISTER_BIOME(STONY_SHORE, "stony_shore")
-REGISTER_BIOME(SUNFLOWER_PLAINS, "sunflower_plains")
-REGISTER_BIOME(SWAMP, "swamp")
-REGISTER_BIOME(TAIGA, "taiga")
-REGISTER_BIOME(THE_END, "the_end")
-REGISTER_BIOME(THE_VOID, "the_void")
-REGISTER_BIOME(WARM_OCEAN, "warm_ocean")
-REGISTER_BIOME(WARPED_FOREST, "warped_forest")
-REGISTER_BIOME(WINDSWEPT_FOREST, "windswept_forest")
-REGISTER_BIOME(WINDSWEPT_GRAVELLY_HILLS, "windswept_gravelly_hills")
-REGISTER_BIOME(WINDSWEPT_HILLS, "windswept_hills")
-REGISTER_BIOME(WINDSWEPT_SAVANNA, "windswept_savanna")
-REGISTER_BIOME(WOODED_BADLANDS, "wooded_badlands")
+const Biome* Biomes::BADLANDS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "badlands"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::BAMBOO_JUNGLE() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "bamboo_jungle"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.95).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.9).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7842047).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::BASALT_DELTAS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "basalt_deltas"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(6840176).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::BEACH() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "beach"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.8).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.4).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7907327).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::BIRCH_FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "birch_forest"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.6).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.6).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8037887).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::CHERRY_GROVE() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "cherry_grove"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(6141935).setWaterFogColor(6141935).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::COLD_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "cold_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4020182).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::CRIMSON_FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "crimson_forest"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(3343107).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DARK_FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "dark_forest"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.7).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7972607).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DEEP_COLD_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "deep_cold_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4020182).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DEEP_DARK() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "deep_dark"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.8).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.4).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7907327).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DEEP_FROZEN_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "deep_frozen_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::Frozen).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(3750089).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DEEP_LUKEWARM_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "deep_lukewarm_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4566514).setWaterFogColor(267827).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DEEP_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "deep_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DESERT() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "desert"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::DRIPSTONE_CAVES() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "dripstone_caves"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.8).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.4).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7907327).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::END_BARRENS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "end_barrens"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(10518688).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(0).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::END_HIGHLANDS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "end_highlands"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(10518688).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(0).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::END_MIDLANDS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "end_midlands"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(10518688).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(0).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::ERODED_BADLANDS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "eroded_badlands"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::FLOWER_FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "flower_forest"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.7).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7972607).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "forest"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.7).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7972607).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::FROZEN_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "frozen_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.0).setTemperatureModifier(BiomeTemperatureModifier::Frozen).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(3750089).setWaterFogColor(329011).setSkyColor(8364543).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::FROZEN_PEAKS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "frozen_peaks"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(-0.7).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.9).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8756735).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::FROZEN_RIVER() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "frozen_river"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(3750089).setWaterFogColor(329011).setSkyColor(8364543).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::GROVE() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "grove"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(-0.2).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8495359).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::ICE_SPIKES() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "ice_spikes"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8364543).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::JAGGED_PEAKS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "jagged_peaks"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(-0.7).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.9).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8756735).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::JUNGLE() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "jungle"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.95).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.9).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7842047).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::LUKEWARM_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "lukewarm_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4566514).setWaterFogColor(267827).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::LUSH_CAVES() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "lush_caves"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::MANGROVE_SWAMP() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "mangrove_swamp"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.8).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.9).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(3832426).setWaterFogColor(5077600).setSkyColor(7907327).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::MEADOW() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "meadow"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(937679).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::MUSHROOM_FIELDS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "mushroom_fields"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.9).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(1.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7842047).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::NETHER_WASTES() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "nether_wastes"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(3344392).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::OLD_GROWTH_BIRCH_FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "old_growth_birch_forest"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.6).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.6).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8037887).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::OLD_GROWTH_PINE_TAIGA() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "old_growth_pine_taiga"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.3).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8168447).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::OLD_GROWTH_SPRUCE_TAIGA() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "old_growth_spruce_taiga"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.25).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8233983).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::PALE_GARDEN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "pale_garden"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.7).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(8484720).setWaterColor(7768221).setWaterFogColor(5597568).setSkyColor(12171705).setMusicVolume(0.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::PLAINS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "plains"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.8).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.4).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7907327).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::RIVER() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "river"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SAVANNA() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "savanna"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SAVANNA_PLATEAU() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "savanna_plateau"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SMALL_END_ISLANDS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "small_end_islands"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(10518688).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(0).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SNOWY_BEACH() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "snowy_beach"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.05).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.3).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4020182).setWaterFogColor(329011).setSkyColor(8364543).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SNOWY_PLAINS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "snowy_plains"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8364543).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SNOWY_SLOPES() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "snowy_slopes"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(-0.3).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.9).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8560639).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SNOWY_TAIGA() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "snowy_taiga"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(-0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.4).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4020182).setWaterFogColor(329011).setSkyColor(8625919).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SOUL_SAND_VALLEY() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "soul_sand_valley"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(1787717).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SPARSE_JUNGLE() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "sparse_jungle"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.95).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7842047).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::STONY_PEAKS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "stony_peaks"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(1.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.3).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7776511).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::STONY_SHORE() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "stony_shore"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.2).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.3).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8233727).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SUNFLOWER_PLAINS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "sunflower_plains"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.8).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.4).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7907327).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::SWAMP() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "swamp"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.8).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.9).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(6388580).setWaterFogColor(2302743).setSkyColor(7907327).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::TAIGA() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "taiga"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.25).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.8).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8233983).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::THE_END() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "the_end"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(10518688).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(0).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::THE_VOID() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "the_void"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::WARM_OCEAN() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "warm_ocean"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.5).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.5).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4445678).setWaterFogColor(270131).setSkyColor(8103167).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::WARPED_FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "warped_forest"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(1705242).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::WINDSWEPT_FOREST() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "windswept_forest"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.2).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.3).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8233727).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::WINDSWEPT_GRAVELLY_HILLS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "windswept_gravelly_hills"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.2).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.3).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8233727).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::WINDSWEPT_HILLS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "windswept_hills"), new Biome(BiomeWeather::Builder().setPrecipitation(true).setTemperature(0.2).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.3).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(8233727).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::WINDSWEPT_SAVANNA() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "windswept_savanna"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
+const Biome* Biomes::WOODED_BADLANDS() {
+    static const Biome* biome = registerBiome(utils::Identifier("minecraft", "wooded_badlands"), new Biome(BiomeWeather::Builder().setPrecipitation(false).setTemperature(2.0).setTemperatureModifier(BiomeTemperatureModifier::None).setDownFall(0.0).build(), BiomeEffects::Builder().setFogColor(12638463).setWaterColor(4159204).setWaterFogColor(329011).setSkyColor(7254527).setMusicVolume(1.0).build()));
+    return biome;
+}
+
 
 void Biomes::registerBiomes() {
     BADLANDS();

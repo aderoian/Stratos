@@ -16,11 +16,13 @@
 #
 
 import argparse
+import json
 
 parser = argparse.ArgumentParser(description='Generate a biome registry for the specified biomes.')
 parser.add_argument("--output-header", type=str, required=True, help="Output header file for the biome registry.")
 parser.add_argument("--output-source", type=str, required=True, help="Output source file for the biome registry.")
 parser.add_argument("--biomes", type=str, required=True, help="Dump of biomes to be included in the registry.")
+parser.add_argument("--biome-data", type=str, required=True, help="Path to the directory containing biome JSON data files.")
 args = parser.parse_args()
 
 def generate_biome_registry(output_header, output_source, biomes_dump):
@@ -116,12 +118,6 @@ public:
 #include "registry/Registries.h"
 #include "utils/Identifier.h"
 
-#define REGISTER_BIOME(codeName, name) \\
-    const Biome* Biomes::codeName() { \\
-        static const Biome* biome = registerBiome(utils::Identifier("minecraft", name), new Biome()); \\
-        return biome; \\
-    }
-
 namespace stratos::world {
 
 Biome* registerBiome(const utils::Identifier& id, Biome* biome) {
@@ -135,10 +131,21 @@ Biome* registerBiome(const utils::Identifier& id, Biome* biome) {
         i = 0
         for biome in biomes:
             parts = biome.split(':', 1)
-            if len(parts) != 2:
-                raise ValueError(f"Invalid biome format: {biome}. Expected format is 'namespace:biome_name'.")
-            namespace, biome_name = parts[0].strip(), parts[1].strip()
-            f.write(f"REGISTER_BIOME({biome_name.upper()}, \"{biome_name}\")\n")
+            with open(f"{args.biome_data}\\{parts[1].strip()}.json", 'r') as biome_file:
+                biome_data = json.load(biome_file)
+
+                if biome_data["has_precipitation"]:
+                    has_precipitation = "true"
+                else:
+                    has_precipitation = "false"
+                temperature_modifier = "BiomeTemperatureModifier::None"
+                if "temperature_modifier" in biome_data:
+                    temperature_modifier = "BiomeTemperatureModifier::Frozen"
+                effects = biome_data.get("effects", {})
+                f.write(f"const Biome* Biomes::{parts[1].strip().upper()}() {{\n")
+                f.write(f"    static const Biome* biome = registerBiome(utils::Identifier(\"{parts[0].strip()}\", \"{parts[1].strip()}\"), new Biome(BiomeWeather::Builder().setPrecipitation({has_precipitation}).setTemperature({str(biome_data["temperature"])}).setTemperatureModifier({temperature_modifier}).setDownFall({str(biome_data["downfall"])}).build(), BiomeEffects::Builder().setFogColor({str(effects["fog_color"])}).setWaterColor({str(effects["water_color"])}).setWaterFogColor({str(effects["water_fog_color"])}).setSkyColor({str(effects["sky_color"])}).setMusicVolume({str(effects["music_volume"])}).build()));\n")
+                f.write("    return biome;\n")
+                f.write("}\n")
         f.write("\nvoid Biomes::registerBiomes() {\n")
         for biome in biomes:
             parts = biome.split(':', 1)

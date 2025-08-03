@@ -21,6 +21,7 @@
 #define CHUNK_H
 #include "Palette.h"
 #include "utils/collection/BitSet.h"
+#include "network/protocol/serialization/WorldSerialization.h"
 
 namespace stratos::nbt {
 class CompoundTag;
@@ -32,7 +33,14 @@ class Heightmap;
 class Chunk {
 public:
     Chunk() = default;
-    int getHeight() const;
+    [[nodiscard]] int getX() const;
+    [[nodiscard]] int getZ() const;
+    [[nodiscard]] int getLowY() const;
+    [[nodiscard]] const std::vector<ChunkSection*>& getSections() const;
+    [[nodiscard]] const Heightmap* getMotionBlocking() const;
+    [[nodiscard]] const Heightmap* getMotionBlockingNoLeaves() const;
+    [[nodiscard]] const Heightmap* getOceanFloor() const;
+    [[nodiscard]] const Heightmap* getWorldSurface() const;
 
     void readNBT(nbt::CompoundTag& nbt);
 private:
@@ -50,6 +58,11 @@ private:
 class ChunkSection {
 public:
     ChunkSection(const Chunk* chunk);
+    [[nodiscard]] int getY() const;
+    [[nodiscard]] const PalettedContainer<const block::BlockState*>* getBlocks() const;
+    [[nodiscard]] const PalettedContainer<const Biome*>* getBiomes() const;
+    [[nodiscard]] const std::vector<int8_t>* getBlockLight() const;
+    [[nodiscard]] const std::vector<int8_t>* getSkyLight() const;
 
     void readNBT(nbt::CompoundTag& nbt);
 private:

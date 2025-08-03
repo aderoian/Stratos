@@ -21,20 +21,18 @@
 #define REGISTRIES_H
 
 #include "Registry.h"
+#include "world/biome/Biome.h"
 
 namespace stratos {
 namespace block {
 class Block;
 } // namespace block
-namespace world {
-class Biome;
-} // namespace world
 namespace registry {
 
 class Registries {
 public:
     static Registry<const block::Block*>* BLOCKS();
-    static Registry<const world::Biome*>* BIOMES();
+    static DynamicRegistry<const world::Biome*>* BIOMES();
 };
 } // namespace registry
 } // namespace stratos

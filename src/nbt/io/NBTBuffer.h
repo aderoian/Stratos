@@ -35,6 +35,7 @@ class StringTag;
 class NBTBuffer : public ByteBuffer {
   public:
     NBTBuffer() = default;
+    explicit NBTBuffer(const int size) : ByteBuffer(size) {}
     explicit NBTBuffer(const ByteVec& data) : ByteBuffer(data, 0) {}
     explicit NBTBuffer(ByteVec&& data) : ByteBuffer(std::move(data), 0) {}
     NBTBuffer(const ByteVec& data, const size_t offset) : ByteBuffer(data, offset) {}

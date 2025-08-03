@@ -22,6 +22,7 @@
 #include "block/state/BlockState.h"
 #include "nbt/io/NBTBuffer.h"
 #include "nbt/ListTag.h"
+#include "network/protocol/serialization/PacketBuffer.h"
 #include "utils/collection/Iterable.h"
 #include "utils/collection/PalettedStorage.h"
 #include "utils/io/ByteBuffer.h"
@@ -148,6 +149,7 @@ public:
 
     void read(ByteBuffer& buffer);
     void write(ByteBuffer& buffer) const;
+    int writeSize() const;
 
     ~PalettedContainer();
 private:
@@ -212,6 +214,12 @@ template <typename T> void SingularPalette<T>::write(ByteBuffer& buffer) const {
     buffer.writeVarInt(idList->getRawIndexOrThrow(*entry));
 }
 template <typename T> int SingularPalette<T>::writeSize() const {
+    std::cout << "(singular palette: " << getEncodedSizeInBytes(idList->getRawIndex(*entry)) << "{index: " << idList->getRawIndex(*entry) << "} [";
+
+    int size = getEncodedSizeInBytes(idList->getRawIndex(*entry));
+    network::PacketBuffer pb;
+    write(pb);
+    assert(pb.size() == size);
     return getEncodedSizeInBytes(idList->getRawIndex(*entry));
 }
 template <typename T> ArrayPalette<T>::ArrayPalette(const utils::IndexedIterable<T>* idList, int bits, const std::vector<T>& entries) : idList(idList), indexBits(bits) {
@@ -249,10 +257,20 @@ template <typename T> void ArrayPalette<T>::write(ByteBuffer& buffer) const {
     for (int i = 0; i < _size; ++i) buffer.writeVarInt(idList->getRawIndex(entries[i]));
 }
 template <typename T> int ArrayPalette<T>::writeSize() const {
+    std::cout << "(array palette: " << getEncodedSizeInBytes(_size) << "{size: " << _size << "}";
     int size = getEncodedSizeInBytes(_size);
     for (const T& entry : entries) {
+        std::cout << " + ";
+        std::cout << getEncodedSizeInBytes(idList->getRawIndex(entry)) << "{index: " << idList->getRawIndex(entry) << "}";
         size += getEncodedSizeInBytes(idList->getRawIndex(entry));
     }
+    std::cout << ")[";
+
+    network::PacketBuffer pb;
+    write(pb);
+
+    assert(pb.size() == size);
+
     return size;
 }
 template <typename T> int IdListPalette<T>::index(T value) {
@@ -274,10 +292,11 @@ template <typename T> void IdListPalette<T>::write(ByteBuffer& buffer) const {
     // No write, uses global registries
 }
 template <typename T> int IdListPalette<T>::writeSize() const {
+    std::cout << "(id list palette: 0 [";
     return 0;
 }
 template <typename T> template <typename U> void PalettedContainer<T>::Data<U>::write(ByteBuffer& buffer) const {
-    buffer.writeByte(storage->getBitsPerEntry());
+    buffer.writeUnsignedByte(storage->getBitsPerEntry());
     palette->write(buffer);
     buffer.writeFixedLongArray(storage->getData());
 }
@@ -318,12 +337,25 @@ template <typename T> T PalettedContainer<T>::swap(const int x, const int y, con
     return swap(provider->computeIndex(x, y, z), value);
 }
 template <typename T> void PalettedContainer<T>::read(ByteBuffer& buffer) {
-    data = createData(buffer.readByte());
+    data = createData(buffer.readUnsignedByte());
     data.palette->read(buffer);
     buffer.readFixedLongArray(data.storage->getData());
 }
 template <typename T> void PalettedContainer<T>::write(ByteBuffer& buffer) const {
     data.write(buffer);
+}
+template <typename T> int PalettedContainer<T>::writeSize() const {
+    std::cout << "(" << sizeof(uint8_t) << " + ";
+    int size = data.palette->writeSize();
+    std::cout << size << "]) + " << "(storage size: " << data.storage->getData().size() << ") + "
+              << data.storage->getData().size() * sizeof(int64_t);
+    int total = sizeof(uint8_t) + size + data.storage->getData().size() * sizeof(int64_t);
+    std::cout << "[ = " << total << "]" << std::endl;
+
+    network::PacketBuffer pb;
+    data.write(pb);
+    assert(pb.size() == total);
+    return sizeof(uint8_t) + size + data.storage->getData().size() * sizeof(int64_t);//sizeof(uint8_t) + size + getEncodedSizeInBytes(static_cast<int>(data.storage->getData().size())) + data.storage->getData().size() * sizeof(int64_t);
 }
 template <typename T> PalettedContainer<T>::~PalettedContainer() {
     delete data.palette;
