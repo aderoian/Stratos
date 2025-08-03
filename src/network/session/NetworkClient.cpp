@@ -371,19 +371,12 @@ int NetworkConnection::handleReceive() {
             }
 
             const int frameLength = offset + packetLength;
-            int initLength = receiveBuf.size();
-
             PacketBuffer packetBuffer(packetLength);
             packetBuffer.insert(packetBuffer.begin(), std::make_move_iterator(receiveBuf.begin() + offset), std::make_move_iterator(receiveBuf.begin() + frameLength));
             receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + frameLength);
-            ByteVec before = receiveBuf;
-            assert(receiveBuf.size() == initLength - frameLength);
             try {
                 const auto* packet = network->getPacketCodec().decode(packetBuffer, state, Serverbound, packetLength);
-                if (!packet) {
-                    // receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + offset + packetLength);
-                    return received;
-                }
+                if (!packet) return received;
 
                 if (!packet->accept(*packetHandler))
                     receiveQueue.enqueue(dynamic_cast<const ServerboundPacket*>(packet)); // Enqueue the packet for further processing
@@ -394,9 +387,6 @@ int NetworkConnection::handleReceive() {
                 logger->error("Encountered an exception when handing a packet for client {}:{}: {}", address, port, e.what());
             }
 
-            // receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + offset + packetLength);
-            assert(receiveBuf.size() == initLength - frameLength);
-            assert(before == receiveBuf);
             offset = 0; // Reset offset for the next packet
         } catch (const PacketSerializationException& ignored) { // Failed to read packet length
             // Not enough data to read a packet, wait for more data

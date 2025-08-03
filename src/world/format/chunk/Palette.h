@@ -214,12 +214,8 @@ template <typename T> void SingularPalette<T>::write(ByteBuffer& buffer) const {
     buffer.writeVarInt(idList->getRawIndexOrThrow(*entry));
 }
 template <typename T> int SingularPalette<T>::writeSize() const {
-    std::cout << "(singular palette: " << getEncodedSizeInBytes(idList->getRawIndex(*entry)) << "{index: " << idList->getRawIndex(*entry) << "} [";
-
-    int size = getEncodedSizeInBytes(idList->getRawIndex(*entry));
     network::PacketBuffer pb;
     write(pb);
-    assert(pb.size() == size);
     return getEncodedSizeInBytes(idList->getRawIndex(*entry));
 }
 template <typename T> ArrayPalette<T>::ArrayPalette(const utils::IndexedIterable<T>* idList, int bits, const std::vector<T>& entries) : idList(idList), indexBits(bits) {
@@ -257,20 +253,11 @@ template <typename T> void ArrayPalette<T>::write(ByteBuffer& buffer) const {
     for (int i = 0; i < _size; ++i) buffer.writeVarInt(idList->getRawIndex(entries[i]));
 }
 template <typename T> int ArrayPalette<T>::writeSize() const {
-    std::cout << "(array palette: " << getEncodedSizeInBytes(_size) << "{size: " << _size << "}";
     int size = getEncodedSizeInBytes(_size);
-    for (const T& entry : entries) {
-        std::cout << " + ";
-        std::cout << getEncodedSizeInBytes(idList->getRawIndex(entry)) << "{index: " << idList->getRawIndex(entry) << "}";
+    for (const T& entry : entries)
         size += getEncodedSizeInBytes(idList->getRawIndex(entry));
-    }
-    std::cout << ")[";
-
     network::PacketBuffer pb;
     write(pb);
-
-    assert(pb.size() == size);
-
     return size;
 }
 template <typename T> int IdListPalette<T>::index(T value) {
@@ -292,7 +279,6 @@ template <typename T> void IdListPalette<T>::write(ByteBuffer& buffer) const {
     // No write, uses global registries
 }
 template <typename T> int IdListPalette<T>::writeSize() const {
-    std::cout << "(id list palette: 0 [";
     return 0;
 }
 template <typename T> template <typename U> void PalettedContainer<T>::Data<U>::write(ByteBuffer& buffer) const {
@@ -345,17 +331,7 @@ template <typename T> void PalettedContainer<T>::write(ByteBuffer& buffer) const
     data.write(buffer);
 }
 template <typename T> int PalettedContainer<T>::writeSize() const {
-    std::cout << "(" << sizeof(uint8_t) << " + ";
-    int size = data.palette->writeSize();
-    std::cout << size << "]) + " << "(storage size: " << data.storage->getData().size() << ") + "
-              << data.storage->getData().size() * sizeof(int64_t);
-    int total = sizeof(uint8_t) + size + data.storage->getData().size() * sizeof(int64_t);
-    std::cout << "[ = " << total << "]" << std::endl;
-
-    network::PacketBuffer pb;
-    data.write(pb);
-    assert(pb.size() == total);
-    return sizeof(uint8_t) + size + data.storage->getData().size() * sizeof(int64_t);//sizeof(uint8_t) + size + getEncodedSizeInBytes(static_cast<int>(data.storage->getData().size())) + data.storage->getData().size() * sizeof(int64_t);
+    return sizeof(uint8_t) + data.palette->writeSize() + data.storage->getData().size() * sizeof(int64_t);
 }
 template <typename T> PalettedContainer<T>::~PalettedContainer() {
     delete data.palette;

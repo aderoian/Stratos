@@ -35,19 +35,8 @@ void ChunkData::write(PacketBuffer& buffer) const {
     }
 
     int dataSize = 0;
-    int i = 0;
     for (const auto& section : sections) {
-        std::cout << "Section (" << i << "): " << static_cast<int>(sizeof(short)) << " + ";
-        int inc = static_cast<int>(sizeof(short)) + section.blocks->writeSize() + section.biomes->writeSize();
-        i++;
-        std::cout << std::endl;
-
-        PacketBuffer pb;
-        pb.writeShort(section.blockCount);
-        section.blocks->write(pb);
-        section.biomes->write(pb);
-        assert(pb.size() == inc);
-        dataSize += inc;
+        dataSize += static_cast<int>(sizeof(short)) + section.blocks->writeSize() + section.biomes->writeSize();
     }
 
     PacketBuffer testBuf;
@@ -56,10 +45,6 @@ void ChunkData::write(PacketBuffer& buffer) const {
         blocks->write(testBuf);
         biomes->write(testBuf);
     }
-
-    std::cout << dataSize << "vs" << testBuf.size() << std::endl;
-    assert(dataSize == testBuf.size());
-
     buffer.writeVarInt(dataSize);
     for (const auto& [blockCount, blocks, biomes] : sections) {
         buffer.writeShort(blockCount);
