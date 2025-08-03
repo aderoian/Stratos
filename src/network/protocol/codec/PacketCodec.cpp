@@ -44,9 +44,10 @@ const stratos::network::Packet* stratos::network::PacketCodec::create(const Pack
     return packetDefinitions.contains(key) ? packetDefinitions.at(key)->factory() : nullptr;
 }
 const stratos::network::Packet* stratos::network::PacketCodec::decode(const PacketBuffer& buffer, const ProtocolState state, const PacketDirection direction, int length) const {
-    const PacketDefinition* definition = getPacket({state, direction, buffer.readVarInt()});
+    int packetId = buffer.readVarInt();
+    const PacketDefinition* definition = getPacket({state, direction, packetId});
     if (!definition) {
-        logger->error("Received unknown packet with ID {} in state {} and direction {}", buffer.readVarInt(), std::string(magic_enum::enum_name<ProtocolState>(state)), std::string(magic_enum::enum_name<PacketDirection>(direction)));
+        logger->error("Received unknown packet with ID {} in state {} and direction {}", std::format("0x{:02X}", packetId), std::string(magic_enum::enum_name<ProtocolState>(state)), std::string(magic_enum::enum_name<PacketDirection>(direction)));
         return nullptr; // No packet definition found for the given key
     }
 
