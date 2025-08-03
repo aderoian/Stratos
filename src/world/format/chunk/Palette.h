@@ -22,6 +22,7 @@
 #include "block/state/BlockState.h"
 #include "nbt/io/NBTBuffer.h"
 #include "nbt/ListTag.h"
+#include "network/protocol/serialization/PacketBuffer.h"
 #include "utils/collection/Iterable.h"
 #include "utils/collection/PalettedStorage.h"
 #include "utils/io/ByteBuffer.h"
@@ -148,6 +149,7 @@ public:
 
     void read(ByteBuffer& buffer);
     void write(ByteBuffer& buffer) const;
+    int writeSize() const;
 
     ~PalettedContainer();
 private:
@@ -212,6 +214,8 @@ template <typename T> void SingularPalette<T>::write(ByteBuffer& buffer) const {
     buffer.writeVarInt(idList->getRawIndexOrThrow(*entry));
 }
 template <typename T> int SingularPalette<T>::writeSize() const {
+    network::PacketBuffer pb;
+    write(pb);
     return getEncodedSizeInBytes(idList->getRawIndex(*entry));
 }
 template <typename T> ArrayPalette<T>::ArrayPalette(const utils::IndexedIterable<T>* idList, int bits, const std::vector<T>& entries) : idList(idList), indexBits(bits) {
@@ -250,9 +254,10 @@ template <typename T> void ArrayPalette<T>::write(ByteBuffer& buffer) const {
 }
 template <typename T> int ArrayPalette<T>::writeSize() const {
     int size = getEncodedSizeInBytes(_size);
-    for (const T& entry : entries) {
+    for (const T& entry : entries)
         size += getEncodedSizeInBytes(idList->getRawIndex(entry));
-    }
+    network::PacketBuffer pb;
+    write(pb);
     return size;
 }
 template <typename T> int IdListPalette<T>::index(T value) {
@@ -277,7 +282,7 @@ template <typename T> int IdListPalette<T>::writeSize() const {
     return 0;
 }
 template <typename T> template <typename U> void PalettedContainer<T>::Data<U>::write(ByteBuffer& buffer) const {
-    buffer.writeByte(storage->getBitsPerEntry());
+    buffer.writeUnsignedByte(storage->getBitsPerEntry());
     palette->write(buffer);
     buffer.writeFixedLongArray(storage->getData());
 }
@@ -318,12 +323,15 @@ template <typename T> T PalettedContainer<T>::swap(const int x, const int y, con
     return swap(provider->computeIndex(x, y, z), value);
 }
 template <typename T> void PalettedContainer<T>::read(ByteBuffer& buffer) {
-    data = createData(buffer.readByte());
+    data = createData(buffer.readUnsignedByte());
     data.palette->read(buffer);
     buffer.readFixedLongArray(data.storage->getData());
 }
 template <typename T> void PalettedContainer<T>::write(ByteBuffer& buffer) const {
     data.write(buffer);
+}
+template <typename T> int PalettedContainer<T>::writeSize() const {
+    return sizeof(uint8_t) + data.palette->writeSize() + data.storage->getData().size() * sizeof(int64_t);
 }
 template <typename T> PalettedContainer<T>::~PalettedContainer() {
     delete data.palette;

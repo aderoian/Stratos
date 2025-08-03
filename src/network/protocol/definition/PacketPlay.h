@@ -21,10 +21,12 @@
 #define PACKETPLAY_H
 #include "math/Position.h"
 #include "network/protocol/Packet.h"
+#include "network/protocol/serialization/WorldSerialization.h"
 #include "utils/Identifier.h"
 #include "utils/Types.h"
 
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace stratos::network {
@@ -121,6 +123,30 @@ class SetDefaultSpawnPosition final : public ClientboundPacket {//SetDefaultSpaw
     SetDefaultSpawnPosition(const math::Position location, const float angle)
          : ClientboundPacket(ID), location(location), angle(angle) {}
     CLIENTBOUND_PACKET_FOOTER(SetDefaultSpawnPosition)
+};
+
+class ChunkDataAndLight final : public ClientboundPacket {
+  public:
+    constexpr static int ID = 0x27;
+    int chunkX; // VarInt
+    int chunkZ; // VarInt
+    ChunkData chunkData;
+    LightData lightData;
+
+    ChunkDataAndLight() : ClientboundPacket(ID), chunkX(0), chunkZ(0), chunkData(), lightData() {}
+    ChunkDataAndLight(const int chunkX, const int chunkZ, ChunkData chunkData, LightData lightData)
+         : ClientboundPacket(ID), chunkX(chunkX), chunkZ(chunkZ), chunkData(std::move(chunkData)), lightData(std::move(lightData)) {}
+    CLIENTBOUND_PACKET_FOOTER(ChunkDataAndLight)
+};
+
+class SetRenderDistance final : public ClientboundPacket {
+public:
+    constexpr static int ID = 0x58;
+    int distance; // VarInt
+
+    SetRenderDistance() : ClientboundPacket(ID), distance(0) {}
+    explicit SetRenderDistance(const int distance) : ClientboundPacket(ID), distance(distance) {}
+    CLIENTBOUND_PACKET_FOOTER(SetRenderDistance)
 };
 
 } // namespace stratos::network

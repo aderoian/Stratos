@@ -19,6 +19,10 @@
 
 #ifndef REGISTRY_H
 #define REGISTRY_H
+#include "nbt/ArrayTag.h"
+#include "nbt/CompoundTag.h"
+#include "nbt/NBT.h"
+#include "network/protocol/definition/PacketConfiguration.h"
 #include "utils/collection/Iterable.h"
 #include "utils/Identifier.h"
 #include "utils/Types.h"
@@ -26,6 +30,9 @@
 #include <unordered_map>
 #include <utility>
 
+namespace stratos::network {
+class RegistryDataPacket;
+}
 namespace stratos::registry {
 struct RegistryKey {
     utils::Identifier registry;
@@ -37,7 +44,7 @@ struct RegistryKey {
     [[nodiscard]] std::string toString() const;
 };
 
-template <typename T> class Registry final : public utils::IndexedIterable<T> {
+template <typename T> class Registry : public utils::IndexedIterable<T> {
   public:
     explicit Registry(RegistryKey key) : key(std::move(key)) {}
     [[nodiscard]] const RegistryKey& getKey() const;
@@ -49,23 +56,41 @@ template <typename T> class Registry final : public utils::IndexedIterable<T> {
     utils::Identifier getEntry(T value) const;
     [[nodiscard]] int size() const override;
 
-    void registerEntry(const RegistryKey& key, T value);
+    virtual void registerEntry(const RegistryKey& key, T value);
 
     typename utils::IndexedIterable<T>::iterator       begin() override;
     typename utils::IndexedIterable<T>::const_iterator begin() const override;
     typename utils::IndexedIterable<T>::iterator       end() override;
     typename utils::IndexedIterable<T>::const_iterator end() const override;
 
-  private:
-    int nextId = 0;
+  protected:
     RegistryKey key;
-
     std::vector<T>                     rawIdToValue;
     std::unordered_map<utils::Identifier, T>  idToValue;
     std::unordered_map<RegistryKey, T> keyToValue;
     std::unordered_map<T, int>        valueToRawId;
     std::unordered_map<T, utils::Identifier> valueToEntry;
+private:
+    int nextId = 0;
 };
+
+class DynamicRegistryElement {
+public:
+    virtual ~DynamicRegistryElement() = default;
+    virtual nbt::CompoundTag toNetworkNBT() const = 0;
+};
+
+template <typename T>
+class DynamicRegistry final : public Registry<T> {
+public:
+    explicit DynamicRegistry(RegistryKey key) : Registry<T>(key) {
+        static_assert(std::is_base_of_v<DynamicRegistryElement, std::remove_pointer_t<T>>);
+    }
+    ~DynamicRegistry() override {}
+
+    const network::RegistryDataPacket* createDynamicEntryPacket(utils::Identifier key) const;
+};
+
 template <typename T> const RegistryKey& Registry<T>::getKey() const {
     return key;
 }
@@ -110,7 +135,19 @@ template <typename T> typename utils::IndexedIterable<T>::iterator Registry<T>::
 template <typename T> typename utils::IndexedIterable<T>::const_iterator Registry<T>::end() const {
     return rawIdToValue.cend();
 }
-}// namespace stratos::registry
+template <typename T> const network::RegistryDataPacket* DynamicRegistry<T>::createDynamicEntryPacket(utils::Identifier key) const {
+    std::vector<RegistryEntry> entries;
+    for (const auto& [regKey, value] : this->idToValue) {
+        const DynamicRegistryElement* e;
+        if constexpr (std::is_pointer_v<T>)
+            e = dynamic_cast<const DynamicRegistryElement*>(value);
+        else
+            e = dynamic_cast<const DynamicRegistryElement*>(&value);
+        entries.emplace_back(regKey, std::make_optional(nbt::writeNetworkNBT(e->toNetworkNBT())));
+    }
+    return new network::RegistryDataPacket(std::move(key), std::move(entries));
+}
+} // namespace stratos::registry
 
 template <> struct std::hash<stratos::registry::RegistryKey> {
     std::size_t operator()(const stratos::registry::RegistryKey& key) const noexcept {

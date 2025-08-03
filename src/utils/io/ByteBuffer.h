@@ -49,6 +49,7 @@ class BufferOverflowException : public std::logic_error {
 class ByteBuffer {
   public:
     ByteBuffer() : offset(0) {}
+    explicit ByteBuffer(const int size) : offset(0), buffer(size) {}
     explicit ByteBuffer(const ByteVec& data) : offset(0), buffer(data) {}
     explicit ByteBuffer(ByteVec&& data) : offset(0), buffer(std::move(data)) {}
     ByteBuffer(const ByteVec& data, const size_t offset) : offset(offset), buffer(data) {
@@ -110,6 +111,8 @@ class ByteBuffer {
     void                         reserve(const size_t size) { buffer.reserve(size); }
     void                         append(const ByteVec& data) { buffer.insert(buffer.end(), data.begin(), data.end()); }
     void                         append(const ByteVec&& data) { buffer.insert(buffer.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end())); }
+    void                         insert(const ByteVec::iterator& pos, const ByteVec::iterator& start, const ByteVec::iterator& end) {buffer.insert(pos, start, end); }
+    void                         insert(const ByteVec::iterator& pos, const std::move_iterator<ByteVec::iterator>& start, const std::move_iterator<ByteVec::iterator>& end) { buffer.insert(pos, start, end); }
     auto                         begin() { return buffer.begin(); }
     auto                         end() { return buffer.end(); }
     ByteVec&                     data() { return buffer; }
@@ -138,8 +141,8 @@ class ByteBuffer {
     }
 };
 
-int  getEncodedSizeInBytes(int value);
-bool getEncodedSizeInBytes(int64_t value);
+int getEncodedSizeInBytes(int value);
+int getEncodedSizeInBytes(int64_t value);
 
 } // namespace stratos
 

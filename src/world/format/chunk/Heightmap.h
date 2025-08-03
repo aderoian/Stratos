@@ -20,26 +20,13 @@
 #ifndef HEIGHTMAP_H
 #define HEIGHTMAP_H
 #include "utils/collection/PalettedStorage.h"
-#include "utils/MathUtils.h"
 #include "utils/Predicate.h"
 
 #include <string>
 
 namespace stratos::world {
 class BlockState;
-class HeightmapType;
 class Chunk;
-
-class Heightmap {
-public:
-    Heightmap(const Chunk* chunk, const HeightmapType* type);
-    Heightmap(const Chunk* chunk, const HeightmapType* type, int bits, const std::vector<int64_t>& data);
-
-private:
-    PackedIntegerArray* data;
-    Predicate<BlockState> blockPredicate;
-    const Chunk* chunk;
-};
 
 class HeightmapType {
 public:
@@ -62,6 +49,22 @@ private:
     std::string name;
     Purpose purpose;
     Predicate<BlockState> blockPredicate;
+};
+
+class Heightmap {
+public:
+    Heightmap(const Chunk* chunk, const HeightmapType* type);
+    Heightmap(const Chunk* chunk, const HeightmapType* type, int bits, const std::vector<int64_t>& data);
+
+    [[nodiscard]] const std::vector<int64_t>& getData() const;
+    [[nodiscard]] const HeightmapType* getType() const;
+    [[nodiscard]] const Predicate<BlockState>& getBlockPredicate() const;
+    [[nodiscard]] const Chunk* getChunk() const;
+private:
+    PackedIntegerArray* data;
+    const HeightmapType* type;
+    Predicate<BlockState> blockPredicate;
+    const Chunk* chunk;
 };
 
 extern const HeightmapType* WORLD_SURFACE_WG;

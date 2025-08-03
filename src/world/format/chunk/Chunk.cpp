@@ -28,7 +28,12 @@
 
 namespace stratos::world {
 
-ChunkSection::ChunkSection(const Chunk* chunk) : chunk(chunk) {}
+ChunkSection::ChunkSection(const Chunk* chunk) : chunk(chunk), blockLight(nullptr), skyLight(nullptr) {}
+int ChunkSection::getY() const { return y; }
+const PalettedContainer<const block::BlockState*>* ChunkSection::getBlocks() const { return blocks; }
+const PalettedContainer<const Biome*>* ChunkSection::getBiomes() const { return biomes; }
+const std::vector<int8_t>* ChunkSection::getBlockLight() const { return blockLight; }
+const std::vector<int8_t>* ChunkSection::getSkyLight() const { return skyLight; }
 void ChunkSection::readNBT(nbt::CompoundTag& nbt) {
     y = nbt["Y"].as<nbt::ByteTag>().get();
     auto& blockStatesTag = nbt["block_states"].as<nbt::CompoundTag>();
@@ -50,6 +55,14 @@ void ChunkSection::readNBT(nbt::CompoundTag& nbt) {
     if (nbt.hasKey("SkyLight"))
         skyLight = new std::vector(nbt["SkyLight"].as<nbt::ByteArrayTag>().get());
 }
+int Chunk::getX() const { return x; }
+int Chunk::getZ() const { return z; }
+int Chunk::getLowY() const { return lowY; }
+const std::vector<ChunkSection*>& Chunk::getSections() const { return sections; }
+const Heightmap* Chunk::getMotionBlocking() const { return motionBlocking; }
+const Heightmap* Chunk::getMotionBlockingNoLeaves() const { return motionBlockingNoLeaves; }
+const Heightmap* Chunk::getOceanFloor() const { return oceanFloor; }
+const Heightmap* Chunk::getWorldSurface() const { return worldSurface; }
 void Chunk::readNBT(nbt::CompoundTag& nbt) {
     x = nbt["xPos"].as<nbt::IntTag>().get();
     z = nbt["zPos"].as<nbt::IntTag>().get();

@@ -67,6 +67,18 @@ UUID PacketBuffer::readUUID() const {
 std::vector<uint8_t> PacketBuffer::readPrefixedByteArray() const {
     return readByteArray(readVarInt());
 }
+std::vector<int8_t>  PacketBuffer::readPrefixedSignedByteArray() const {
+    std::vector<int8_t> result(readVarInt(), 0);
+    for (int8_t& i : result)
+        i = readByte();
+    return result;
+}
+std::vector<int64_t> PacketBuffer::readPrefixedLongArray() const {
+    std::vector<int64_t> result(readVarInt(), 0);
+    for (int64_t & i : result)
+        i = readLong();
+    return result;
+}
 std::vector<LoginProperty> PacketBuffer::readLoginProperty() const {
     const int length = readVarInt();
     if (length < 0 || length > 16)
@@ -128,6 +140,14 @@ void PacketBuffer::writeUUID(const UUID& uuid) {
 void PacketBuffer::writePrefixedByteArray(const std::vector<uint8_t>& bytes) {
     writeVarInt(static_cast<int>(bytes.size()));
     writeByteArray(bytes);
+}
+void PacketBuffer::writePrefixedSignedByteArray(const std::vector<int8_t>& bytes) {
+    writeVarInt(static_cast<int>(bytes.size()));
+    for (const int8_t& i : bytes) writeByte(i);
+}
+void PacketBuffer::writePrefixedLongArray(const std::vector<int64_t>& longs) {
+    writeVarInt(static_cast<int>(longs.size()));
+    for (const int64_t& i : longs) writeLong(i);
 }
 void PacketBuffer::writeLoginProperty(const std::vector<LoginProperty>& properties) {
     writeVarInt(static_cast<int>(properties.size()));

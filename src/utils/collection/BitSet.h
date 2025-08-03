@@ -19,13 +19,15 @@
 
 #ifndef BITSET_H
 #define BITSET_H
+#include <cstdint>
 #include <vector>
 
 namespace stratos::utils {
 class BitSet {
 public:
+    BitSet() = default;
     explicit BitSet(int size);
-    explicit BitSet(const std::vector<long>& data);
+    explicit BitSet(const std::vector<int64_t>& data);
 
     [[nodiscard]] bool get(int index) const;
     void set(int index);
@@ -34,14 +36,14 @@ public:
 
     [[nodiscard]] size_t size() const;
 
-    [[nodiscard]] std::vector<long> toVector() const;
+    [[nodiscard]] std::vector<int64_t> toVector() const;
 private:
     static constexpr int BITS_PER_LONG = 64;
     static constexpr int ADDRESS_BITS = 6; // log2(BITS_PER_LONG)
 
     static int wordIndex(int index);
 
-    std::vector<long> data;
+    std::vector<int64_t> data;
 };
 }
 

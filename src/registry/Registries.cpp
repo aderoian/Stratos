@@ -26,8 +26,8 @@ Registry<const block::Block*>* Registries::BLOCKS() {
     static auto* registry = new Registry<const block::Block*>({utils::Identifier("minecraft", "root"), utils::Identifier("minecraft", "block")});
     return registry;
 }
-Registry<const world::Biome*>* Registries::BIOMES() {
-    static auto* registry = new Registry<const world::Biome*>({utils::Identifier("minecraft", "worldgen"), utils::Identifier("minecraft", "biome")});
+DynamicRegistry<const world::Biome*>* Registries::BIOMES() {
+    static auto* registry = new DynamicRegistry<const world::Biome*>({utils::Identifier("minecraft", "worldgen"), utils::Identifier("minecraft", "biome")});
     return registry;
 }
 } // namespace stratos::registry

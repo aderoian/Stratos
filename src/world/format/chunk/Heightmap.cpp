@@ -22,8 +22,13 @@
 
 namespace stratos::world {
 
-Heightmap::Heightmap(const Chunk* chunk, const HeightmapType* type) : data(new PackedIntegerArray(9, 256)), blockPredicate(type->getBlockPredicate()), chunk(chunk) {}
-Heightmap::Heightmap(const Chunk* chunk, const HeightmapType* type, const int bits, const std::vector<int64_t>& data) : data(new PackedIntegerArray(bits, 256, data)), blockPredicate(type->getBlockPredicate()), chunk(chunk) {}
+Heightmap::Heightmap(const Chunk* chunk, const HeightmapType* type) : data(new PackedIntegerArray(9, 256)), type(type), blockPredicate(type->getBlockPredicate()), chunk(chunk) {}
+Heightmap::Heightmap(const Chunk* chunk, const HeightmapType* type, const int bits, const std::vector<int64_t>& data)
+    : data(new PackedIntegerArray(bits, 256, data)), type(type), blockPredicate(type->getBlockPredicate()), chunk(chunk) {}
+const std::vector<int64_t>& Heightmap::getData() const { return data->getData(); }
+const HeightmapType* Heightmap::getType() const { return type; }
+const Predicate<BlockState>& Heightmap::getBlockPredicate() const { return blockPredicate; }
+const Chunk* Heightmap::getChunk() const { return chunk; }
 
 // TODO: Define the block predicates for each heightmap type
 const HeightmapType* WORLD_SURFACE_WG = new HeightmapType(
