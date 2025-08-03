@@ -23,7 +23,7 @@
 #include "nbt/NBT.h"
 #include "nbt/PrimitiveTag.h"
 #include "nbt/StringTag.h"
-#include "network/protocol/PacketSerialization.h"
+#include "network/protocol/serialization/PacketSerialization.h"
 #include "utils/collection/PalettedStorage.h"
 #include "utils/config/Config.h"
 #include "utils/io/ByteBuffer.h"
@@ -112,7 +112,7 @@ void networkSerializationTest() {
     try {
         buffer.writeString(testString, 10);
         assert(false); // Should not reach here
-    } catch (const stratos::PacketSerializationException& e) {
+    } catch (const stratos::network::PacketSerializationException& e) {
 
     }
     assert(buffer.readString(100) == testString);
