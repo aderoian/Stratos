@@ -36,6 +36,7 @@
 #include "network/protocol/serialization/PacketSerialization.h"
 #include "Server.h"
 #include "spdlog/logger.h"
+#include "utils/TimeUtils.h"
 
 namespace stratos::network {
 void NetworkSession::tick() {
@@ -44,6 +45,22 @@ void NetworkSession::tick() {
     // Empty received queue
     // TODO: Should we always empty or consume a fix amount per tick?
     processReceived();
+    sendKeepAlive();
+}
+void NetworkSession::sendKeepAlive() {
+    int64_t randomID = utils::currentTimeMillis();
+
+    if (sentKeepAlives.empty() || (!sentKeepAlives.empty() && randomID - sentKeepAlives.back() >= 7500)) { //Send packet every 7.5 seconds
+        std::cout << "Sending Keep Alive " << randomID << std::endl;
+        if (!sentKeepAlives.empty() && randomID - sentKeepAlives[0] >= 15000) { //if the first pending packet has been sent more than 15 seconds ago
+            std::cout << "More than 15 seconds has passed since last keep alive! Disconnecting client." << std::endl;
+            connection->disconnect();
+        }
+        else {
+            connection->sendPacket(new KeepAlive(randomID));
+            sentKeepAlives.push_back(randomID);
+        }
+    }
 }
 void NetworkSession::beginConfiguration() const {
     // TODO: R&D the proper configuration process
@@ -344,6 +361,7 @@ void NetworkSession::processReceived() {
         if (!packet) break; // No more packets to process
         if (!packet->accept(*packetHandler)) {
             networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);
+            std::cout << "Packet received with id:" << packet->getId() << std::endl;
         }
         delete packet;
     }
