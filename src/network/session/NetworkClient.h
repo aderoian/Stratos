@@ -133,7 +133,7 @@ class NetworkSession {
     void dispose() const;
 
     friend class NetworkManager;
-    std::vector<uint64_t> sentKeepAlives;
+    std::vector<int64_t> sentKeepAlives;
 };
 
 } // stratos::network

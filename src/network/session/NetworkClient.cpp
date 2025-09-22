@@ -48,17 +48,15 @@ void NetworkSession::tick() {
     sendKeepAlive();
 }
 void NetworkSession::sendKeepAlive() {
-    int64_t randomID = utils::currentTimeMillis();
+    int64_t timeID = utils::currentTimeMillis();
 
-    if (sentKeepAlives.empty() || (!sentKeepAlives.empty() && randomID - sentKeepAlives.back() >= 7500)) { //Send packet every 7.5 seconds
-        std::cout << "Sending Keep Alive " << randomID << std::endl;
-        if (!sentKeepAlives.empty() && randomID - sentKeepAlives[0] >= 15000) { //if the first pending packet has been sent more than 15 seconds ago
-            std::cout << "More than 15 seconds has passed since last keep alive! Disconnecting client." << std::endl;
+    if (sentKeepAlives.empty() || (!sentKeepAlives.empty() && timeID - sentKeepAlives.back() >= 7500)) { //Send packet every 7.5 seconds
+        if (!sentKeepAlives.empty() && timeID - sentKeepAlives[0] >= 15000) { //if the first pending packet has been sent more than 15 seconds ago
             connection->disconnect();
         }
         else {
-            connection->sendPacket(new KeepAlive(randomID));
-            sentKeepAlives.push_back(randomID);
+            connection->sendPacket(new KeepAlive(timeID));
+            sentKeepAlives.push_back(timeID);
         }
     }
 }
@@ -360,9 +358,7 @@ void NetworkSession::processReceived() {
         const ServerboundPacket* packet = connection->receivePacket();
         if (!packet) break; // No more packets to process
         if (!packet->accept(*packetHandler)) {
-            networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);
-            std::cout << "Packet received with id:" << packet->getId() << std::endl;
-        }
+            networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);}
         delete packet;
     }
 }

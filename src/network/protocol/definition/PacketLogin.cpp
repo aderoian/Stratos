@@ -40,7 +40,7 @@ void LoginCookieResponse::decrypt(const PacketBuffer& buffer) {
     payload = buffer.readPrefixedOptionalPrefixedByteArray();
 }
 void KeepAliveResponse::decrypt(const PacketBuffer& buffer) {
-    receivedKeepAliveID = buffer.readVarLong();
+    receivedKeepAliveID = buffer.readLong();
 }
 void LoginDisconnect::encrypt(PacketBuffer& buffer) const {
     buffer.writeString(reason, 32767);
