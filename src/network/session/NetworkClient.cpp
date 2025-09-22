@@ -358,7 +358,8 @@ void NetworkSession::processReceived() {
         const ServerboundPacket* packet = connection->receivePacket();
         if (!packet) break; // No more packets to process
         if (!packet->accept(*packetHandler)) {
-            networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);}
+            networkManager->getLogger()->warn("Unhandled packet with ID {} from client {}:{}", packet->getId(), sessionId.ip, sessionId.port);
+        }
         delete packet;
     }
 }
