@@ -34,9 +34,11 @@
 #include "network/protocol/handler/PacketStatusHandler.h"
 #include "network/protocol/serialization/PacketBuffer.h"
 #include "network/protocol/serialization/PacketSerialization.h"
+#include "registry/Registries.h"
 #include "Server.h"
 #include "spdlog/logger.h"
 #include "utils/TimeUtils.h"
+#include "world/format/io/Region.h"
 
 namespace stratos::network {
 void NetworkSession::tick() {
@@ -87,19 +89,6 @@ void NetworkSession::beginConfiguration() const {
                                                                                         nbt::CompoundTag::CompoundElement{"max_inclusive", nbt::IntTag{7}},
                                                                                         nbt::CompoundTag::CompoundElement{"min_inclusive", nbt::IntTag{0}}}},
         nbt::CompoundTag::CompoundElement{"monster_spawn_block_light_limit", nbt::IntTag{0}}};
-
-    const nbt::CompoundTag plainsBiome{
-        nbt::CompoundTag::CompoundElement{"has_precipitation", nbt::ByteTag{true}}, nbt::CompoundTag::CompoundElement{"temperature", nbt::FloatTag{0.8}},
-        nbt::CompoundTag::CompoundElement{"downfall", nbt::FloatTag{0.4}},
-        nbt::CompoundTag::CompoundElement{
-            "effects",
-            nbt::CompoundTag{nbt::CompoundTag::CompoundElement{"fog_color", nbt::IntTag{12638463}}, nbt::CompoundTag::CompoundElement{"water_color", nbt::IntTag{4159204}},
-                             nbt::CompoundTag::CompoundElement{"water_fog_color", nbt::IntTag{329011}}, nbt::CompoundTag::CompoundElement{"sky_color", nbt::IntTag{329011}},
-                             nbt::CompoundTag::CompoundElement{"mood_sound", nbt::CompoundTag{nbt::CompoundTag::CompoundElement{"tick_delay", nbt::IntTag{6000}},
-                                                                                              nbt::CompoundTag::CompoundElement{"block_search_extent", nbt::IntTag{8}},
-                                                                                              nbt::CompoundTag::CompoundElement{"sound", nbt::StringTag{"minecraft:ambient.cave"}},
-                                                                                              nbt::CompoundTag::CompoundElement{"offset", nbt::FloatTag{2.0f}}}}}}};
-
     const nbt::CompoundTag catVariant{
         nbt::CompoundTag::CompoundElement{"asset_id", nbt::StringTag{"minecraft:entity/cat/all_black"}}, nbt::CompoundTag::CompoundElement{"spawn_conditions", nbt::ListTag{}}
     };
@@ -268,7 +257,6 @@ void NetworkSession::beginConfiguration() const {
 
 
     RegistryEntry dimensionTypeEntry{utils::Identifier{"minecraft", "overworld"}, std::make_optional(nbt::writeNetworkNBT(dimensionType))};
-    RegistryEntry plainsBiomeEntry{utils::Identifier{"minecraft", "plains"}, std::make_optional(nbt::writeNetworkNBT(plainsBiome))};
     RegistryEntry catVariantEntry{utils::Identifier{"minecraft", "cat/all_black"}, std::make_optional(nbt::writeNetworkNBT(catVariant))};
     RegistryEntry cowVariantEntry{utils::Identifier{"minecraft", "cow/temperate"}, std::make_optional(nbt::writeNetworkNBT(cowVariant))};
     RegistryEntry chickenVariantEntry{utils::Identifier{"minecraft", "chicken/temperate"}, std::make_optional(nbt::writeNetworkNBT(chickenVariant))};
@@ -279,7 +267,7 @@ void NetworkSession::beginConfiguration() const {
     RegistryEntry wolfSoundVariantEntry{utils::Identifier{"minecraft", "angry"}, std::make_optional(nbt::writeNetworkNBT(wolfSoundVariant))};
 
     send(new RegistryDataPacket(utils::Identifier{"minecraft", "dimension_type"}, std::vector{std::move(dimensionTypeEntry)}));
-    send(new RegistryDataPacket(utils::Identifier{"minecraft", "worldgen/biome"}, std::vector{std::move(plainsBiomeEntry)}));
+    send(registry::Registries::BIOMES()->createDynamicEntryPacket(utils::Identifier{"minecraft", "worldgen/biome"}));
     send(new RegistryDataPacket(utils::Identifier{"minecraft", "cat_variant"}, std::vector{std::move(catVariantEntry)}));
     send(new RegistryDataPacket(utils::Identifier{"minecraft", "cow_variant"}, std::vector{std::move(cowVariantEntry)}));
     send(new RegistryDataPacket(utils::Identifier{"minecraft", "chicken_variant"}, std::vector{std::move(chickenVariantEntry)}));
@@ -346,12 +334,18 @@ void NetworkSession::loginPlayer() {
         true
         ));
 
-    send(new SetDefaultSpawnPosition(math::Position{8, 64, 8}, 0)); // TODO: Spawn position should be determined by the server
-    send(new SetCenterChunk(0, 0));
-    send(new SynchronizePlayerPosition(0, 8, 64, 8, 0, 0, 0, 0, 0));
+    send(new SetRenderDistance(12));
+    send(new SetDefaultSpawnPosition(math::Position{24, 100, 24}, 0)); // TODO: Spawn position should be determined by the server
+    send(new SetCenterChunk(1, 1));
+    send(new SynchronizePlayerPosition(0, 24, 100, 24, 0, 0, 0, 0, 0));
     send(new GameEventPacket(GameEvent::StartWaitingForChunks));
 
+    Path          worldRegion = server->getServerDirectory() / "world" / "region";
+    world::Region region(0, 0, worldRegion);
 
+    for (int i = 0 ; i <= 2; ++i)
+        for (int j = 0; j <= 2; ++j)
+            if (const world::Chunk* neighbor = region.loadChunk(i, j)) send(new ChunkDataAndLight(i, j, ChunkData::fromChunk(neighbor), LightData::fromChunk(neighbor)));
 }
 void NetworkSession::processReceived() {
     while (true) {
@@ -391,14 +385,13 @@ int NetworkConnection::handleReceive() {
                 return received;
             }
 
-            PacketBuffer packetBuffer(receiveBuf, offset);
+            const int frameLength = offset + packetLength;
+            PacketBuffer packetBuffer(packetLength);
+            packetBuffer.insert(packetBuffer.begin(), std::make_move_iterator(receiveBuf.begin() + offset), std::make_move_iterator(receiveBuf.begin() + frameLength));
+            receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + frameLength);
             try {
-                const auto* packet = network->getPacketCodec().decode(packetBuffer, state, Serverbound);
-                if (!packet) {
-                    logger->error("Received unknown packet from client {}:{} with length {} at offset {}", address, port, packetLength, offset);
-                    receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + offset + packetLength);
-                    return received;
-                }
+                const auto* packet = network->getPacketCodec().decode(packetBuffer, state, Serverbound, packetLength);
+                if (!packet) return received;
 
                 if (!packet->accept(*packetHandler))
                     receiveQueue.enqueue(dynamic_cast<const ServerboundPacket*>(packet)); // Enqueue the packet for further processing
@@ -409,7 +402,6 @@ int NetworkConnection::handleReceive() {
                 logger->error("Encountered an exception when handing a packet for client {}:{}: {}", address, port, e.what());
             }
 
-            receiveBuf.erase(receiveBuf.begin(), receiveBuf.begin() + offset + packetLength);
             offset = 0; // Reset offset for the next packet
         } catch (const PacketSerializationException& ignored) { // Failed to read packet length
             // Not enough data to read a packet, wait for more data

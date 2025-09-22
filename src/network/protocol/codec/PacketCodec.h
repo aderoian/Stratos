@@ -23,12 +23,15 @@
 
 #include <unordered_map>
 
+namespace spdlog {
+class logger;
+}
 namespace stratos::network {
 class PacketBuffer;
 
 class PacketCodec {
 public:
-    PacketCodec() = default;
+    explicit PacketCodec(std::shared_ptr<spdlog::logger> logger) : logger(std::move(logger)) {};
     ~PacketCodec() = default;
     PacketCodec(const PacketCodec&) = delete;
     PacketCodec& operator=(const PacketCodec&) = delete;
@@ -44,9 +47,10 @@ public:
     [[nodiscard]] const std::unordered_map<PacketKey, const PacketDefinition*>& getPacketDefinitions() const;
 
     [[nodiscard]] const Packet* create(const PacketKey& key) const;
-    const Packet* decode(const PacketBuffer& buffer, ProtocolState state, PacketDirection direction) const;
+    const Packet* decode(const PacketBuffer& buffer, ProtocolState state, PacketDirection direction, int length) const;
     void encode(PacketBuffer& buffer, const Packet* packet) const;
 private:
+    std::shared_ptr<spdlog::logger> logger;
     std::unordered_map<PacketKey, const PacketDefinition*> packetDefinitions;
 };
 }

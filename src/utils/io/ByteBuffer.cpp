@@ -320,13 +320,15 @@ uint8_t& stratos::ByteBuffer::operator[](const size_t index) {
     return buffer[index];
 }
 int stratos::getEncodedSizeInBytes(const int value) {
+    if (value == 0) return 1;
     for (int i = 0; i < 5; ++i) {
         if ((value & -1 << i * 7) != 0) continue;
         return i;
     }
     return 5;
 }
-bool stratos::getEncodedSizeInBytes(const int64_t value) {
+int stratos::getEncodedSizeInBytes(const int64_t value) {
+    if (value == 0) return 1;
     for (int i = 0; i < 10; ++i) {
         if ((value & -1LL << i * 7) != 0) continue;
         return i;

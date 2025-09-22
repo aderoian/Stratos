@@ -107,6 +107,8 @@ void PacketRegistry::setup() {
     REGISTER_CLIENTBOUND(ProtocolState::Play, SetDefaultSpawnPosition)
     REGISTER_CLIENTBOUND(ProtocolState::Play, KeepAlive)
     REGISTER_SERVERBOUND(ProtocolState::Play, KeepAliveResponse)
+    REGISTER_CLIENTBOUND(ProtocolState::Play, ChunkDataAndLight)
+    REGISTER_CLIENTBOUND(ProtocolState::Play, SetRenderDistance)
 }
 void PacketRegistry::registerPacket(const PacketKey& key, const PacketDefinition* definition) {
     packets[key] = definition;

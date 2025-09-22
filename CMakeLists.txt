@@ -48,6 +48,7 @@ set(SOURCES
         network/protocol/handler/PacketStatusHandler.cpp
         network/protocol/serialization/PacketBuffer.cpp
         network/protocol/serialization/PacketSerialization.cpp
+        network/protocol/serialization/WorldSerialization.cpp
         registry/Registries.cpp
         registry/Registry.cpp
         utils/collection/BitSet.cpp
@@ -60,6 +61,7 @@ set(SOURCES
         utils/io/FileUtils.cpp
         utils/Identifier.cpp
         utils/StringUtils.cpp
+        world/biome/Biome.cpp
         world/biome/Biomes.cpp
         world/format/chunk/Chunk.cpp
         world/format/chunk/Heightmap.cpp
@@ -106,6 +108,7 @@ set(HEADERS
         network/protocol/handler/PacketStatusHandler.h
         network/protocol/serialization/PacketBuffer.h
         network/protocol/serialization/PacketSerialization.h
+        network/protocol/serialization/WorldSerialization.h
         network/protocol/Packet.h
         registry/Registries.h
         registry/Registry.h

@@ -80,8 +80,6 @@ Chunk* Region::loadChunk(const int chunkX, const int chunkZ) {
 
     nbt::NBTBuffer chunkNBT(compressionType != 3 ? decompress(byteBuffer.readByteArray(length - 1)) : byteBuffer.readByteArray(length - 1));
 
-    writeAllBytes(Path("chunk_dump.dat"), chunkNBT.data());
-
     auto [name, tag] = chunkNBT.readTag<nbt::CompoundTag>();
     if (!tag) throw std::runtime_error("Failed to read chunk NBT data");
     auto* chunk = new Chunk();

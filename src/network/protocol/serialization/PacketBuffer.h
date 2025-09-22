@@ -31,6 +31,7 @@ namespace stratos::network {
 class PacketBuffer final : public nbt::NBTBuffer {
   public:
     PacketBuffer() = default;
+    explicit PacketBuffer(const int size) : NBTBuffer(size) {}
     explicit PacketBuffer(const ByteVec& data) : NBTBuffer(data, 0) {}
     explicit PacketBuffer(ByteVec&& data) : NBTBuffer(std::move(data), 0) {}
     PacketBuffer(const ByteVec& data, const size_t offset) : NBTBuffer(data, offset) {}
@@ -53,6 +54,8 @@ class PacketBuffer final : public nbt::NBTBuffer {
     template <typename T, typename ReadFunc>
     T readVarIntEnum(const ReadFunc& enumMapper) const { return enumMapper(readVarInt()); }
     std::vector<uint8_t> readPrefixedByteArray() const;
+    std::vector<int8_t> readPrefixedSignedByteArray() const;
+    std::vector<int64_t> readPrefixedLongArray() const;
     std::vector<LoginProperty> readLoginProperty() const;
     std::optional<std::string> readPrefixedOptionalString(int maxChars) const;
     std::vector<uint8_t> readInferredByteArray() const;
@@ -72,6 +75,8 @@ class PacketBuffer final : public nbt::NBTBuffer {
     void writeAngle(const math::Angle& angle);
     void writeUUID(const UUID& uuid);
     void writePrefixedByteArray(const std::vector<uint8_t>& bytes);
+    void writePrefixedSignedByteArray(const std::vector<int8_t>& bytes);
+    void writePrefixedLongArray(const std::vector<int64_t>& longs);
     void writeLoginProperty(const std::vector<LoginProperty>& properties);
     void writeResourcePackHeader(const ResourcePackHeader& header);
     void writeRegistryEntry(const RegistryEntry& entry);
