@@ -37,6 +37,7 @@ class LoginCookieResponse;
 class LoginAcknowledge;
 class LoginPluginResponse;
 class EncryptionResponse;
+class KeepAliveResponse;
 class LoginStart;
 class LegacyServerListPing;
 class ClientHandshake;
@@ -90,6 +91,7 @@ public:
     virtual bool handle(const LoginPluginResponse* packet) { return false; }
     virtual bool handle(const LoginAcknowledge* packet) { return false; }
     virtual bool handle(const LoginCookieResponse* packet) { return false; }
+    virtual bool handle(const KeepAliveResponse* packet) { return false; }
     virtual bool handle(const StatusRequest* packet) { return false; }
     virtual bool handle(const PingRequest* packet) { return false; }
 };

@@ -37,6 +37,7 @@
 #include "registry/Registries.h"
 #include "Server.h"
 #include "spdlog/logger.h"
+#include "utils/TimeUtils.h"
 #include "world/format/io/Region.h"
 
 namespace stratos::network {
@@ -46,6 +47,20 @@ void NetworkSession::tick() {
     // Empty received queue
     // TODO: Should we always empty or consume a fix amount per tick?
     processReceived();
+    sendKeepAlive();
+}
+void NetworkSession::sendKeepAlive() {
+    int64_t timeID = utils::currentTimeMillis();
+
+    if (sentKeepAlives.empty() || (!sentKeepAlives.empty() && timeID - sentKeepAlives.back() >= 7500)) { //Send packet every 7.5 seconds
+        if (!sentKeepAlives.empty() && timeID - sentKeepAlives[0] >= 15000) { //if the first pending packet has been sent more than 15 seconds ago
+            connection->disconnect();
+        }
+        else {
+            connection->sendPacket(new KeepAlive(timeID));
+            sentKeepAlives.push_back(timeID);
+        }
+    }
 }
 void NetworkSession::beginConfiguration() const {
     // TODO: R&D the proper configuration process

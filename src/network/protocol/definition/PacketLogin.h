@@ -77,6 +77,15 @@ public:
     SERVERBOUND_PACKET_FOOTER(LoginCookieResponse)
 };
 
+class KeepAliveResponse final : public ServerboundPacket {
+public:
+    constexpr static int ID = 0x1B;
+    int64_t receivedKeepAliveID;
+
+    KeepAliveResponse() : ServerboundPacket(ID) {}
+    SERVERBOUND_PACKET_FOOTER(KeepAliveResponse)
+};
+
 class LoginDisconnect final : public ClientboundPacket {//LoginDisconnect> {
 public:
     constexpr static int ID = 0x00;
@@ -85,6 +94,16 @@ public:
     LoginDisconnect() : ClientboundPacket(ID) {}
     explicit LoginDisconnect(std::string&& reason) : ClientboundPacket(ID), reason(std::move(reason)) {}
     CLIENTBOUND_PACKET_FOOTER(LoginDisconnect)
+};
+
+class KeepAlive final : public ClientboundPacket {//KeepAlive> {
+public:
+    constexpr static int ID = 0x26;
+    int64_t keepAliveID;
+
+    KeepAlive() : ClientboundPacket(ID) {}
+    explicit KeepAlive(const int64_t keepAlive_ID) : ClientboundPacket(ID), keepAliveID(keepAlive_ID) {}
+    CLIENTBOUND_PACKET_FOOTER(KeepAlive)
 };
 
 class EncryptionRequest final : public ClientboundPacket {//EncryptionRequest> {

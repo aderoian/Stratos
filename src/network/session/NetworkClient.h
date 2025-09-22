@@ -116,6 +116,8 @@ class NetworkSession {
     void beginConfiguration() const;
     void changeState(ProtocolState newState) const;
     void loginPlayer();
+    void sendKeepAlive();
+    void receiveKeepAlive(const ServerboundPacket* packet);
 
     template <typename T> void send(const T* packet) const { connection->sendPacket(packet); }
 
@@ -131,6 +133,7 @@ class NetworkSession {
     void dispose() const;
 
     friend class NetworkManager;
+    std::vector<int64_t> sentKeepAlives;
 };
 
 } // stratos::network
